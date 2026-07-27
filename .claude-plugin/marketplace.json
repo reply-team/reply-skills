@@ -1,0 +1,19 @@
+{
+  "name": "reply-skills",
+  "description": "Reply.io outbound expertise for AI agents — skills that drive the Reply toolkit (CLI, MCP, API v3).",
+  "owner": {
+    "name": "Reply.io",
+    "url": "https://github.com/reply-team"
+  },
+  "plugins": [
+    {
+      "name": "reply",
+      "source": "./plugins/reply",
+      "description": "Reply.io outbound skills: run the CLI and API, import prospects, launch and analyze outreach, manage replies, plan long-running campaigns — with protection guardrails.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Reply.io"
+      }
+    }
+  ]
+}
