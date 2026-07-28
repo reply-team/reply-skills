@@ -1,0 +1,15 @@
+# Ownership map. Business and protection skills carry domain expertise and
+# require expert review; everything else needs any maintainer.
+#
+# TODO(setup): replace the team handles below with real reply-team GitHub teams
+# before enabling required reviews in branch protection.
+
+*                                               @reply-team/skills-maintainers
+
+# Expert-owned knowledge areas (see docs/conventions.md — maturity ladder):
+plugins/reply/skills/import-prospects/          @reply-team/outbound-experts
+plugins/reply/skills/launch-outreach/           @reply-team/outbound-experts
+plugins/reply/skills/manage-replies/            @reply-team/outbound-experts
+plugins/reply/skills/analyze-performance/       @reply-team/outbound-experts
+plugins/reply/skills/email-deliverability/      @reply-team/outbound-experts
+plugins/reply/skills/linkedin-safety/           @reply-team/outbound-experts

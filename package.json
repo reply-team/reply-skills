@@ -1,0 +1,14 @@
+{
+  "name": "reply-skills-tooling",
+  "private": true,
+  "type": "module",
+  "description": "Repo tooling for reply-skills: frontmatter validation and INDEX generation. Zero dependencies, Node >= 20.",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "build-index": "node scripts/build-index.mjs",
+    "check-index": "node scripts/build-index.mjs --check"
+  }
+}
