@@ -1,0 +1,44 @@
+{
+  "name": "reply-skills",
+  "interface": {
+    "displayName": "Reply Skills"
+  },
+  "plugins": [
+    {
+      "name": "ai-sdr-core",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ai-sdr-core"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Business & Operations"
+    },
+    {
+      "name": "reply-adapter",
+      "source": {
+        "source": "local",
+        "path": "./plugins/reply-adapter"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Business & Operations"
+    },
+    {
+      "name": "agentic-runtime",
+      "source": {
+        "source": "local",
+        "path": "./plugins/agentic-runtime"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

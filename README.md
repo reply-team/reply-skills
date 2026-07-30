@@ -88,23 +88,61 @@ installs all 18, so it is safe to script.
 If you want dependencies resolved for you, use the Claude Code marketplace above, where
 installing `reply-adapter` pulls in `ai-sdr-core` automatically.
 
-## Install — Codex and other SKILL.md hosts
+## Install — Codex
 
-> **Not verified yet.** Native plugin packaging for Codex is tracked in REPLY-51541; until it
-> lands, use the directory copy below. It works because a pack is just a directory of skills,
-> but the exact commands have not been tested on a supported Codex version — treat them as a
+Codex has its own plugin mechanism and reads this repository as a marketplace:
+
+```bash
+codex plugin marketplace add reply-team/reply-skills
+
+# ai-sdr-core FIRST — Codex resolves no dependencies, see below
+codex plugin add ai-sdr-core@reply-skills
+codex plugin add reply-adapter@reply-skills
+codex plugin add agentic-runtime@reply-skills
+```
+
+Skills appear namespaced per pack — `ai-sdr-core:campaign-launch`, `reply-adapter:reply-cli` —
+so they never collide with skills you wrote yourself. **Start a new session** for newly
+installed skills to be picked up.
+
+> **Install order matters here.** The Codex plugin format has no dependency field at all, so
+> nothing installs `ai-sdr-core` for you. Adding `reply-adapter` on its own gives you five
+> skills whose guidance is missing. Install the core first, or install all three.
+
+Managing them:
+
+```bash
+codex plugin list                              # installed
+codex plugin list --available                   # what the marketplace offers
+codex plugin remove reply-adapter@reply-skills   # remove one pack
+codex plugin marketplace upgrade                # pull a newer snapshot of this repo
+```
+
+Verified with **`codex-cli 0.146.0-alpha.3.1`**: all three packs install, and all 18 skills
+reach the model — 9 + 5 + 4, confirmed via `codex debug prompt-input`. Re-running
+`codex plugin add` upgrades in place: it does not duplicate the config entry or the cache.
+
+**On Windows the `codex` binary is not on `PATH`** — it ships with the desktop app at
+`%LOCALAPPDATA%\OpenAI\Codex\bin\<hash>\codex.exe`. Call it by full path, and note that
+tooling which detects Codex with `which codex` will wrongly report it as missing.
+
+## Install — Cursor, Windsurf, Gemini CLI and other SKILL.md hosts
+
+> **Not verified yet** (REPLY-51268). These hosts have no plugin mechanism, so a pack is
+> installed by copying its skills directory. That works because a pack is just a directory of
+> skills, but the exact paths below have not been tested on each host — treat them as a
 > starting point rather than a contract.
 
-Hosts with a flat skills directory (Codex `~/.agents/skills`, Cursor, Gemini CLI) have no
-dependency resolution, so **install the core yourself** — every other pack needs it:
+No plugin mechanism means no dependency resolution, so **install the core yourself** — every
+other pack needs it:
 
 ```bash
 git clone https://github.com/reply-team/reply-skills /tmp/reply-skills
 
 # ai-sdr-core is required by the others — copy it first
-cp -r /tmp/reply-skills/plugins/ai-sdr-core/skills/*     ~/.agents/skills/
-cp -r /tmp/reply-skills/plugins/reply-adapter/skills/*   ~/.agents/skills/
-cp -r /tmp/reply-skills/plugins/agentic-runtime/skills/* ~/.agents/skills/
+cp -r /tmp/reply-skills/plugins/ai-sdr-core/skills/*     <host skills dir>/
+cp -r /tmp/reply-skills/plugins/reply-adapter/skills/*   <host skills dir>/
+cp -r /tmp/reply-skills/plugins/agentic-runtime/skills/* <host skills dir>/
 ```
 
 Omit the packs you do not want — but never copy `reply-adapter` or `agentic-runtime` without
@@ -124,7 +162,7 @@ starting point, not a promise.
 |---|---|---|---|---|
 | Claude Code plugin marketplace | Packs | **Resolved by the host** — `reply-adapter` pulls `ai-sdr-core` | Namespaced per pack | Claude Code 2.1.220 |
 | `npx skills` / [skills.sh](https://www.skills.sh/reply-team/reply-skills) | Individual skills | **None** — install all 18 yourself | Flat, no namespacing | skills CLI 1.5.21 |
-| Codex native packaging | Packs | Not yet determined | Not yet determined | Not verified — REPLY-51541 |
+| Codex plugin marketplace | Packs | **Manual** — install `ai-sdr-core` first; the format has no dependency field | Namespaced per pack | codex-cli 0.146.0-alpha.3.1 |
 | Cursor, Windsurf, Gemini CLI (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, per host path | Not verified — REPLY-51268 |
 | `reply skills install` | All three packs | Resolved by the installer | Per host | Planned — REPLY-51356 |
 

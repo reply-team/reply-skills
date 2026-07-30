@@ -58,18 +58,35 @@ Host manifests are **generated** from it:
 
 ```
 packs.json
-  ├── .claude-plugin/marketplace.json            (npm run build-manifests)
-  └── plugins/<pack>/.claude-plugin/plugin.json   (npm run build-manifests)
+  ├── .claude-plugin/marketplace.json             (npm run build-manifests)
+  ├── plugins/<pack>/.claude-plugin/plugin.json   (npm run build-manifests)
+  ├── .agents/plugins/marketplace.json            (npm run build-manifests)
+  └── plugins/<pack>/.codex-plugin/plugin.json    (npm run build-manifests)
 ```
 
-Never hand-edit a generated manifest — CI fails on drift (`npm run check-manifests`). When a
-second host is added, its manifests are emitted from the same file, so two hosts cannot disagree
-about names, versions or dependencies.
+Never hand-edit a generated manifest — CI fails on drift (`npm run check-manifests`). Both
+hosts are emitted from the same file, so they cannot disagree about names, versions or skills
+paths. `packs.json` also carries a `presentation` block per pack — the catalog copy a user reads
+before installing — in host-neutral terms; each generator maps it into that host's own shape
+(Codex calls it `interface`).
+
+## What each host does with the dependency graph
 
 Claude Code resolves `dependencies` as an array of pack names within the same marketplace.
 This was verified by performing a real install, not by manifest validation — `claude plugin
 validate` accepts several spellings of the field without discriminating between them, so it
 cannot be used as evidence here.
+
+**Codex cannot express dependencies at all.** Its plugin manifest has no such field — checked
+against the 188 manifests the Codex CLI ships, of which none declares one — and installing
+`reply-adapter` alone provably does not pull `ai-sdr-core`. So on Codex the ordering is the
+installer's or the reader's job, and the README states it as an instruction rather than
+implying it. This is exactly why the dependency graph lives in `packs.json` and not only in a
+host manifest: `reply skills install` resolves it itself, whatever the host can or cannot do.
+
+Codex reads `$REPO_ROOT/.claude-plugin/marketplace.json` as a legacy-compatible marketplace as
+well as its own `.agents/plugins/marketplace.json`, so both manifests work. We ship the native
+one so the packs get proper catalog metadata rather than relying on a compatibility path.
 
 ## Self-containment
 

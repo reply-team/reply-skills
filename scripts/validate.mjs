@@ -7,6 +7,7 @@ import path from 'node:path';
 import {
     ROOT, read_packs, pack_map, reachable_packs, skill_dirs, parse_skill_md,
     CATEGORIES, MATURITIES, STATUSES, RELATION_KEYS, HARD_RELATIONS,
+    CODEX_CATEGORIES, CODEX_CAPABILITIES, CODEX_ASSET_FIELDS,
 } from './lib.mjs';
 
 const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -70,6 +71,71 @@ for (const [a, b] of [['reply-adapter', 'agentic-runtime'], ['agentic-runtime', 
 // Packs present on disk but absent from the registry would ship unvalidated.
 for (const dir of fs.readdirSync(path.join(ROOT, 'plugins'))) {
     if (!packs.has(dir)) err(dir, 'directory under plugins/ is not declared in packs.json');
+}
+
+// ------------------------------------------------- host catalog presentation (REPLY-51541)
+//
+// `presentation` in packs.json is what a user reads in a host's plugin catalog before
+// deciding to install. It is validated here, at the source, rather than in the generated
+// manifests: a missing field would otherwise become `undefined` in shipped JSON, and the
+// freshness check would happily call that up to date.
+
+if (!registry.marketplace.displayName) {
+    err('marketplace', 'marketplace.displayName missing — Codex renders the marketplace by it');
+}
+
+for (const p of registry.packs) {
+    const pr = p.presentation;
+    if (!pr || typeof pr !== 'object') { err(p.name, 'presentation block missing from packs.json'); continue; }
+
+    if (!pr.shortDescription) err(p.name, 'presentation.shortDescription missing');
+    else if (/[.!]$/.test(pr.shortDescription)) {
+        err(p.name, 'presentation.shortDescription must not end in a full stop — host catalogs render it as a label, not a sentence');
+    }
+    if (!pr.longDescription || pr.longDescription.length < 80) {
+        err(p.name, 'presentation.longDescription missing or too short (< 80 chars) — it is the catalog body text');
+    }
+    if (!CODEX_CATEGORIES.includes(pr.category)) {
+        err(p.name, `presentation.category '${pr.category}' is not one of the categories Codex actually uses: ${CODEX_CATEGORIES.join(', ')}`);
+    }
+    const caps = Array.isArray(pr.capabilities) ? pr.capabilities : [];
+    if (!caps.length) err(p.name, 'presentation.capabilities must list at least one capability');
+    for (const c of caps) {
+        if (!CODEX_CAPABILITIES.includes(c)) err(p.name, `presentation.capabilities '${c}' not in ${CODEX_CAPABILITIES.join('|')}`);
+    }
+    const prompts = Array.isArray(pr.examplePrompts) ? pr.examplePrompts : [];
+    if (!prompts.length) err(p.name, 'presentation.examplePrompts must offer at least one prompt — hosts show them as starting points');
+    for (const q of prompts) {
+        if (typeof q !== 'string' || !q.trim()) err(p.name, 'presentation.examplePrompts contains an empty entry');
+    }
+
+    // The Codex manifest exposes skills with `skills: "./skills/"`. If that directory is
+    // absent or empty the pack installs and contributes nothing — silently.
+    const skills_root = path.join(ROOT, 'plugins', p.name, 'skills');
+    if (!fs.existsSync(skills_root)) {
+        err(p.name, 'plugins/<pack>/skills/ does not exist — the manifest\'s skills path would not resolve');
+    } else if (!fs.readdirSync(skills_root).some(d => fs.statSync(path.join(skills_root, d)).isDirectory())) {
+        err(p.name, 'plugins/<pack>/skills/ contains no skill directories');
+    }
+
+    // Any image the Codex manifest names must ship inside the pack. Nothing emits these
+    // yet (brand assets are REPLY-51558); the check exists so they cannot arrive broken.
+    const codex_manifest = path.join(ROOT, 'plugins', p.name, '.codex-plugin', 'plugin.json');
+    if (!fs.existsSync(codex_manifest)) {
+        err(p.name, '.codex-plugin/plugin.json missing — run `npm run build-manifests`');
+    } else {
+        let iface;
+        try { iface = JSON.parse(fs.readFileSync(codex_manifest, 'utf8')).interface ?? {}; }
+        catch (e) { err(p.name, `.codex-plugin/plugin.json is not valid JSON: ${e.message}`); iface = {}; }
+        for (const field of CODEX_ASSET_FIELDS) {
+            for (const asset of [iface[field]].flat().filter(Boolean)) {
+                const resolved = path.resolve(path.join(ROOT, 'plugins', p.name), asset);
+                if (!fs.existsSync(resolved)) {
+                    err(p.name, `interface.${field} → '${asset}' does not exist inside the pack`);
+                }
+            }
+        }
+    }
 }
 
 // ---------------------------------------------------------------------- skills

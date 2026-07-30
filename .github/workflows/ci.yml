@@ -27,5 +27,5 @@ jobs:
       - name: Generated catalogs are current
         run: npm run check-index
 
-      - name: Each pack is self-contained when installed alone
+      - name: Packs install cleanly, per-pack and flattened
         run: npm run smoke

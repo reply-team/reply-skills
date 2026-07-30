@@ -1,8 +1,9 @@
 {
-  "$schema-note": "Host-neutral pack definition — the single source of truth for pack identity and the dependency graph. Host manifests (.claude-plugin/*, and later .codex-plugin/*) are generated from this file by `npm run build-manifests`; CI fails if they drift. See docs/packs.md.",
+  "$schema-note": "Host-neutral pack definition — the single source of truth for pack identity, the dependency graph, and how a pack presents itself in a host catalog. Host manifests (.claude-plugin/*, .agents/plugins/* and .codex-plugin/*) are generated from this file by `npm run build-manifests`; CI fails if they drift. `presentation` holds product metadata in host-neutral terms — each generator maps it into that host's own shape (Codex calls it `interface`). See docs/packs.md.",
   "version": 1,
   "marketplace": {
     "name": "reply-skills",
+    "displayName": "Reply Skills",
     "description": "Reply.io outbound expertise for AI agents — vendor-neutral SDR knowledge, Reply execution, and durable long-running work.",
     "owner": {
       "name": "Reply.io",
@@ -17,7 +18,18 @@
       "layers": ["L1 SDR business operations", "L2 strategy & playbooks", "L3 protection & guardrails"],
       "description": "Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.",
       "dependencies": [],
-      "keywords": ["sdr", "outbound", "sales", "playbooks", "guardrails", "vendor-neutral"]
+      "keywords": ["sdr", "outbound", "sales", "playbooks", "guardrails", "vendor-neutral"],
+      "presentation": {
+        "shortDescription": "Run real outbound with guardrails, not guesswork",
+        "longDescription": "Teaches an agent what an SDR operation actually is: how to shape an audience, plan a campaign, work the replies and read the numbers honestly — with sending and channel limits, and explicit approval gates before anything reaches a real person. Vendor-neutral: it needs no Reply.io account and no provider at all.",
+        "category": "Business & Operations",
+        "capabilities": ["Read"],
+        "examplePrompts": [
+          "Plan an outbound campaign to book ten meetings with fintech founders",
+          "What sending limits should I respect on a brand-new domain?",
+          "Review this sequence and tell me what to fix before I launch"
+        ]
+      }
     },
     {
       "name": "reply-adapter",
@@ -26,7 +38,18 @@
       "layers": ["L4 Reply execution surfaces"],
       "description": "Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.",
       "dependencies": ["ai-sdr-core"],
-      "keywords": ["reply.io", "cli", "api", "mcp", "auth", "adapter"]
+      "keywords": ["reply.io", "cli", "api", "mcp", "auth", "adapter"],
+      "presentation": {
+        "shortDescription": "Operate Reply.io from your agent — CLI, API v3 and MCP",
+        "longDescription": "Turns the vendor-neutral SDR operations into real Reply.io calls: which endpoint group serves which operation, the order composite work must run in, how to authenticate and scope an API key, and what Reply's errors actually mean. Requires a Reply.io account and the AI SDR Core pack.",
+        "category": "Business & Operations",
+        "capabilities": ["Read", "Write"],
+        "examplePrompts": [
+          "Show me how my Reply.io campaigns performed last week",
+          "Import this CSV as a new list and tell me about the duplicates",
+          "Pause the campaign that is bouncing"
+        ]
+      }
     },
     {
       "name": "agentic-runtime",
@@ -35,7 +58,18 @@
       "layers": ["L5 long-running work & runtime coordination"],
       "description": "Durable multi-session work: goals, plans, work items, checkpoints, resumability, execution reports and user memory in a plain-markdown workspace. Optional — skip it if your orchestrator already provides durable work.",
       "dependencies": ["ai-sdr-core"],
-      "keywords": ["orchestration", "durable-work", "workspace", "planning", "resumability"]
+      "keywords": ["orchestration", "durable-work", "workspace", "planning", "resumability"],
+      "presentation": {
+        "shortDescription": "Outbound work that survives a restart",
+        "longDescription": "Gives an agent a plain-markdown workspace for work that outlives one session: goals broken into plans and work items, checkpoints it can resume from, reports of what a run actually did, and durable notes about the user. Optional — skip it if your orchestrator already provides durable work.",
+        "category": "Developer Tools",
+        "capabilities": ["Read", "Write"],
+        "examplePrompts": [
+          "Turn this goal into a plan I can resume tomorrow",
+          "Where did we leave off on the Q3 outbound push?",
+          "Report on what this run actually changed"
+        ]
+      }
     }
   ]
 }

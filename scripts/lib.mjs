@@ -112,6 +112,22 @@ const parse_skill_md = (file) => {
     return { data, body: m[2] };
 };
 
+// Codex plugin-catalog vocabulary. Codex publishes no schema, so this is OBSERVED — read
+// off the 188 manifests the CLI ships (bundled marketplace + the official 180-plugin one),
+// recorded in REPLY-51541. Widen it deliberately if a future Codex version adds a value we
+// want; do not widen it to make a typo pass.
+const CODEX_CATEGORIES = [
+    'Productivity', 'Developer Tools', 'Finance', 'Business & Operations', 'Data & Analytics',
+    'Education & Research', 'Communication', 'Creativity', 'Security', 'Engineering', 'Travel', 'Other',
+];
+// Some third-party vendors use `capabilities` as free-text feature bullets. We keep to the
+// three values that behave like a closed set, so our packs read consistently.
+const CODEX_CAPABILITIES = ['Read', 'Write', 'Interactive'];
+// interface fields that name an image file shipped inside the pack. None are emitted yet
+// (brand assets are REPLY-51558) — the validator checks them so that when they arrive, a
+// dangling icon path cannot ship.
+const CODEX_ASSET_FIELDS = ['logo', 'logoDark', 'composerIcon', 'screenshots'];
+
 const CATEGORIES = ['operations', 'strategy', 'protection', 'execution', 'runtime', 'user-knowledge'];
 const MATURITIES = ['draft', 'reviewed', 'validated', 'production'];
 const STATUSES = ['active', 'deprecated', 'archived'];
@@ -122,4 +138,5 @@ const RELATION_KEYS = [...HARD_RELATIONS, ...SOFT_RELATIONS];
 export {
     ROOT, read_packs, pack_map, reachable_packs, skill_dirs, parse_skill_md,
     CATEGORIES, MATURITIES, STATUSES, RELATION_KEYS, HARD_RELATIONS, SOFT_RELATIONS,
+    CODEX_CATEGORIES, CODEX_CAPABILITIES, CODEX_ASSET_FIELDS,
 };
