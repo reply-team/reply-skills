@@ -4,6 +4,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Note: installing the packs through a real host (`claude plugin install`) is not run here —
+# it needs the host CLI on the runner. It is verified manually before a release, and the
+# pure-Node `smoke` step below covers the property that actually breaks: whether a pack still
+# works when it is the only thing installed.
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -12,7 +17,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Validate skill frontmatter & structure
+
+      - name: Skill contract & pack architecture
         run: npm run validate
-      - name: INDEX.md is up to date
+
+      - name: Generated manifests are current
+        run: npm run check-manifests
+
+      - name: Generated catalogs are current
         run: npm run check-index
+
+      - name: Each pack is self-contained when installed alone
+        run: npm run smoke

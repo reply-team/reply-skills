@@ -27,3 +27,17 @@ frontmatter uses a constrained YAML subset so the zero-dependency validator stay
 
 Per-skill `manifest.json` — rejected: guaranteed drift. Central `skills.yaml` registry — rejected:
 merge-conflict magnet, second place to forget.
+
+## Amended 2026-07-30 — `packs.json` is the pack-level manifest
+
+This decision is about **skills**, and it stands: a skill's frontmatter is its only manifest,
+with no companion file and no central registry of skills.
+
+Packs are a different scope and do need one file. `packs.json` declares pack identity, versions
+and the dependency graph — information that is not a property of any single skill and cannot live
+in frontmatter. It does not list skills: pack membership is the directory a skill sits in, checked
+against `metadata.pack`, so there is still no registry to forget to update.
+
+Host manifests (`.claude-plugin/marketplace.json`, `plugins/<pack>/.claude-plugin/plugin.json`)
+are **generated** from `packs.json` and never hand-edited; CI fails on drift. That keeps the
+no-drift property this ADR was written to protect, one level up.

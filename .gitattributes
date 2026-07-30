@@ -1,0 +1,4 @@
+# Generated files (host manifests, catalogs) are compared byte-for-byte against what the
+# generators produce, and the generators write LF. Normalising line endings in the working
+# tree keeps `npm run check` honest on every platform instead of failing on Windows only.
+* text=auto eol=lf

@@ -1,15 +1,27 @@
-# Ownership map. Business and protection skills carry domain expertise and
-# require expert review; everything else needs any maintainer.
+# Ownership map. Strategy and protection knowledge carries domain expertise and requires
+# expert review; everything else needs any maintainer.
 #
 # TODO(setup): replace the team handles below with real reply-team GitHub teams
 # before enabling required reviews in branch protection.
 
-*                                               @reply-team/skills-maintainers
+*                                                   @reply-team/skills-maintainers
 
-# Expert-owned knowledge areas (see docs/conventions.md — maturity ladder):
-plugins/reply/skills/import-prospects/          @reply-team/outbound-experts
-plugins/reply/skills/launch-outreach/           @reply-team/outbound-experts
-plugins/reply/skills/manage-replies/            @reply-team/outbound-experts
-plugins/reply/skills/analyze-performance/       @reply-team/outbound-experts
-plugins/reply/skills/email-deliverability/      @reply-team/outbound-experts
-plugins/reply/skills/linkedin-safety/           @reply-team/outbound-experts
+# Architecture. packs.json is the dependency graph; scripts/ enforces the invariants that
+# keep the packs separable (docs/packs.md).
+/packs.json                                         @reply-team/skills-maintainers
+/docs/packs.md                                      @reply-team/skills-maintainers
+/scripts/                                           @reply-team/skills-maintainers
+
+# The contract everything else builds on. Changing an operation's effect, reversibility or
+# approval level is a breaking change for every guardrail downstream — so both groups review.
+plugins/ai-sdr-core/skills/sdr-operations/          @reply-team/skills-maintainers @reply-team/outbound-experts
+plugins/ai-sdr-core/skills/approval-boundaries/     @reply-team/skills-maintainers @reply-team/outbound-experts
+
+# Expert-owned knowledge (see docs/conventions.md — maturity ladder).
+plugins/ai-sdr-core/skills/audience-building/       @reply-team/outbound-experts
+plugins/ai-sdr-core/skills/campaign-launch/         @reply-team/outbound-experts
+plugins/ai-sdr-core/skills/campaign-planning/       @reply-team/outbound-experts
+plugins/ai-sdr-core/skills/inbox-triage/            @reply-team/outbound-experts
+plugins/ai-sdr-core/skills/performance-analysis/    @reply-team/outbound-experts
+plugins/ai-sdr-core/skills/sending-guardrails/      @reply-team/outbound-experts
+plugins/ai-sdr-core/skills/linkedin-guardrails/     @reply-team/outbound-experts
