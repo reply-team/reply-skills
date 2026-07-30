@@ -90,7 +90,7 @@ skills) is architectural debt. Repository growth without curation is a warning s
 |---|---|
 | `npm run build` | Regenerates host manifests and catalogs from `packs.json` and the skills |
 | `npm run validate` | Skill contract + pack architecture: schema, naming, relations, dependency direction, self-containment |
-| `npm run smoke` | Simulates installing each pack alone and checks it still works |
+| `npm run smoke` | Simulates both install shapes — each pack alone, and every skill flattened into one directory as `npx skills add` does |
 | `npm run check` | All of the above in check mode — what CI runs |
 
 Generated files are committed. CI fails when they are stale, so `npm run build` before pushing.
