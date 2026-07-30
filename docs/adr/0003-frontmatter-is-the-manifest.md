@@ -41,3 +41,27 @@ against `metadata.pack`, so there is still no registry to forget to update.
 Host manifests (`.claude-plugin/marketplace.json`, `plugins/<pack>/.claude-plugin/plugin.json`)
 are **generated** from `packs.json` and never hand-edited; CI fails on drift. That keeps the
 no-drift property this ADR was written to protect, one level up.
+
+## Amended 2026-07-31 — a second host, and catalog copy stays host-neutral
+
+Codex packaging (REPLY-51541) was the first real test of the "generated from one file" rule,
+and it held: `.agents/plugins/marketplace.json` and `plugins/<pack>/.codex-plugin/plugin.json`
+are emitted from the same `packs.json`, so the two hosts cannot disagree about names, versions
+or skills paths.
+
+It also forced one addition. Codex renders a plugin in its catalog from an `interface` block —
+display name, short and long description, category, capabilities, example prompts. That is
+**product copy, not host configuration**: any future host will want the same sentences under
+different key names. So it lives in `packs.json` as a host-neutral `presentation` block, and
+each generator maps it into the host's own shape. The alternative — writing Codex's `interface`
+literally into `packs.json` — was rejected because it would make the source of truth
+Codex-shaped and force the next host to either duplicate it or rename it in place.
+
+The validator checks `presentation` at the source rather than in the generated output. A field
+missing from `packs.json` would otherwise be emitted as `undefined` into shipped JSON, and the
+freshness check would call that up to date, because it faithfully reflects the source.
+
+One thing this ADR cannot fix: **Codex's manifest has no dependency field at all** (0 of the 188
+manifests its CLI ships declare one). The graph therefore cannot round-trip through every host
+manifest, which is precisely why it is declared in `packs.json` and resolved by our own
+installer rather than delegated to whichever host happens to be installing.

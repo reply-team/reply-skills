@@ -1,0 +1,35 @@
+{
+  "name": "agentic-runtime",
+  "version": "0.1.0",
+  "description": "Durable multi-session work: goals, plans, work items, checkpoints, resumability, execution reports and user memory in a plain-markdown workspace. Optional — skip it if your orchestrator already provides durable work.",
+  "author": {
+    "name": "Reply.io"
+  },
+  "homepage": "https://github.com/reply-team/reply-skills",
+  "repository": "https://github.com/reply-team/reply-skills",
+  "license": "MIT",
+  "keywords": [
+    "orchestration",
+    "durable-work",
+    "workspace",
+    "planning",
+    "resumability"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agentic Runtime",
+    "shortDescription": "Outbound work that survives a restart",
+    "longDescription": "Gives an agent a plain-markdown workspace for work that outlives one session: goals broken into plans and work items, checkpoints it can resume from, reports of what a run actually did, and durable notes about the user. Optional — skip it if your orchestrator already provides durable work.",
+    "developerName": "Reply.io",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Turn this goal into a plan I can resume tomorrow",
+      "Where did we leave off on the Q3 outbound push?",
+      "Report on what this run actually changed"
+    ]
+  }
+}

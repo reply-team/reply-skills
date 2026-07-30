@@ -1,0 +1,36 @@
+{
+  "name": "reply-adapter",
+  "version": "0.1.0",
+  "description": "Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.",
+  "author": {
+    "name": "Reply.io"
+  },
+  "homepage": "https://github.com/reply-team/reply-skills",
+  "repository": "https://github.com/reply-team/reply-skills",
+  "license": "MIT",
+  "keywords": [
+    "reply.io",
+    "cli",
+    "api",
+    "mcp",
+    "auth",
+    "adapter"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Reply.io Adapter",
+    "shortDescription": "Operate Reply.io from your agent — CLI, API v3 and MCP",
+    "longDescription": "Turns the vendor-neutral SDR operations into real Reply.io calls: which endpoint group serves which operation, the order composite work must run in, how to authenticate and scope an API key, and what Reply's errors actually mean. Requires a Reply.io account and the AI SDR Core pack.",
+    "developerName": "Reply.io",
+    "category": "Business & Operations",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Show me how my Reply.io campaigns performed last week",
+      "Import this CSV as a new list and tell me about the duplicates",
+      "Pause the campaign that is bouncing"
+    ]
+  }
+}
