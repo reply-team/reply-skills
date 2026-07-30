@@ -1,0 +1,41 @@
+{
+  "$schema-note": "Host-neutral pack definition — the single source of truth for pack identity and the dependency graph. Host manifests (.claude-plugin/*, and later .codex-plugin/*) are generated from this file by `npm run build-manifests`; CI fails if they drift. See docs/packs.md.",
+  "version": 1,
+  "marketplace": {
+    "name": "reply-skills",
+    "description": "Reply.io outbound expertise for AI agents — vendor-neutral SDR knowledge, Reply execution, and durable long-running work.",
+    "owner": {
+      "name": "Reply.io",
+      "url": "https://github.com/reply-team"
+    }
+  },
+  "packs": [
+    {
+      "name": "ai-sdr-core",
+      "displayName": "AI SDR Core",
+      "version": "0.1.0",
+      "layers": ["L1 SDR business operations", "L2 strategy & playbooks", "L3 protection & guardrails"],
+      "description": "Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.",
+      "dependencies": [],
+      "keywords": ["sdr", "outbound", "sales", "playbooks", "guardrails", "vendor-neutral"]
+    },
+    {
+      "name": "reply-adapter",
+      "displayName": "Reply.io Adapter",
+      "version": "0.1.0",
+      "layers": ["L4 Reply execution surfaces"],
+      "description": "Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.",
+      "dependencies": ["ai-sdr-core"],
+      "keywords": ["reply.io", "cli", "api", "mcp", "auth", "adapter"]
+    },
+    {
+      "name": "agentic-runtime",
+      "displayName": "Agentic Runtime",
+      "version": "0.1.0",
+      "layers": ["L5 long-running work & runtime coordination"],
+      "description": "Durable multi-session work: goals, plans, work items, checkpoints, resumability, execution reports and user memory in a plain-markdown workspace. Optional — skip it if your orchestrator already provides durable work.",
+      "dependencies": ["ai-sdr-core"],
+      "keywords": ["orchestration", "durable-work", "workspace", "planning", "resumability"]
+    }
+  ]
+}

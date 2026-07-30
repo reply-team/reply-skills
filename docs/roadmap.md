@@ -5,9 +5,13 @@
 
 ## M1 — Foundational structure  *(current)*
 
-Conventions, skill contract, templates, workspace model, validator + generated index; bootstrap
-catalog (technical skills, salvaged business workflows, protection skeletons).
-**Done when:** contributors know where new knowledge belongs; planners reliably discover skills.
+Conventions, skill contract, templates, workspace model, validator + generated catalogs;
+bootstrap catalog. Now also the **pack architecture** (ADR-0006): five layers distributed as
+three installable packs, with the dependency direction enforced by CI — vendor-neutral SDR
+knowledge separated from provider execution and from the durable-work runtime, so each can be
+replaced without rewriting the others.
+**Done when:** contributors know where new knowledge belongs; planners reliably discover skills;
+a second provider adapter could be written without touching the core.
 
 ## M2 — Planning excellence
 

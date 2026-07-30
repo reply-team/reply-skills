@@ -5,17 +5,18 @@ description: >
   Use when the user asks to <trigger phrases>. Hosts route on this text.
 metadata:
   version: 0.1.0
-  category: business        # technical | business | planning | protection | user-knowledge
+  pack: ai-sdr-core         # must match plugins/<pack>/ — see docs/packs.md
+  category: strategy        # operations | strategy | protection | execution | runtime | user-knowledge
   maturity: draft           # draft | reviewed | validated | production
   status: active            # active | deprecated | archived
   owner: skills-maintainers
   tags: []
-  tools: []                 # e.g. [reply-cli, reply-mcp]
-  api: []                   # docs.reply.io group slugs this skill touches
+  tools: []                 # execution surfaces — LEAVE EMPTY in vendor-neutral packs
+  api: []                   # provider doc groups — LEAVE EMPTY in vendor-neutral packs
   relations:
-    depends-on: []
-    extends: []
-    recommends: []
+    depends-on: []          # HARD — only skills in this pack or a pack it depends on
+    extends: []             # HARD — same rule
+    recommends: []          # SOFT — may cross packs; skill must work without the target
     validates: []
     validated-by: []
     supersedes: []
@@ -31,41 +32,49 @@ The problem this skill solves, in one paragraph.
 ## When to use / when NOT to use
 
 - Use when: …
-- Do NOT use when: … (point to the alternative skill)
+- Do NOT use when: … (point to the alternative skill, by name)
 
 ## Prerequisites
 
-- Auth / scopes required, data needed, skills to read first.
+- Data needed, skills to read first, and the business operations this skill uses.
+- Adapter skills only: credentials and scopes required.
 
 ## Planning guidance
 
-How to think about the task before acting: questions to answer, decomposition hints,
-what to check in the workspace.
+How to think about the task before acting: what to decide with the user, decomposition hints,
+which constraints shape the work.
 
 ## Execution guidance
 
-Concrete steps. Reference exact API doc pages (docs.reply.io) — never invent endpoint
-paths or body shapes. Prefer `reply api /v3/...` calls; show expected outputs.
+Concrete steps.
+
+- **Vendor-neutral packs**: name the **operations** from `sdr-operations`. No endpoints, no
+  payloads, no tool names — that knowledge belongs in an adapter.
+- **Adapter packs**: name the endpoint group and doc page and fetch it before calling. Never
+  invent a path or a body shape from memory.
 
 ## Validation
 
-How to verify the outcome: state checks, counts, IDs to confirm.
+How to verify the outcome: state checks, counts, identifiers to confirm.
 
 ## Reporting
 
-What the report for this work must capture (see templates/report.md).
+What the report for this work must capture. Reference the `execution-reporting` skill by name —
+never by path, since it may not be installed.
 
 ## Failure modes
 
-Known errors and recovery; honest gaps ("not available yet — say so").
+Known errors and recovery; honest gaps ("not available yet — say so"). Use `TODO(expert):` for
+knowledge that needs a domain expert rather than guessing.
 
 ## Safety
 
-Actions that require explicit user confirmation in the conversation; irreversibility notes.
+Actions requiring explicit user confirmation, and irreversibility notes. Defer to
+`approval-boundaries` for the rules rather than restating them, so they cannot drift.
 
 ## Related skills
 
-Prose complement to `relations:` — why/when a reader should look at each.
+Prose complement to `relations:` — why and when a reader should look at each.
 
 ## Changelog
 

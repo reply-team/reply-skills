@@ -1,4 +1,4 @@
-// Shared helpers: skill discovery + constrained-YAML frontmatter parsing.
+// Shared helpers: the pack registry, skill discovery, and constrained-YAML frontmatter parsing.
 // Zero dependencies by design (ADR-0003) — the frontmatter format is a documented
 // subset (docs/skill-contract.md): scalars, `key: >` folded blocks, inline [a, b]
 // arrays, and nested maps at 2/4-space indent. No anchors, no deep nesting.
@@ -8,19 +8,47 @@ import path from 'node:path';
 
 const ROOT = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 
+// ---------------------------------------------------------------- pack registry
+
+// packs.json is the single host-neutral source of truth (docs/packs.md): pack identity,
+// versions and the dependency graph. Host manifests are generated from it.
+const read_packs = () => JSON.parse(fs.readFileSync(path.join(ROOT, 'packs.json'), 'utf8'));
+
+// name -> pack entry
+const pack_map = (registry = read_packs()) => new Map(registry.packs.map(p => [p.name, p]));
+
+// Packs whose skills a given pack may reference with a HARD `depends-on`:
+// itself plus everything reachable through its declared dependencies.
+// A hard dependency outside this set would break a solo install of that pack.
+const reachable_packs = (name, registry = read_packs()) => {
+    const by_name = pack_map(registry);
+    const seen = new Set();
+    const walk = (n) => {
+        if (seen.has(n)) return;
+        seen.add(n);
+        for (const dep of by_name.get(n)?.dependencies ?? []) walk(dep);
+    };
+    walk(name);
+    return seen;
+};
+
+// ------------------------------------------------------------- skill discovery
+
 const skill_dirs = () => {
     const out = [];
     const plugins_root = path.join(ROOT, 'plugins');
-    for (const plugin of fs.readdirSync(plugins_root)) {
-        const skills_root = path.join(plugins_root, plugin, 'skills');
+    for (const pack of fs.readdirSync(plugins_root)) {
+        const skills_root = path.join(plugins_root, pack, 'skills');
         if (!fs.existsSync(skills_root)) continue;
         for (const name of fs.readdirSync(skills_root)) {
             const dir = path.join(skills_root, name);
-            if (fs.statSync(dir).isDirectory()) out.push({ plugin, name, dir });
+            if (fs.statSync(dir).isDirectory()) out.push({ pack, name, dir });
         }
     }
     return out;
 };
+
+// ---------------------------------------------------------- frontmatter parsing
 
 const strip_comment = (line) => {
     // Drop a trailing " # comment" when we're not inside [...] brackets.
@@ -84,9 +112,14 @@ const parse_skill_md = (file) => {
     return { data, body: m[2] };
 };
 
-const CATEGORIES = ['technical', 'business', 'planning', 'protection', 'user-knowledge'];
+const CATEGORIES = ['operations', 'strategy', 'protection', 'execution', 'runtime', 'user-knowledge'];
 const MATURITIES = ['draft', 'reviewed', 'validated', 'production'];
 const STATUSES = ['active', 'deprecated', 'archived'];
-const RELATION_KEYS = ['depends-on', 'extends', 'recommends', 'validates', 'validated-by', 'supersedes', 'alternative-to'];
+const HARD_RELATIONS = ['depends-on', 'extends'];
+const SOFT_RELATIONS = ['recommends', 'validates', 'validated-by', 'supersedes', 'alternative-to'];
+const RELATION_KEYS = [...HARD_RELATIONS, ...SOFT_RELATIONS];
 
-export { ROOT, skill_dirs, parse_skill_md, CATEGORIES, MATURITIES, STATUSES, RELATION_KEYS };
+export {
+    ROOT, read_packs, pack_map, reachable_packs, skill_dirs, parse_skill_md,
+    CATEGORIES, MATURITIES, STATUSES, RELATION_KEYS, HARD_RELATIONS, SOFT_RELATIONS,
+};

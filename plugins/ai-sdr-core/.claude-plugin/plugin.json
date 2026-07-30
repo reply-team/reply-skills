@@ -1,0 +1,20 @@
+{
+  "name": "ai-sdr-core",
+  "displayName": "AI SDR Core",
+  "description": "Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Reply.io"
+  },
+  "homepage": "https://github.com/reply-team/reply-skills",
+  "repository": "https://github.com/reply-team/reply-skills",
+  "license": "MIT",
+  "keywords": [
+    "sdr",
+    "outbound",
+    "sales",
+    "playbooks",
+    "guardrails",
+    "vendor-neutral"
+  ]
+}
