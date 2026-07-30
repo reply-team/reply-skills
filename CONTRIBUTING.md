@@ -40,7 +40,7 @@ If a skill would need content from two of those, it is two skills.
 
 ```bash
 npm run build     # regenerates host manifests and catalogs
-npm run check     # contract, architecture, freshness, solo-install simulation
+npm run check     # contract, architecture, freshness, per-pack + flat install simulation
 ```
 
 ## Review & maturity

@@ -46,7 +46,10 @@ These are enforced by `npm run validate`, not by good intentions:
 5. **Nothing references a file outside its own pack.** Hosts install a pack by copying that one
    directory; a link to the repository root dangles on the user's machine.
 6. **Skill names are globally unique** across packs. Hosts with a flat skills directory put them
-   all in one namespace.
+   all in one namespace, so a shared name is not a merge — it is a silent overwrite in which one
+   skill's content wins and the other disappears. `npm run smoke` simulates that flat install
+   (the shape `npx skills add` produces) alongside the per-pack one, so this invariant is checked
+   against the layout that actually depends on it.
 
 ## Source of truth
 

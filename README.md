@@ -53,6 +53,41 @@ Skills appear namespaced per pack — `ai-sdr-core:campaign-launch`,
 `reply-adapter:reply-cli` — so they never collide with skills you wrote yourself.
 **Start a new session** for newly installed skills to be picked up.
 
+## Install — any agent, via the skills ecosystem CLI
+
+[`npx skills`](https://github.com/vercel-labs/skills) is the ecosystem's package manager for
+Agent Skills, with a directory entry at
+[skills.sh/reply-team/reply-skills](https://www.skills.sh/reply-team/reply-skills). Use it to
+reach the long tail of hosts we do not package for individually, or to try these skills quickly
+in whatever agent you already run.
+
+```bash
+# Everything — asks where to install, or installs all 18 when a coding agent invokes it
+npx skills add reply-team/reply-skills
+
+# Everything, no prompts, into one named agent
+npx skills add reply-team/reply-skills --skill '*' --agent claude-code -y
+
+# See what the repository offers without installing anything
+npx skills add reply-team/reply-skills --list
+```
+
+Verified with skills CLI **1.5.21** (Windows, Claude Code 2.1.220): `--list` reports
+`Found 18 skills`, and a full install places all 18 — with their `references/` and `templates/`
+files — in the host's skills directory (`.claude/skills/` for a project-scoped Claude Code
+install), recording provenance in `skills-lock.json` so `npx skills update` works later. Invoked
+by an agent rather than a person it prints `Agent detected — installing non-interactively` and
+installs all 18, so it is safe to script.
+
+> **This channel has no pack model.** It installs individual skills by name: no packs, no
+> namespacing, no dependency resolution. **Install all 18** — that is the only shape supported
+> here. A `--skill` subset is your own responsibility, because the CLI will install
+> `reply-operations-mapping` or `durable-work` without `sdr-operations` and say nothing about
+> it, leaving a skill whose declared dependency is simply absent.
+
+If you want dependencies resolved for you, use the Claude Code marketplace above, where
+installing `reply-adapter` pulls in `ai-sdr-core` automatically.
+
 ## Install — Codex and other SKILL.md hosts
 
 > **Not verified yet.** Native plugin packaging for Codex is tracked in REPLY-51541; until it
@@ -78,6 +113,24 @@ afterwards.
 
 A one-command installer that handles host detection and dependency order for every assistant
 (`reply skills install`) is on the CLI roadmap.
+
+## Install channels — what is actually verified
+
+A command in this README is part of the product contract, so each row below says which version
+it was tested against. Rows marked *not verified* have instructions that are a reasonable
+starting point, not a promise.
+
+| Channel | Installs | Dependency handling | Layout on disk | Verified |
+|---|---|---|---|---|
+| Claude Code plugin marketplace | Packs | **Resolved by the host** — `reply-adapter` pulls `ai-sdr-core` | Namespaced per pack | Claude Code 2.1.220 |
+| `npx skills` / [skills.sh](https://www.skills.sh/reply-team/reply-skills) | Individual skills | **None** — install all 18 yourself | Flat, no namespacing | skills CLI 1.5.21 |
+| Codex native packaging | Packs | Not yet determined | Not yet determined | Not verified — REPLY-51541 |
+| Cursor, Windsurf, Gemini CLI (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, per host path | Not verified — REPLY-51268 |
+| `reply skills install` | All three packs | Resolved by the installer | Per host | Planned — REPLY-51356 |
+
+Only the first channel enforces the `ai-sdr-core` dependency for you. On every other channel,
+installing a pack without the core is something you have to avoid deliberately. Per-host skills
+paths and the exact version each was tested on are tracked in REPLY-51268.
 
 ## Execution requirements
 
