@@ -23,6 +23,42 @@ replaceable pack. Install what you need:
 `ai-sdr-core` and `agentic-runtime` are useful **without** Reply.io and without the Reply CLI.
 Only `reply-adapter` needs an execution provider — see [Execution requirements](#execution-requirements).
 
+## Install — one command, any assistant
+
+The [reply CLI](https://github.com/reply-team/reply-cli) detects the assistants on your
+machine and installs the packs into each one, dependencies resolved:
+
+```bash
+npm install -g reply-cli    # needs Node.js 20 or newer
+reply skills install
+```
+
+```
+✓ detected Claude Code, Codex
+✓ Claude Code · ai-sdr-core, reply-adapter, agentic-runtime installed
+✓ Codex       · ai-sdr-core, reply-adapter, agentic-runtime installed
+Start a new session in each assistant so the skills load.
+```
+
+Install a subset — dependencies come along, so `adapter` pulls `core`:
+
+```bash
+reply skills install core
+reply skills install adapter runtime
+reply skills install --agent codex     # only this assistant
+reply skills install --project         # into this repository, not your home
+```
+
+`reply skills list` shows what is installed where, `reply skills update` brings packs to the
+latest version, and `reply skills remove` takes them out. Add `--dry-run` to any of them to
+see the plan without changing anything.
+
+**Claude Code and Codex are the two hosts this is verified against.** For Cursor, Windsurf,
+Gemini CLI and GitHub Copilot the installer writes the files to each host's documented skills
+directory, but we have not yet confirmed those hosts read them — the command tells you so in
+its output. The per-host sections below are the manual equivalents, for when you would rather
+not install the CLI.
+
 ## Install — Claude Code
 
 Everything, in three terminal commands:
@@ -128,10 +164,13 @@ tooling which detects Codex with `which codex` will wrongly report it as missing
 
 ## Install — Cursor, Windsurf, Gemini CLI and other SKILL.md hosts
 
-> **Not verified yet** (REPLY-51268). These hosts have no plugin mechanism, so a pack is
-> installed by copying its skills directory. That works because a pack is just a directory of
-> skills, but the exact paths below have not been tested on each host — treat them as a
-> starting point rather than a contract.
+> **Not verified yet.** These hosts have no plugin mechanism, so a pack is installed by
+> copying its skills directory. That works because a pack is just a directory of skills, but
+> the exact paths below have not been tested on each host — treat them as a starting point
+> rather than a contract.
+
+`reply skills install` (above) does this copying for you, to the same unverified paths. These
+manual steps are the equivalent by hand.
 
 No plugin mechanism means no dependency resolution, so **install the core yourself** — every
 other pack needs it:
@@ -149,9 +188,6 @@ Omit the packs you do not want — but never copy `reply-adapter` or `agentic-ru
 `ai-sdr-core`, or their skills will reference guidance that is not there. Start a new session
 afterwards.
 
-A one-command installer that handles host detection and dependency order for every assistant
-(`reply skills install`) is on the CLI roadmap.
-
 ## Install channels — what is actually verified
 
 A command in this README is part of the product contract, so each row below says which version
@@ -160,15 +196,14 @@ starting point, not a promise.
 
 | Channel | Installs | Dependency handling | Layout on disk | Verified |
 |---|---|---|---|---|
+| **`reply skills install`** | Packs | **Resolved by the installer** on every host | Whatever the channel it drives produces | reply CLI 0.4.0 — Claude Code and Codex; other hosts receive files, unconfirmed |
 | Claude Code plugin marketplace | Packs | **Resolved by the host** — `reply-adapter` pulls `ai-sdr-core` | Namespaced per pack | Claude Code 2.1.220 |
 | `npx skills` / [skills.sh](https://www.skills.sh/reply-team/reply-skills) | Individual skills | **None** — install all 18 yourself | Flat, no namespacing | skills CLI 1.5.21 |
 | Codex plugin marketplace | Packs | **Manual** — install `ai-sdr-core` first; the format has no dependency field | Namespaced per pack | codex-cli 0.146.0-alpha.3.1 |
-| Cursor, Windsurf, Gemini CLI (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, per host path | Not verified — REPLY-51268 |
-| `reply skills install` | All three packs | Resolved by the installer | Per host | Planned — REPLY-51356 |
+| Cursor, Windsurf, Gemini CLI, GitHub Copilot (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, per host path | Not verified |
 
-Only the first channel enforces the `ai-sdr-core` dependency for you. On every other channel,
-installing a pack without the core is something you have to avoid deliberately. Per-host skills
-paths and the exact version each was tested on are tracked in REPLY-51268.
+The first two channels resolve the `ai-sdr-core` dependency for you. On the rest, installing a
+pack without the core is something you have to avoid deliberately.
 
 ## Execution requirements
 

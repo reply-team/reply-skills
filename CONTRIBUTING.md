@@ -36,6 +36,9 @@ If a skill would need content from two of those, it is two skills.
      `TODO(expert):`.
    - **Safety section**: defer to the `approval-boundaries` skill for the rules rather than
      restating them, so they cannot drift apart.
+   - **No internal tracker ids**: this repository is public, so a Reply.io ticket id is a dead
+     link for most of its readers. Say the reason in words where the reason belongs, and put the
+     ticket in the pull request. `npm run check` fails the build on one.
 4. Run the checks and commit what they generate:
 
 ```bash

@@ -73,7 +73,7 @@ for (const dir of fs.readdirSync(path.join(ROOT, 'plugins'))) {
     if (!packs.has(dir)) err(dir, 'directory under plugins/ is not declared in packs.json');
 }
 
-// ------------------------------------------------- host catalog presentation (REPLY-51541)
+// ---------------------------------------------------- host catalog presentation
 //
 // `presentation` in packs.json is what a user reads in a host's plugin catalog before
 // deciding to install. It is validated here, at the source, rather than in the generated
@@ -119,7 +119,7 @@ for (const p of registry.packs) {
     }
 
     // Any image the Codex manifest names must ship inside the pack. Nothing emits these
-    // yet (brand assets are REPLY-51558); the check exists so they cannot arrive broken.
+    // yet (we have no brand assets); the check exists so they cannot arrive broken.
     const codex_manifest = path.join(ROOT, 'plugins', p.name, '.codex-plugin', 'plugin.json');
     if (!fs.existsSync(codex_manifest)) {
         err(p.name, '.codex-plugin/plugin.json missing — run `npm run build-manifests`');
@@ -231,6 +231,47 @@ for (const { pack, name, dir } of dirs) {
             }
         }
     }
+}
+
+// ------------------------------------------------- public-repository hygiene
+//
+// This repository is public. An internal tracker id inside it is a dead link for every
+// reader outside Reply.io — it annotates a claim with something they cannot open, in
+// the place where the sentence should have carried its own reasoning. The ticket goes
+// in the pull request, where the audience is us.
+//
+// The pattern deliberately does not match its own source: `REPLY-` below is followed by
+// `\d`, not by a digit, and `atlassian\.net` carries a backslash where a real link has
+// a dot. So this file is scanned like any other, with no exemption to maintain.
+const TRACKER_REF = /\bREPLY-\d+\b|atlassian\.net/;
+
+// A filesystem walk rather than a git listing, so an id is caught before it is
+// committed. Dependency and IDE directories are skipped — they are not ours to police,
+// and a branch name in an IDE workspace file is not a published reference.
+const SKIP_DIRS = new Set(['.git', '.idea', '.vscode', 'node_modules']);
+
+const all_files = (dir) => {
+    const out = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            if (!SKIP_DIRS.has(entry.name)) out.push(...all_files(full));
+        } else {
+            out.push(full);
+        }
+    }
+    return out;
+};
+
+for (const found of all_files(ROOT)) {
+    const rel = path.relative(ROOT, found).replace(/\\/g, '/');
+    fs.readFileSync(found, 'utf8').split(/\r?\n/).forEach((line, i) => {
+        if (TRACKER_REF.test(line)) {
+            err(`${rel}:${i + 1}`,
+                'internal tracker reference in a public repository — say the reason in words here, '
+                + 'and put the ticket in the pull request description');
+        }
+    });
 }
 
 if (errors.length) {

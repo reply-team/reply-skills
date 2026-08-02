@@ -44,7 +44,7 @@ no-drift property this ADR was written to protect, one level up.
 
 ## Amended 2026-07-31 — a second host, and catalog copy stays host-neutral
 
-Codex packaging (REPLY-51541) was the first real test of the "generated from one file" rule,
+Codex packaging was the first real test of the "generated from one file" rule,
 and it held: `.agents/plugins/marketplace.json` and `plugins/<pack>/.codex-plugin/plugin.json`
 are emitted from the same `packs.json`, so the two hosts cannot disagree about names, versions
 or skills paths.

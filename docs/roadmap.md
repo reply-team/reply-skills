@@ -40,4 +40,6 @@ one; repository health (duplication, orphans, freshness) is monitored, and curat
 ---
 
 Priorities when trade-offs arise: reusable knowledge > explainability > deduplication > evidence >
-implementation scope. See the epic (REPLY-51231) for the engineering backlog that runs alongside.
+implementation scope. The engineering work that carries this — the CLI, the MCP server, the
+daemon — runs alongside in the [reply-cli](https://github.com/reply-team/reply-cli) and
+[reply-mcp](https://github.com/reply-team/reply-mcp) repositories.

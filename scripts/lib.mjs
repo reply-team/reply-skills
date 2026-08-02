@@ -113,9 +113,9 @@ const parse_skill_md = (file) => {
 };
 
 // Codex plugin-catalog vocabulary. Codex publishes no schema, so this is OBSERVED — read
-// off the 188 manifests the CLI ships (bundled marketplace + the official 180-plugin one),
-// recorded in REPLY-51541. Widen it deliberately if a future Codex version adds a value we
-// want; do not widen it to make a typo pass.
+// off the 188 manifests the CLI ships (bundled marketplace + the official 180-plugin one).
+// Widen it deliberately if a future Codex version adds a value we want; do not widen it to
+// make a typo pass.
 const CODEX_CATEGORIES = [
     'Productivity', 'Developer Tools', 'Finance', 'Business & Operations', 'Data & Analytics',
     'Education & Research', 'Communication', 'Creativity', 'Security', 'Engineering', 'Travel', 'Other',
@@ -124,7 +124,7 @@ const CODEX_CATEGORIES = [
 // three values that behave like a closed set, so our packs read consistently.
 const CODEX_CAPABILITIES = ['Read', 'Write', 'Interactive'];
 // interface fields that name an image file shipped inside the pack. None are emitted yet
-// (brand assets are REPLY-51558) — the validator checks them so that when they arrive, a
+// (we have no brand assets) — the validator checks them so that when they arrive, a
 // dangling icon path cannot ship.
 const CODEX_ASSET_FIELDS = ['logo', 'logoDark', 'composerIcon', 'screenshots'];
 

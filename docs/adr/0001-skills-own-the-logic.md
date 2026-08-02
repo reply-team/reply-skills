@@ -4,8 +4,8 @@
 
 ## Context
 
-The Reply Agentic Toolkit (epic REPLY-51231) spans a CLI, an MCP server, a local Web UI, a daemon
-and this repository. Business knowledge could live in any of them — encoded in commands, tool
+The Reply Agentic Toolkit spans a CLI, an MCP server, a local Web UI, a daemon and this
+repository. Business knowledge could live in any of them — encoded in commands, tool
 descriptions, or prompts. LLMs commoditize; execution tools become interchangeable; the durable
 long-term value is accumulated, validated operational knowledge, which compounds.
 

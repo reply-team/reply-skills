@@ -4,7 +4,7 @@
 //     .claude-plugin/marketplace.json            — one entry per pack
 //     plugins/<pack>/.claude-plugin/plugin.json  — pack identity + native dependencies
 //
-//   Codex (REPLY-51541)
+//   Codex
 //     .agents/plugins/marketplace.json           — one entry per pack
 //     plugins/<pack>/.codex-plugin/plugin.json   — pack identity + skills path + catalog metadata
 //
@@ -59,13 +59,13 @@ const claude_plugin = (p) => ({
 //
 // Shape established by reading the 188 manifests the Codex CLI ships (the bundled
 // marketplace plus the official 180-plugin one), because the public docs do not specify
-// it. Recorded in REPLY-51541. Two things worth not re-deriving:
+// it. Two things worth not re-deriving:
 //
 //   * A marketplace entry carries exactly name / source / policy / category. No version,
 //     no description, no author — those live in the plugin manifest.
 //   * There is NO dependencies field: 0 of 188 manifests declare one. The format cannot
-//     express our graph, so install order is the installer's job (REPLY-51356) and is
-//     stated explicitly in the README instead of being implied.
+//     express our graph, so install order is the installer's job and is stated explicitly
+//     in the README instead of being implied.
 
 const CODEX_SKILLS_PATH = './skills/';
 
@@ -97,7 +97,7 @@ const codex_plugin = (p) => ({
     skills: CODEX_SKILLS_PATH,
     // `interface` is what a user sees in the plugin catalog. Image fields (logo,
     // composerIcon, brandColor, screenshots) are deliberately absent until brand assets
-    // exist — REPLY-51558. Inventing branding would be worse than an unadorned entry.
+    // exist. Inventing branding would be worse than an unadorned entry.
     interface: {
         displayName: p.displayName,
         shortDescription: p.presentation.shortDescription,
