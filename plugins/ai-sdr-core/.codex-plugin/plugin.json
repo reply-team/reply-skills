@@ -1,6 +1,6 @@
 {
   "name": "ai-sdr-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.",
   "author": {
     "name": "Reply.io"

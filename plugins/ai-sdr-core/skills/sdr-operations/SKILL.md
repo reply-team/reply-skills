@@ -7,7 +7,7 @@ description: >
   outbound work, when writing a plan someone or something else must execute, or before
   reaching for a provider-specific execution skill.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   pack: ai-sdr-core
   category: operations
   maturity: draft
@@ -43,6 +43,11 @@ high-frequency ones as direct commands. All three must mean the same thing by
   That belongs in an adapter skill (for Reply.io: `reply-operations-mapping`).
 - Do NOT use this as an execution guide. It says *what* an operation means, never *how*
   to perform it against a particular product.
+- The contract starts once the audience is decided: it composes people the user has, and
+  has no operation for finding new ones. That absence is deliberate and is recorded under
+  *Known gaps* in the catalog — but it bounds this contract, not the conversation. Where a
+  user has nobody to contact yet, `audience-building` names the routes, and the provider's
+  adapter says whether that provider searches for prospects itself.
 
 ## Prerequisites
 
@@ -153,5 +158,8 @@ existing operation as a breaking change, not an edit.
 
 ## Changelog
 
+- 1.1.0 (2026-08-02): said explicitly that the contract begins once the audience is
+  decided, and pointed the discovery gap at the routes in `audience-building` rather than
+  leaving it a bare absence that a plan could only stop at.
 - 1.0.0 (2026-07-30): initial contract — six operation families, the four properties
   (effect, reversibility, approval, idempotency check), naming rules.

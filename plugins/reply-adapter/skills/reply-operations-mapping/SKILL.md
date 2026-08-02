@@ -7,7 +7,7 @@ description: >
   need to actually perform it against Reply, or when a Reply response needs interpreting in
   business terms.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   pack: reply-adapter
   category: execution
   maturity: draft
@@ -129,6 +129,41 @@ markdown (append `.md` to its URL) before the first call of that kind.
 | `metrics.sequence` | sequences → *Get stats for all sequences* (`/v3/sequences/stats`), then *Get sequence stats* (`/v3/sequences/{id}/stats`) for outliers | Both are documented as stable paths. Stricter rate limits — sequential only |
 | `metrics.channel-efficiency` | reports → *Get channel efficiency overview* | For comparing channels, not for judging one in isolation |
 
+### Sourcing prospects — outside the contract, inside Reply
+
+The core contract has no discovery operation, because most providers cannot offer one.
+Reply can. Do not let the contract's silence read as "Reply cannot do this" — that is the
+mistake this section exists to prevent — and equally, do not present a beta as settled.
+
+| Reply surface | What it is | Notes |
+|---|---|---|
+| live-data → the typeahead endpoints (departments, industries, job titles, locations, seniorities) | Resolves the words a user says into the values a search accepts | **Beta.** Use these to build the filter rather than guessing accepted values |
+| live-data → *Preview a Live Data search* | What the filter would return, before committing to it | **Beta.** Always run this first — see below |
+| live-data → *Start a Live Data search* | Runs the search | **Beta.** Consumes the user's data allowance. Never the first call |
+| live-data → *List Live Data searches*, *Get a Live Data search* | What was run before, and the result of one | **Beta.** Check for an existing search before starting a near-identical one |
+| ai-sdr-intent-signals → the typeahead endpoints (industries, technologies) | Narrows an audience by intent rather than firmographics | **Beta.** Complements Live Data; not a substitute for it |
+| contact-enrichment → enrich by email, enrich by LinkedIn URL, find email, find phone | Filling in people the user already has | **Coming soon** — documented as available late August 2026. Not callable yet |
+
+Three rules, in order of how expensive it is to get them wrong:
+
+1. **Preview before Start, always.** Start spends the user's allowance; Preview does not.
+   Show the user who came back and let them approve the filter before it is run for real.
+   A search started on an unreviewed filter is money spent on the wrong people.
+2. **Say "beta" out loud.** Not as a disclaimer at the end — as part of the plan, before
+   the user commits to a route that depends on it. Fetch the doc page and confirm the
+   endpoint is callable before planning around it, exactly as with any other surface.
+3. **Sourcing produces rows, nothing more.** Whatever comes back enters the normal path —
+   `contact.create` into a named list, with the same mapping, dedupe policy and approval
+   gate as any import. Discovery does not create a new contract operation, and does not
+   earn an exemption from the import gate.
+
+For **Contact Enrichment**, the only correct behaviour today is to say it is not available
+yet and name the date the docs give. Never substitute an unrelated endpoint for it: an
+enrichment that silently returns something else is worse than a missing capability.
+
+The core-side view of all this — the four routes a user without a list can take, of which
+Live Data is one — is `audience-building` → *Where an audience comes from*.
+
 ### Composite ordering
 
 Two flows where order is not obvious and getting it wrong wastes real sends:
@@ -194,6 +229,11 @@ the endpoints used for writes, and any scope or team change that the run require
   autopilot, pending approvals, enrichment, live data — are marked *Beta* or *Coming soon*
   in the docs. Check the page before relying on one, and say so honestly if it is not
   callable. Never substitute an unrelated endpoint for a missing capability.
+- **Telling a user Reply cannot source prospects.** It can, in beta — see *Sourcing
+  prospects*. The core contract's silence on discovery is about providers in general, and
+  reporting it as a Reply limitation is a wrong answer, not a cautious one.
+- **Starting a Live Data search without previewing it.** Start spends the user's allowance;
+  the mistake is only visible once it is already paid for.
 
 ## Safety
 
@@ -213,6 +253,11 @@ for the full rule, which this skill does not restate or override.
 
 ## Changelog
 
+- 1.1.0 (2026-08-02): added *Sourcing prospects* — Live Data search and AI SDR intent
+  signals, both beta, with Preview-before-Start as a hard rule, and Contact Enrichment
+  recorded as not yet callable. Until now the only mention of Live Data in this skill was a
+  warning in Failure modes, so an agent reading it could conclude Reply has no prospect
+  search at all.
 - 1.0.0 (2026-07-30): initial mapping of the six operation families onto Reply API v3,
   including composite launch/import ordering, async handling and error translation.
   Consolidates the Reply-specific execution detail previously embedded in the business

@@ -6,21 +6,21 @@
 
 Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.
 
-**Pack:** `ai-sdr-core` v0.1.0 · **Depends on:** _none_
+**Pack:** `ai-sdr-core` v0.2.0 · **Depends on:** _none_
 
 ### Operations — the vendor-neutral SDR contract
 
 | Skill | Description | Maturity | Version |
 |---|---|---|---|
-| [sdr-operations](skills/sdr-operations/SKILL.md) | The vendor-neutral contract of atomic SDR business operations — add a contact, enrol it into a sequence, pause, reply, classify a conversation, read engagement — named in the language of an SDR practitioner with no provider detail. Use when planning any outbound work, when writing a plan someone or something else must execute, or before reaching for a provider-specific execution skill. | draft | 1.0.0 |
+| [sdr-operations](skills/sdr-operations/SKILL.md) | The vendor-neutral contract of atomic SDR business operations — add a contact, enrol it into a sequence, pause, reply, classify a conversation, read engagement — named in the language of an SDR practitioner with no provider detail. Use when planning any outbound work, when writing a plan someone or something else must execute, or before reaching for a provider-specific execution skill. | draft | 1.1.0 |
 
 ### Strategy — playbooks and planning
 
 | Skill | Description | Maturity | Version |
 |---|---|---|---|
-| [audience-building](skills/audience-building/SKILL.md) | Turn raw prospect data into a clean, deliberately-shaped audience: decide who belongs, map and sanity-check the incoming fields, choose a duplicate policy, and organise people into named lists. Use when the user wants to import contacts, build or extend a list, define a segment, or asks what to do about duplicates and messy data. | draft | 2.0.0 |
+| [audience-building](skills/audience-building/SKILL.md) | Turn raw prospect data into a clean, deliberately-shaped audience: decide who belongs, map and sanity-check the incoming fields, choose a duplicate policy, and organise people into named lists. Use when the user wants to import contacts, build or extend a list, define a segment, or asks what to do about duplicates and messy data. | draft | 2.1.0 |
 | [campaign-launch](skills/campaign-launch/SKILL.md) | Prepare and launch an outreach sequence with every precondition checked and the user's explicit approval of what will actually be sent. Covers sending capability, step content, schedule, enrolment and the go-live gate. Use when the user wants to create or start a sequence, launch a campaign, add contacts to a sequence, or begin sending. | draft | 2.0.0 |
-| [campaign-planning](skills/campaign-planning/SKILL.md) | Turn a vague outbound goal into an executable plan: clarify the objective until success is observable, surface the constraints that shape it, compose the work from known operations and playbooks, and decide the checkpoints. Use when the user states a business goal — book meetings, launch a campaign, grow pipeline — rather than a single concrete action. | draft | 2.0.0 |
+| [campaign-planning](skills/campaign-planning/SKILL.md) | Turn a vague outbound goal into an executable plan: clarify the objective until success is observable, surface the constraints that shape it, compose the work from known operations and playbooks, and decide the checkpoints. Use when the user states a business goal — book meetings, launch a campaign, grow pipeline — rather than a single concrete action. | draft | 2.1.0 |
 | [inbox-triage](skills/inbox-triage/SKILL.md) | Work the inbound replies: surface the conversations that matter first, give the user compact thread context, draft responses together, send only what was explicitly approved, and record the outcome of each conversation. Use when the user asks about replies, inbox triage, responding to prospects, or finding the interested leads. | draft | 2.0.0 |
 | [performance-analysis](skills/performance-analysis/SKILL.md) | An honest read on outreach performance: account and per-campaign figures over a stated window, a diagnosis that separates deliverability from copy from targeting, and one or two high-impact recommendations. Use when the user asks how campaigns are performing, what is underperforming, what to fix or pause, or wants outreach analytics. | draft | 2.0.0 |
 

@@ -6,7 +6,7 @@ description: >
   and playbooks, and decide the checkpoints. Use when the user states a business goal — book
   meetings, launch a campaign, grow pipeline — rather than a single concrete action.
 metadata:
-  version: 2.0.0
+  version: 2.1.0
   pack: ai-sdr-core
   category: strategy
   maturity: draft
@@ -58,6 +58,10 @@ an invented method silently competes with it.
 1. **Clarify until success is observable.** Target outcome, a number, a deadline, and the
    constraints: volume limits, brand voice, channels allowed, who must approve what. "More
    pipeline" is not a goal; "ten booked calls with EU SaaS VPs of Eng by 30 September" is.
+   - **Settle where the audience will come from here, not later.** A plan whose first work
+     item is "find the people", with no named source, is not executable — it stalls on its
+     own first step. Ask whether the user has a list, has a sourcing tool of their own, or
+     needs the options laid out: `audience-building` → *Where an audience comes from*.
 2. **Surface the constraints that shape the plan** before designing it — sender maturity and
    volume ceilings (`sending-guardrails`), channel limits (`linkedin-guardrails`), and the
    approval boundaries the user expects (`approval-boundaries`). Constraints discovered
@@ -130,6 +134,9 @@ the skills being composed, and defined in full in `approval-boundaries`.
 
 ## Changelog
 
+- 2.1.0 (2026-08-02): step 1 now requires the audience source to be settled during
+  clarification. A plan that opens with an unnamed "find the people" stalls immediately,
+  which is how a goal stated in one sentence turned into a refusal one step later.
 - 2.0.0 (2026-07-30): renamed from `outbound-campaign-planning` and rewritten for the
   `ai-sdr-core` pack. The durable-work and workspace mechanics moved out to `durable-work` in
   `agentic-runtime`; the Reply CLI dependency is gone, so planning now works with any
