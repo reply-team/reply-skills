@@ -6,7 +6,7 @@ description: >
   into named lists. Use when the user wants to import contacts, build or extend a list,
   define a segment, or asks what to do about duplicates and messy data.
 metadata:
-  version: 2.0.0
+  version: 2.1.0
   pack: ai-sdr-core
   category: strategy
   maturity: draft
@@ -41,14 +41,43 @@ campaigns can address.
   duplicates or data quality.
 - Use *before* `campaign-launch` — the audience is a precondition for the launch, not a
   step inside it.
-- Do NOT use for finding **new** people the user does not already have. Discovery and
-  enrichment are a named gap in the operation contract; say so honestly rather than
-  improvising a substitute.
+- Do NOT source **new** people from inside this skill — it shapes an audience, it does not
+  find one, and inventing a way to find one is the failure mode it guards against. But do
+  not stop at "cannot" either: sourcing has routes, and naming them is part of this skill's
+  job. See *Where an audience comes from*.
 - Do NOT use for judging campaign results — that is `performance-analysis`.
+
+## Where an audience comes from
+
+A user who says "I want to sell into LATAM" and has no list is asking a real question, and
+"discovery is a gap" is not an answer to it. Sourcing happens before this skill and is not
+part of it — but the routes are few and knowable, so name them instead of leaving the user
+to guess which one they are supposed to invent:
+
+1. **A list the user already has.** A CRM export, a conference roster, past customers, a
+   spreadsheet someone on the team maintains. The most common case by far and the fastest
+   to first value. Ask for this first, every time, before proposing anything else.
+2. **The user's own sourcing tools.** Their agent may already reach a data provider — over
+   MCP, over an API, through a product they pay for. Sourcing is theirs, ingestion is ours:
+   whatever it produces, take it as rows and continue from route 1.
+3. **The execution provider's own prospect search, where it has one.** This varies sharply
+   between providers and is not part of the operation contract, so never assume it exists.
+   The adapter skill for the provider in use is what knows — consult it rather than
+   guessing, and treat anything it marks as beta as beta when you plan around it.
+4. **Manual research.** Slow, and entirely legitimate for a short list of high-value
+   accounts. Do not talk a user out of it when the list is twenty companies.
+
+Whichever route, the ICP decision stays the user's and has to be explicit before sourcing
+starts: who counts as a fit, which signals matter, what disqualifies. An audience assembled
+without a stated ICP cannot be judged afterwards — when the campaign underperforms there is
+no way to separate bad targeting from bad copy.
+
+If the user has neither a list nor a sourcing tool, say so plainly and put the four routes
+in front of them. That is a real answer, and it ends with the user able to act.
 
 ## Prerequisites
 
-- Data in hand, or a clear statement of where it comes from.
+- Data in hand, or a clear statement of where it comes from — see the routes above.
 - The user's ICP if one exists — check their stored preferences and ICP notes before asking
   them to repeat it.
 - Operations used: `contact.find`, `contact.create`, `contact.update`, `contact.list.create`,
@@ -136,6 +165,8 @@ change the next import — that is the part a future run actually benefits from.
 - **Treating a partial import as complete.** State N succeeded, M failed, and why.
 - **Building a list nobody can define.** If the segment cannot be stated in one checkable
   sentence, the campaign built on it cannot be learned from.
+- **Answering "I have no list" with a refusal.** Sourcing is out of scope; the routes to it
+  are not. A user left at "that is a gap" has been given nothing they can act on.
 
 ## Safety
 
@@ -153,6 +184,10 @@ copy it into reports or logs beyond what the outcome requires.
 
 ## Changelog
 
+- 2.1.0 (2026-08-02): added *Where an audience comes from*. The skill used to answer a user
+  with no list by naming discovery as a contract gap and stopping there, which is honest and
+  useless at the same time. Sourcing is still out of scope — the four routes to it are now
+  in scope, and refusing without them is listed as a failure mode.
 - 2.0.0 (2026-07-30): renamed from `import-prospects` and rewritten vendor-neutral for the
   `ai-sdr-core` pack — Reply endpoint and CLI detail moved to `reply-operations-mapping` in
   the adapter pack. Scope widened from "import a file" to "shape an audience": segment

@@ -6,7 +6,7 @@
 
 Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.
 
-**Pack:** `reply-adapter` v0.1.0 · **Depends on:** `ai-sdr-core`
+**Pack:** `reply-adapter` v0.2.0 · **Depends on:** `ai-sdr-core`
 
 ### Execution — driving the Reply platform
 
@@ -16,4 +16,4 @@ Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API
 | [reply-auth](skills/reply-auth/SKILL.md) | Reply.io credentials in depth: API key types (personal, Team, Organization), the scopes model (domain:verb), acting-user headers, and team/organization resolution errors (TEAM_REQUIRED, USER_REQUIRED and friends). Use when choosing or creating a key for an agent, resolving 401/403 auth errors, or working across multiple teams. | reviewed | 1.1.0 |
 | [reply-cli](skills/reply-cli/SKILL.md) | Operate Reply.io from the terminal with the reply CLI: sign in (OAuth or API key), manage profiles and team context, and call any API v3 endpoint via `reply api`. Use when executing any Reply.io operation from a shell, setting up authentication, or when another Reply skill needs commands executed. | reviewed | 1.1.0 |
 | [reply-mcp](skills/reply-mcp/SKILL.md) | Connect Reply.io to an MCP-compatible AI client (Claude, ChatGPT, Codex, Cursor) via the remote server mcp.reply.io, choose the right auth, and decide when to use MCP tools versus the CLI. Use when setting up the Reply MCP connection or choosing between MCP and CLI execution. | reviewed | 1.1.0 |
-| [reply-operations-mapping](skills/reply-operations-mapping/SKILL.md) | Maps each vendor-neutral SDR business operation onto its Reply.io execution: which API v3 endpoint group and doc page, which scope, what order to call things in, and how Reply's errors translate back into operation outcomes. Use when a plan names an operation and you need to actually perform it against Reply, or when a Reply response needs interpreting in business terms. | draft | 1.0.0 |
+| [reply-operations-mapping](skills/reply-operations-mapping/SKILL.md) | Maps each vendor-neutral SDR business operation onto its Reply.io execution: which API v3 endpoint group and doc page, which scope, what order to call things in, and how Reply's errors translate back into operation outcomes. Use when a plan names an operation and you need to actually perform it against Reply, or when a Reply response needs interpreting in business terms. | draft | 1.1.0 |

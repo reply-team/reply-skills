@@ -118,7 +118,11 @@ Deliberately absent from v1. Named here so that a plan can reference the gap ins
 inventing an operation:
 
 - **Prospect discovery and enrichment** — finding *new* people, rather than importing
-  people the user already has. Availability varies sharply between providers.
+  people the user already has. Availability varies sharply between providers, which is
+  exactly why it is not in the contract: a vendor-neutral operation nobody can guarantee is
+  worse than no operation at all. Treat this as a boundary, not a dead end —
+  `audience-building` carries the routes a user without a list can take, and the adapter
+  for the provider in use states whether that provider offers a search of its own.
 - **Meeting booking** — calendar handling and the hand-off from interested reply to booked
   call.
 - **Task management** — manual to-dos assigned to a human in a workflow.

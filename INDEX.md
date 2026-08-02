@@ -6,7 +6,7 @@
 Skills ship in three independently installable packs. `ai-sdr-core` is vendor-neutral and
 depends on nothing; the other two build on it. See [docs/packs.md](docs/packs.md).
 
-## AI SDR Core — `ai-sdr-core` v0.1.0
+## AI SDR Core — `ai-sdr-core` v0.2.0
 
 Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.
 
@@ -16,15 +16,15 @@ Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound s
 
 | Skill | Description | Maturity | Version |
 |---|---|---|---|
-| [sdr-operations](plugins/ai-sdr-core/skills/sdr-operations/SKILL.md) | The vendor-neutral contract of atomic SDR business operations — add a contact, enrol it into a sequence, pause, reply, classify a conversation, read engagement — named in the language of an SDR practitioner with no provider detail. Use when planning any outbound work, when writing a plan someone or something else must execute, or before reaching for a provider-specific execution skill. | draft | 1.0.0 |
+| [sdr-operations](plugins/ai-sdr-core/skills/sdr-operations/SKILL.md) | The vendor-neutral contract of atomic SDR business operations — add a contact, enrol it into a sequence, pause, reply, classify a conversation, read engagement — named in the language of an SDR practitioner with no provider detail. Use when planning any outbound work, when writing a plan someone or something else must execute, or before reaching for a provider-specific execution skill. | draft | 1.1.0 |
 
 ### Strategy — playbooks and planning
 
 | Skill | Description | Maturity | Version |
 |---|---|---|---|
-| [audience-building](plugins/ai-sdr-core/skills/audience-building/SKILL.md) | Turn raw prospect data into a clean, deliberately-shaped audience: decide who belongs, map and sanity-check the incoming fields, choose a duplicate policy, and organise people into named lists. Use when the user wants to import contacts, build or extend a list, define a segment, or asks what to do about duplicates and messy data. | draft | 2.0.0 |
+| [audience-building](plugins/ai-sdr-core/skills/audience-building/SKILL.md) | Turn raw prospect data into a clean, deliberately-shaped audience: decide who belongs, map and sanity-check the incoming fields, choose a duplicate policy, and organise people into named lists. Use when the user wants to import contacts, build or extend a list, define a segment, or asks what to do about duplicates and messy data. | draft | 2.1.0 |
 | [campaign-launch](plugins/ai-sdr-core/skills/campaign-launch/SKILL.md) | Prepare and launch an outreach sequence with every precondition checked and the user's explicit approval of what will actually be sent. Covers sending capability, step content, schedule, enrolment and the go-live gate. Use when the user wants to create or start a sequence, launch a campaign, add contacts to a sequence, or begin sending. | draft | 2.0.0 |
-| [campaign-planning](plugins/ai-sdr-core/skills/campaign-planning/SKILL.md) | Turn a vague outbound goal into an executable plan: clarify the objective until success is observable, surface the constraints that shape it, compose the work from known operations and playbooks, and decide the checkpoints. Use when the user states a business goal — book meetings, launch a campaign, grow pipeline — rather than a single concrete action. | draft | 2.0.0 |
+| [campaign-planning](plugins/ai-sdr-core/skills/campaign-planning/SKILL.md) | Turn a vague outbound goal into an executable plan: clarify the objective until success is observable, surface the constraints that shape it, compose the work from known operations and playbooks, and decide the checkpoints. Use when the user states a business goal — book meetings, launch a campaign, grow pipeline — rather than a single concrete action. | draft | 2.1.0 |
 | [inbox-triage](plugins/ai-sdr-core/skills/inbox-triage/SKILL.md) | Work the inbound replies: surface the conversations that matter first, give the user compact thread context, draft responses together, send only what was explicitly approved, and record the outcome of each conversation. Use when the user asks about replies, inbox triage, responding to prospects, or finding the interested leads. | draft | 2.0.0 |
 | [performance-analysis](plugins/ai-sdr-core/skills/performance-analysis/SKILL.md) | An honest read on outreach performance: account and per-campaign figures over a stated window, a diagnosis that separates deliverability from copy from targeting, and one or two high-impact recommendations. Use when the user asks how campaigns are performing, what is underperforming, what to fix or pause, or wants outreach analytics. | draft | 2.0.0 |
 
@@ -36,7 +36,7 @@ Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound s
 | [linkedin-guardrails](plugins/ai-sdr-core/skills/linkedin-guardrails/SKILL.md) | Keep social accounts safe under automation: invitation pacing, messaging cadence, daily limits and recovery when the platform flags activity. Use before any LinkedIn outreach volume, when configuring account limits, or when an account shows a warning. | draft | 0.2.0 |
 | [sending-guardrails](plugins/ai-sdr-core/skills/sending-guardrails/SKILL.md) | Protect sender reputation and inbox placement: domain authentication, warm-up, volume pacing, bounce interpretation and recovery. Use before launching significant email volume, when bounce rates rise, when replies collapse, or when a sending account or domain is new. | draft | 0.2.0 |
 
-## Reply.io Adapter — `reply-adapter` v0.1.0
+## Reply.io Adapter — `reply-adapter` v0.2.0
 
 Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.
 
@@ -50,7 +50,7 @@ Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API
 | [reply-auth](plugins/reply-adapter/skills/reply-auth/SKILL.md) | Reply.io credentials in depth: API key types (personal, Team, Organization), the scopes model (domain:verb), acting-user headers, and team/organization resolution errors (TEAM_REQUIRED, USER_REQUIRED and friends). Use when choosing or creating a key for an agent, resolving 401/403 auth errors, or working across multiple teams. | reviewed | 1.1.0 |
 | [reply-cli](plugins/reply-adapter/skills/reply-cli/SKILL.md) | Operate Reply.io from the terminal with the reply CLI: sign in (OAuth or API key), manage profiles and team context, and call any API v3 endpoint via `reply api`. Use when executing any Reply.io operation from a shell, setting up authentication, or when another Reply skill needs commands executed. | reviewed | 1.1.0 |
 | [reply-mcp](plugins/reply-adapter/skills/reply-mcp/SKILL.md) | Connect Reply.io to an MCP-compatible AI client (Claude, ChatGPT, Codex, Cursor) via the remote server mcp.reply.io, choose the right auth, and decide when to use MCP tools versus the CLI. Use when setting up the Reply MCP connection or choosing between MCP and CLI execution. | reviewed | 1.1.0 |
-| [reply-operations-mapping](plugins/reply-adapter/skills/reply-operations-mapping/SKILL.md) | Maps each vendor-neutral SDR business operation onto its Reply.io execution: which API v3 endpoint group and doc page, which scope, what order to call things in, and how Reply's errors translate back into operation outcomes. Use when a plan names an operation and you need to actually perform it against Reply, or when a Reply response needs interpreting in business terms. | draft | 1.0.0 |
+| [reply-operations-mapping](plugins/reply-adapter/skills/reply-operations-mapping/SKILL.md) | Maps each vendor-neutral SDR business operation onto its Reply.io execution: which API v3 endpoint group and doc page, which scope, what order to call things in, and how Reply's errors translate back into operation outcomes. Use when a plan names an operation and you need to actually perform it against Reply, or when a Reply response needs interpreting in business terms. | draft | 1.1.0 |
 
 ## Agentic Runtime — `agentic-runtime` v0.1.0
 
