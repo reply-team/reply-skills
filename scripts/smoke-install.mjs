@@ -7,7 +7,7 @@
 //   1. PER-PACK  — Claude Code plugin install, or a directory copy of one pack.
 //      Copies `plugins/<pack>/` and resolves declared pack dependencies.
 //
-//   2. FLAT      — `npx skills add reply-team/reply-skills` (skills.sh, REPLY-51556).
+//   2. FLAT      — `npx skills add reply-team/reply-skills` (skills.sh).
 //      Copies every skill directory into ONE directory with no pack namespacing and
 //      no dependency resolution. Verified against skills CLI 1.5.21.
 //

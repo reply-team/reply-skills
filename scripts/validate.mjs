@@ -73,7 +73,7 @@ for (const dir of fs.readdirSync(path.join(ROOT, 'plugins'))) {
     if (!packs.has(dir)) err(dir, 'directory under plugins/ is not declared in packs.json');
 }
 
-// ------------------------------------------------- host catalog presentation (REPLY-51541)
+// ---------------------------------------------------- host catalog presentation
 //
 // `presentation` in packs.json is what a user reads in a host's plugin catalog before
 // deciding to install. It is validated here, at the source, rather than in the generated
@@ -119,7 +119,7 @@ for (const p of registry.packs) {
     }
 
     // Any image the Codex manifest names must ship inside the pack. Nothing emits these
-    // yet (brand assets are REPLY-51558); the check exists so they cannot arrive broken.
+    // yet (we have no brand assets); the check exists so they cannot arrive broken.
     const codex_manifest = path.join(ROOT, 'plugins', p.name, '.codex-plugin', 'plugin.json');
     if (!fs.existsSync(codex_manifest)) {
         err(p.name, '.codex-plugin/plugin.json missing — run `npm run build-manifests`');

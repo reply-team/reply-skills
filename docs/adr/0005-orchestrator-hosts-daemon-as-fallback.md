@@ -5,8 +5,8 @@
 ## Context
 
 Long-running, multi-session orchestrators already exist in the agent ecosystem (e.g. OpenClaw;
-Hermes — pending a research spike). Building only our own `reply daemon` (REPLY-51324) maximizes
-control but not autonomy or reach. The moat is skills + the API/MCP monetization surface — every
+Hermes — pending a research spike). Building only our own `reply daemon` maximizes control but
+not autonomy or reach. The moat is skills + the API/MCP monetization surface — every
 action flows through Reply regardless of whose orchestrator runs it.
 
 ## Decision
@@ -26,5 +26,5 @@ against existing orchestrators.
 
 ## Follow-up
 
-Research spike: Hermes capabilities; OpenClaw skill/workspace integration check (tracked with
-REPLY-51324's spike).
+Research spike: Hermes capabilities; OpenClaw skill/workspace integration check — folded into
+the `reply daemon` design spike.
