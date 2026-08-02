@@ -6,7 +6,7 @@ description: >
   Use when executing any Reply.io operation from a shell, setting up authentication,
   or when another Reply skill needs commands executed.
 metadata:
-  version: 1.1.0
+  version: 1.2.0
   pack: reply-adapter
   category: execution
   maturity: reviewed
@@ -55,6 +55,22 @@ reply auth logout
 Credential precedence (strict): `--api-key` flag → `REPLY_API_KEY` env → stored credential.
 Flag/env are ephemeral — never written to disk. Expired OAuth sessions refresh automatically; if
 refresh fails the CLI asks to log in again.
+
+A user with no Reply.io account can create one during `reply auth login` — the sign-in page
+offers registration, and a trial costs nothing. Say that rather than treating a missing account
+as a dead end.
+
+### Keeping the CLI current
+
+```bash
+reply install                         # update to the newest release (`reply update` is an alias)
+reply install --dry-run               # report whether an update exists, change nothing
+```
+
+Only a global npm install is driven; a project-local copy, an `npx` run or a source checkout is
+reported with the command that fits it and left alone. `reply --version` mentions a newer release
+when one exists, and says nothing when output is piped or `--json` is in play — so it never
+corrupts machine-readable output.
 
 ### Profiles (multiple accounts)
 
@@ -119,8 +135,10 @@ exit codes with their error `code` slugs.
 - `Not authenticated` → run the auth setup above.
 - `TEAM_REQUIRED` / `TEAM_NOT_ACCESSIBLE` / `USER_REQUIRED` / `USER_NOT_FOUND` → see
   `reply-auth` skill; the CLI's stderr guidance shows the exact fix.
-- Discrete domain commands (e.g. `reply sequences list`) are **not available yet** — the CLI
-  currently covers auth/profile/team plus `reply api`. Don't invent commands; use `reply api`.
+- Discrete domain commands (e.g. `reply sequences list`) are **not available yet**. The command
+  groups are `auth`, `profile`, `team`, `api`, `skills` and `install` — nothing else exists.
+  Don't invent one: reach the operation through `reply api`, using the endpoint mapping in
+  `reply-operations-mapping`.
 
 ## Safety
 
@@ -135,6 +153,10 @@ explicit confirmation its Safety section requires.
 
 ## Changelog
 
+- 1.2.0 (2026-08-02): the command inventory was two groups out of date — `skills` and `install`
+  shipped and this skill still said the CLI covers auth/profile/team plus `reply api`, which is
+  how an agent ends up telling a user a command does not exist. Added self-update, and a note
+  that a user without an account can register during login instead of being turned away.
 - 1.1.0 (2026-07-30): moved into the `reply-adapter` pack; category `technical` → `execution`;
   `auth-and-keys` renamed `reply-auth`.
 - 1.0.0 (2026-07-27): initial version, matches reply-cli v1 (auth, profiles, teams, `reply api`).
