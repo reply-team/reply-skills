@@ -23,6 +23,22 @@ replaceable pack. Install what you need:
 `ai-sdr-core` and `agentic-runtime` are useful **without** Reply.io and without the Reply CLI.
 Only `reply-adapter` needs an execution provider — see [Execution requirements](#execution-requirements).
 
+## Where this fits
+
+Reply's agentic toolkit is three pieces. They are complementary, not alternatives:
+
+| | What it is | When you want it |
+|---|---|---|
+| **[reply CLI](https://github.com/reply-team/reply-cli)** | `npm i -g reply-cli` — authenticated access to *every* v3 endpoint via `reply api` | Your agent has a shell. This is the complete surface. |
+| **[Reply MCP](https://github.com/reply-team/reply-mcp)** | A curated tool catalog over `mcp.reply.io` | Your client speaks MCP and has no shell — desktop apps, hosted assistants. |
+| **reply-skills** (this repo) | Outbound expertise as markdown skills: what to do, in what order, with what guardrails | Your agent knows *how* to call things but not *what* to run. |
+
+MCP gives your agent tools. Skills give it judgement. Most setups want both; a shell-capable
+agent can do everything through the CLI alone.
+
+The shortest path that works: install the CLI, `reply auth login`, `reply skills install`, then
+talk to your agent in plain words. MCP is optional — add it when your client has no shell.
+
 ## Install — one command, any assistant
 
 The [reply CLI](https://github.com/reply-team/reply-cli) detects the assistants on your
@@ -208,15 +224,12 @@ pack without the core is something you have to avoid deliberately.
 ## Execution requirements
 
 **Installing skills is not the same as configuring a provider.** The core and runtime packs need
-nothing. `reply-adapter` needs at least one Reply.io execution surface:
-
-- **[reply CLI](https://github.com/reply-team/reply-cli)** — the usual choice; reaches every v3
-  endpoint via `reply api`. That repository is the source of truth for installing and
-  authenticating it.
-- **[Reply API v3](https://docs.reply.io/api-reference/introduction)** — the full surface.
-  Agents: start at [llms.txt](https://docs.reply.io/llms.txt).
-- **[Reply MCP](https://docs.reply.io/reply-mcp)** (`mcp.reply.io`) — a curated tool catalog for
-  MCP clients, useful where no shell is available.
+nothing. `reply-adapter` needs at least one Reply.io execution surface — the CLI, the MCP server,
+or the API directly; [Where this fits](#where-this-fits) says which to pick, and the
+[reply CLI](https://github.com/reply-team/reply-cli) repository is the source of truth for
+installing and authenticating it. To drive the API on its own, the full surface is the
+[v3 reference](https://docs.reply.io/api-reference/introduction) — agents should start at
+[llms.txt](https://docs.reply.io/llms.txt).
 
 If the CLI is already installed, this confirms the adapter has something to drive:
 
