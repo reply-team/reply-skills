@@ -1,0 +1,62 @@
+name: Notify site sync
+
+# Tell the documentation site that this repository's published catalog changed, so it can
+# check itself and open a pull request against its own pages.
+#
+# The site mirrors two files from here: `packs.json` (pack identity, versions and the
+# dependency graph) and `INDEX.md` (the generated skill catalog). Those two are the source
+# of truth — the README is a mirror like any other. So this only fires when one of them
+# actually moves on `main`.
+#
+# This workflow sends a notification and nothing else. It cannot edit the site, and the site
+# never publishes anything without a human merging a pull request. If the notification never
+# arrives, the site re-checks on a weekly schedule anyway; the notification only shortens the
+# delay from days to minutes.
+#
+# Setup, once, by someone with admin on both repositories:
+#   - variable SITE_SYNC_REPO — the `owner/name` of the site repository to notify
+#   - secret   SITE_SYNC_TOKEN — a fine-grained PAT with `contents: read/write` on that
+#                                repository. A repository's own GITHUB_TOKEN cannot reach
+#                                across repositories, which is the whole reason this exists.
+# With either missing, the job warns and succeeds. It is never a build failure.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packs.json"
+      - "INDEX.md"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notify-site-sync
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify the site that the catalog changed
+        env:
+          TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
+          TARGET: ${{ vars.SITE_SYNC_REPO }}
+        run: |
+          if [ -z "$TARGET" ]; then
+            echo "::warning::SITE_SYNC_REPO is not set — skipping the site-sync notification."
+            exit 0
+          fi
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::SITE_SYNC_TOKEN is not set — skipping the site-sync notification. The site will pick this change up on its next scheduled check."
+            exit 0
+          fi
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${TARGET}/dispatches" \
+            -d "{\"event_type\":\"skills-released\",\"client_payload\":{\"sha\":\"${GITHUB_SHA}\",\"ref\":\"${GITHUB_REF_NAME}\"}}")
+          echo "dispatch HTTP $code"
+          [ "$code" = "204" ] || { echo "::error::dispatch failed ($code)"; exit 1; }
