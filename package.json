@@ -7,13 +7,16 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "npm run build-manifests && npm run build-index",
+    "build": "npm run build-manifests && npm run build-index && npm run build-operations",
     "build-manifests": "node scripts/build-manifests.mjs",
     "build-index": "node scripts/build-index.mjs",
+    "build-operations": "node scripts/build-operations.mjs",
     "validate": "node scripts/validate.mjs",
+    "validate-operations": "node scripts/validate-operations.mjs",
     "smoke": "node scripts/smoke-install.mjs",
-    "check": "npm run validate && npm run check-manifests && npm run check-index && npm run smoke",
+    "check": "npm run validate && npm run validate-operations && npm run check-manifests && npm run check-index && npm run check-operations && npm run smoke",
     "check-manifests": "node scripts/build-manifests.mjs --check",
-    "check-index": "node scripts/build-index.mjs --check"
+    "check-index": "node scripts/build-index.mjs --check",
+    "check-operations": "node scripts/build-operations.mjs --check"
   }
 }

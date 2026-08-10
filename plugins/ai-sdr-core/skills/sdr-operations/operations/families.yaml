@@ -104,6 +104,22 @@
 
 contract_version: 2.0.0
 
+# Entity words this contract has retired. They are not aliases and they must never quietly resolve:
+# a sentence written today that says `sequence.activate` or `metrics.sequence` is naming something
+# that does not exist, and the reader deserves to be told so rather than have the token pass as
+# ordinary prose.
+#
+# This list exists because an entity set derived from the operations alone cannot see them. Both
+# words were renamed rather than dropped — `sequence` became `campaign`, `metrics` collapsed into
+# `engagement` plus a grouping argument — so neither appears in any fragment, and without this
+# every stale reference to them would read as "not an operation reference at all" instead of as a
+# defect. It is kept after the migration for the same reason it was needed during it.
+retired_entities:
+  - name: sequence
+    became: campaign
+  - name: metrics
+    became: engagement, with the grouping as an argument rather than a separate operation
+
 meters:
   - id: discovery
     consumed_by: searching a database we do not own
