@@ -26,8 +26,13 @@
 #       cost: none                 # none | metered
 #       cost_basis: >              # REQUIRED when cost is metered — a basis, never a price
 #       meter: message             # the meter consumed, from the register below
-#       invariants: [E2, E7]       # stable IDs from references/invariants.md
 #       questions: [4]             # open-question numbers this operation is unsettled by
+#
+# A fragment does NOT list the invariants an operation is bound by. Each rule in
+# references/invariants.md already names the operations that enforce it, so the binding is
+# derived by inverting those lists — one statement, no second copy to drift, and an operation
+# named by a rule that does not exist in the contract is a build failure rather than a ghost
+# reference nobody notices.
 #
 # ABSENCE IS NOT A DEFAULT. A missing property reads as the most dangerous value:
 # reach `act`, reversibility `irreversible`, approval `confirm_each`, cost `metered`. Nothing is
