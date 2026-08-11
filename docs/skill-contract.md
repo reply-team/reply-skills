@@ -28,7 +28,7 @@ metadata:
   maturity: draft           # draft | reviewed | validated | production
   status: active            # active | deprecated | archived
   owner: outbound-experts   # CODEOWNERS group responsible for content
-  tags: [sequences, safety]
+  tags: [campaigns, safety]
   tools: []                 # execution surfaces the skill drives — EMPTY for vendor-neutral skills
   api: []                   # provider doc groups touched — EMPTY for vendor-neutral skills
   relations:
@@ -85,9 +85,21 @@ In order (omit a section only when genuinely empty; `production` maturity requir
 | `validated` | Real executions confirmed the guidance; evidence linked | ≥1 `validated-by` link |
 | `production` | Default recommendation; safe to follow blindly | non-empty Validation + Safety; owner sign-off |
 
-Expert placeholders: business and protection skills may ship as skeletons with explicit
-`TODO(expert): …` markers. Visible gaps are fine; invented expertise is not. A skeleton says so
-in a note under its title, so a reader knows before relying on it.
+Expert placeholders: business and protection skills may ship as skeletons with explicit markers.
+Visible gaps are fine; invented expertise is not. A skeleton says so in a note under its title, so
+a reader knows before relying on it. There are two markers, and they mark different things:
+
+- `TODO(expert): …` — an unvalidated number or playbook: a sending cap, a ramp curve, a response
+  window. The shape is right, the value is a guess. Resolved by evidence from real runs, or by an
+  expert's judgement on that value.
+- `OPEN QUESTION n: …` — a fork in the operation contract that cannot be decided here, `n` keyed to
+  the open-questions reference inside the `sdr-operations` skill. Resolved by a decision, which then
+  changes an operation fragment — a property, an option, sometimes a verb that exists or stops
+  existing.
+
+Keep the two spellings apart. Different people clear them, doing different work: one is answered
+with a number, the other with a choice that means nothing until it is written back into the
+contract. Merged into one marker, neither clean-up could be scoped.
 
 ## Self-containment
 
@@ -102,5 +114,11 @@ in a note under its title, so a reader knows before relying on it.
 - **Review over overwrite**: corrections bump `version` + Changelog; rewrites need an ADR.
 - Additive first; deprecate before removal (`status: deprecated`, successor in `supersedes`).
 - If knowledge repeats across skills, extract a shared skill instead of copying.
-- Changing an operation's effect, reversibility or approval level in `sdr-operations` is a
-  **breaking change** — every guardrail downstream reads those.
+- Changing any of an operation's five properties in `sdr-operations` — **reach**,
+  **reversibility**, **approval**, **`before_repeating`** or **cost** — is a **breaking change**.
+  Every guardrail, playbook and adapter downstream reads them, and approval is *derived* from reach
+  × reversibility rather than authored, so an edit to either of the first two silently moves the
+  gate. Those values live in the operation fragments under the skill's `operations/` directory and
+  are changed **there, never in prose**: every normative table in a skill is generated from them,
+  and a table in a skill that disagrees with a fragment is a bug in the skill — fixed by
+  regenerating, not by editing the table.

@@ -14,20 +14,21 @@
     {
       "name": "ai-sdr-core",
       "displayName": "AI SDR Core",
-      "version": "0.2.0",
+      "version": "1.0.0",
       "layers": ["L1 SDR business operations", "L2 strategy & playbooks", "L3 protection & guardrails"],
       "description": "Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.",
       "dependencies": [],
       "keywords": ["sdr", "outbound", "sales", "playbooks", "guardrails", "vendor-neutral"],
       "presentation": {
         "shortDescription": "Run real outbound with guardrails, not guesswork",
-        "longDescription": "Teaches an agent what an SDR operation actually is: how to shape an audience, plan a campaign, work the replies and read the numbers honestly — with sending and channel limits, and explicit approval gates before anything reaches a real person. Vendor-neutral: it needs no Reply.io account and no provider at all.",
+        "longDescription": "Teaches an agent what an SDR operation actually is: 325 named operations in 21 families — find and verify a person, build an audience, plan and launch a campaign, work the replies, honour an opt-out, read the numbers honestly. Each one says what it reaches, whether it can be undone and what approval it needs, so sending and channel limits and explicit approval gates apply before anything reaches a real person. Vendor-neutral: it needs no Reply.io account and no provider at all.",
         "category": "Business & Operations",
         "capabilities": ["Read"],
         "examplePrompts": [
           "Plan an outbound campaign to book ten meetings with fintech founders",
           "What sending limits should I respect on a brand-new domain?",
-          "Review this sequence and tell me what to fix before I launch"
+          "Review this campaign and tell me what to fix before I launch",
+          "Which of these steps would reach a real person, and what do you need me to approve?"
         ]
       }
     },
