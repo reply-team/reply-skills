@@ -151,7 +151,7 @@ operations:
       detail: metered where the extract consumes an allowance.
     cost_basis: per call
     meter: request
-    questions: []
+    questions: [24]
 
   - name: export.get
     intent: >
@@ -164,4 +164,4 @@ operations:
     idempotency_key: none
     per_item_results: not_applicable
     cost: none
-    questions: []
+    questions: [24]

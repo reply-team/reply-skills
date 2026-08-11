@@ -277,7 +277,7 @@ operations:
       conditional: true
       detail: when a collection is given.
     cost: none
-    questions: [9]
+    questions: [9, 25]
 
   - name: campaign.unfreeze
     intent: >

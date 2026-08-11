@@ -155,7 +155,7 @@ operations:
     idempotency_key: required
     per_item_results: required
     cost: none
-    questions: []
+    questions: [22]
 
   - name: editorial_review.record
     intent: >
@@ -451,7 +451,7 @@ operations:
     key_exempt: unstated
     per_item_results: required
     cost: none
-    questions: []
+    questions: [25]
 
   - name: stoprule_firing.list
     intent: >

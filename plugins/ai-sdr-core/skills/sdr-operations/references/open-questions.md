@@ -1,6 +1,6 @@
 # Open questions
 
-Twenty-one forks in this contract that research could not settle. Each is a place where two
+Twenty-six forks in this contract that research could not settle. Each is a place where two
 defensible readings exist, we took one, and taking the other would change an operation — not the
 prose around it, the operation.
 
@@ -89,6 +89,11 @@ readings under pressure. Questions 16–19 came out of working the families one 
 | 19 | The blank-value rule, per field | The four writes that take a blank-value rule |
 | 20 | Should telephony be in the core set | The core set: `call.log`, `call.place` |
 | 21 | The task queue's cross-class ranking | `task.list`, possibly a new policy pair |
+| 22 | `escalation.resolve` is a restart direction that derives `auto` | `escalation.resolve`, the resolving actor |
+| 23 | The deletion feed transmits outward from the protective floor | `deletion_feed.report` |
+| 24 | Nothing in the export pair says personal data left | `export.request`, `export.get` |
+| 25 | Two collection writes take no key and give no reason | `stoprule.clear`, `campaign.freeze` |
+| 26 | One confirmation lifts a collection of legal exclusions | `suppression.remove` |
 
 ---
 
@@ -419,3 +424,96 @@ guarantee with nothing declarable behind it.
 
 **Our answer today:** (a). **Why we are asking:** this is precisely "a default we set that should be
 the operator's choice" — the feedback category this contract asks for by name.
+
+## 22. `escalation.resolve` is the restart direction of a protective pair and derives `auto`
+
+**The fork.** `escalation.raise` is protective — "I cannot or must not proceed; a named human owns
+this now" — and derives `auto`, correctly. Its resolution is declared `control` × `reversible` ×
+`auto`, which the derivation table gives freely. But the contract also states, without
+qualification, that the restart direction of every protective pair is never `auto`, and every other
+pair obeys it: pause/resume, hold/release, set/clear. So an agent that escalated *because it must
+not proceed* can clear the gate itself, record that the work returns to the agent, and carry on. The
+resolving human's identity is not required anywhere, which leaves L4 — an agent may transmit a
+human's decision and may never author one — unenforceable at exactly the point it matters.
+
+| Option | Cost |
+|---|---|
+| (a) `auto`, as declared (current) | The one bypass path available using nothing but operations the contract hands the agent. An unattended run can escalate and un-escalate without a human ever seeing it |
+| (b) `confirm_once`, raised, with the deciding actor required — the shape `outreach.release` and `editorial_review.record` already use | One more gate on a path a human is usually driving anyway, and a resolution recorded by a human directly is a confirmation already |
+| (c) Keep `auto` but require the resolving actor and extend `before_repeating` to name who resolved it | Cheaper, and it makes the record auditable without adding a prompt — but an agent may still write its own name |
+
+**Our answer today:** (a), transcribed as declared. **Why we are asking:** the guide's own restart
+rule and its own appendix row disagree here, and only the author can say which was meant. If it is
+(b) or (c), the fix is a property change plus a required argument, not a wording change.
+
+## 23. `deletion_feed.report` sits on the protective floor while it transmits outward
+
+**The fork.** The floor is for operations whose non-performance is itself the harm, and the other
+four members record a fact into our own store — somebody said stop, the platform restricted us,
+somebody arrived, somebody asked. This one **sends something to a third party, per identifier**, to
+meet a reporting deadline. It is declared `control` × `irreversible` × `auto`, protective.
+
+| Option | Cost |
+|---|---|
+| (a) On the floor, `auto`, because the deadline is the obligation (current) | An over-broad or wrong report is an irreversible disclosure, which its own reversibility concedes; A13 says a `legal_obligation` exclusion blocks disclosure and transfer, not only sending. Nothing bounds the payload |
+| (b) `act` + `confirm_once` — one report over a batch is one decision over a set, which the table admits | A gate on a deadline-driven obligation, which is the failure the floor exists to prevent, and the deadline does not wait for a human |
+| (c) Keep `auto` and state what bounds the payload — which identifiers, which register, which window | The reason field carries the safety instead of the class, and a reason is not enforced |
+
+**Our answer today:** (a), transcribed as declared, and the floor marker makes the membership
+checkable rather than remembered. **Why we are asking:** every other outbound transmission in the
+contract is `act` (`restriction.appeal`, `approved_content.submit`,
+`messaging_registration.submit`), so either this one is different for a reason worth stating, or its
+reach is wrong.
+
+## 24. Nothing in the export pair says personal data left the system
+
+**The fork.** `export.request` is declared `control` × `reversible`, `confirm_once` raised, and its
+own raise reason says "an extract moves personal data out of the system where its handling rules are
+enforced" — while `reversible` means a second call puts the world back. `export.get` is `read` ×
+`reversible` × `auto` with no key. So whichever of the two is the moment of disclosure, that moment
+is expressible nowhere in the family.
+
+| Option | Cost |
+|---|---|
+| (a) As declared (current) | A guardrail reasoning about blast radius off `reversibility` is told an extract of personal data is undoable. `privacy_request.fulfill` gets the same shape right — `act` when it discloses, `irreversible`, `confirm_each` |
+| (b) `export.request` becomes `irreversible`, with `act` or a conditional reach naming the disclosing half | A property change on a reporting operation people use constantly, and the gate stays `confirm_once` either way |
+| (c) The disclosure is `export.get` — it gets the gate and the key, and `request` stays as it is | Collection is where the file actually leaves, which is arguably more honest, but it gates a read |
+
+**Our answer today:** (a), transcribed as declared. **Why we are asking:** A13 binds this operation
+precisely because of that disclosure, and the two rows as written cannot both be right.
+
+## 25. Two collection writes take no idempotency key and give no reason
+
+**The fork.** A collection write takes a key, and two shapes are exempt because a repeat is harmless
+by construction: an absolute-valued setter, and an operation naming a terminal state. Four
+operations claim one of those exemptions in the source's own words. Two do not — `stoprule.clear`
+and `campaign.freeze` — and both are safety switches: clearing a stop rule leaves work running
+unprotected, and `campaign.freeze`'s own note says freezing twice with different expiries "is a
+change, not a repeat", which is the opposite of harmless.
+
+| Option | Cost |
+|---|---|
+| (a) No key, no reason — carried as `key_exempt: unstated` (current) | A lost connection during "clear these stop rules" leaves the safety configuration in an unknown state, and `invocation.get` cannot answer because no key was sent |
+| (b) Both take a key, like `campaign.pause` — which is `campaign.freeze`'s own twin and declares exactly this case | Two rows change; nothing else does. The cost is that every caller now generates a key for a call they may think of as a toggle |
+| (c) Name the exemption that applies, if one does | Cheapest if the answer is "clearing is absolute-valued" — but freeze carries an expiry, so it is not obviously either shape |
+
+**Our answer today:** (a), and the gap is declared rather than hidden: the catalogs print
+`exempt: unstated`, which is the contract admitting it has no reason rather than implying one.
+**Why we are asking:** these are the two operations where an unrecoverable partial run costs most.
+
+## 26. One confirmation lifts a whole collection of legal exclusions
+
+**The fork.** `suppression.remove` accepts a collection, reports per item, and is `confirm_once`. So
+one yes authorises N lifts of what the contract calls the only lift — each of which needs its own
+evidence, and whose own `before_repeating` says "the sends made during a wrongful lift cannot be
+restored by any second act".
+
+| Option | Cost |
+|---|---|
+| (a) `confirm_once` over the collection (current) | The gradient runs backwards against its own neighbours: `duplicate.merge`, also `control` × `irreversible`, raises to `confirm_each`, and `optout.confirm` — which sends one harmless email — is `confirm_each` over a single object. Merging two records gets a confirmation per item; lifting a legal opt-out gets one per batch |
+| (b) `confirm_each`, raised, with the evidence per item | Slow by design, which is arguably the point, and the operation is rare |
+| (c) `accepts_collection: false` — one lift, one call, one piece of evidence | Removes the batch case entirely rather than gating it, and a bulk correction after a mistaken import then has no route |
+
+**Our answer today:** (a), transcribed as declared. **Why we are asking:** this is the one place in
+the contract where the confirmation gradient runs opposite to the consequence, and whether bulk
+lifting is real practice decides between (b) and (c).

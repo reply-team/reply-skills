@@ -98,7 +98,7 @@ operations:
     idempotency_key: required
     per_item_results: required
     cost: none
-    questions: []
+    questions: [26]
 
   - name: optout.record
     core: true
@@ -359,7 +359,7 @@ operations:
     idempotency_key: required
     per_item_results: required
     cost: none
-    questions: []
+    questions: [23]
 
   - name: retention.apply
     intent: >
