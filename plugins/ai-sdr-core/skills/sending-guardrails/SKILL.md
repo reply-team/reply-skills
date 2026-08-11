@@ -22,8 +22,8 @@ metadata:
 # Sending guardrails
 
 > **Expert skeleton.** The structure, the safety posture and the decision points are final.
-> Every number and every playbook is `TODO(expert)` and must be validated by Reply's
-> deliverability experts before this skill leaves `draft`. Visible gaps are deliberate;
+> Every number and every playbook is `TODO(expert)` and must be validated by the deliverability
+> experts who own this skill before it leaves `draft`. Visible gaps are deliberate;
 > invented thresholds would be worse than none. What changed at 0.3.0 is that each missing
 > number now names the operation it will be configured through — which is not the same as
 > having the number, and is not progress towards `production`.
