@@ -68,7 +68,7 @@ depends-on: [WI-001]
 operations: [campaign.enroll]    # the business operations this item performs
 outputs: []               # artifact paths / created entity IDs, filled during execution
 approval:                 # present only while status = awaiting-approval
-  question: "Start sequence 12345 for 214 contacts?"
+  question: "Activate campaign 12345, releasing 214 enrolments?"
 history:
   - 2026-07-27T14:02Z started
   - 2026-07-27T14:07Z paused: awaiting user approval

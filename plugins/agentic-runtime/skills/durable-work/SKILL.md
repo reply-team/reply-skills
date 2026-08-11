@@ -60,7 +60,7 @@ after.
 Three properties make a work item durable:
 
 1. **Small and observable.** It has a stated objective and a way to tell it is done. "Run the
-   campaign" fails both; "enrol the 214 contacts from list *Q3 founders* into sequence 12345"
+   campaign" fails both; "enrol the 214 contacts from list *Q3 founders* into campaign 12345"
    passes.
 2. **Independently resumable.** Enough state recorded that a fresh session can continue from
    the middle. External identifiers get recorded the moment they exist — an identifier that
