@@ -6,7 +6,7 @@ description: >
   Use when executing any Reply.io operation from a shell, setting up authentication,
   or when another Reply skill needs commands executed.
 metadata:
-  version: 1.2.0
+  version: 1.3.0
   pack: reply-adapter
   category: execution
   maturity: reviewed
@@ -26,6 +26,11 @@ metadata:
 `reply` (npm: `reply-cli`, Node ≥ 20) is the terminal entry point to Reply.io. It handles
 authentication, multi-account profiles and team context, and exposes the **entire** API v3 through
 one command — `reply api`. All other Reply skills execute through it.
+
+Reaching the whole API is not the same as reaching the whole job. Whether a given business
+operation can be performed against Reply at all — and how far it keeps the operation's promise —
+is answered per operation in `reply-operations-mapping`, not by this skill. This one is how a call
+is issued once that question has an answer.
 
 ## When to use / when NOT to use
 
@@ -123,7 +128,10 @@ for piping. Transient failures (429/5xx) retry automatically honoring `Retry-Aft
 ## Validation
 
 After any write, read the entity back (`reply api GET …`) and confirm IDs/counts before reporting
-success. Never claim success without checking `code` and the response body.
+success. Never claim success without checking `code` and the response body. Which read to perform
+is not a judgement call: every operation in the `sdr-operations` contract names its
+`before_repeating` state, and that is the read-back — it is also what makes a resumed run and an
+interrupted plan safe, so it is not optional on the paths nobody is watching.
 
 ## Reporting
 
@@ -150,9 +158,17 @@ explicit confirmation its Safety section requires.
 
 - `reply-api` — how to find the right endpoint and read the docs before calling.
 - `reply-auth` — key types, scopes and team/org resolution in depth.
+- `reply-operations-mapping` — whether an operation is performable against Reply at all, and the
+  endpoint group that performs it.
 
 ## Changelog
 
+- 1.3.0 (2026-08-10): said plainly that reaching the whole API is not reaching the whole job — the
+  per-operation answer is in `reply-operations-mapping` — because "exposes the entire API v3" was
+  the sentence an agent was reading as "anything the user asks for is reachable". The read-back in
+  *Validation* is now named as the contract's `before_repeating` state rather than left as a
+  general instruction to check afterwards. The command inventory was re-checked against the
+  2.0.0 contract and needed no change.
 - 1.2.0 (2026-08-02): the command inventory was two groups out of date — `skills` and `install`
   shipped and this skill still said the CLI covers auth/profile/team plus `reply api`, which is
   how an agent ends up telling a user a command does not exist. Added self-update, and a note
