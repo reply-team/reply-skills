@@ -1768,7 +1768,7 @@ operations:
   - name: variant.add
     fulfilment: direct
     surface: sequence-steps -> Create a step variant, Bulk create step variants
-    scopes: [sequences:write]
+    scopes: [sequences:write, sequences:operate]
     notes: >
       A variant carries a subject, a message, an enabled flag and up to three attachment
       identifiers. There is no split share, so report the split as unsettable rather than assuming

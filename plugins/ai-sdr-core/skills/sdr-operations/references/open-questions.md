@@ -28,9 +28,12 @@ a future clean-up of either, because they are cleared by different people doing 
 A `TODO(expert)` is answered with a number. An open question is answered with a choice, and the
 answer has to be written back into the contract before it means anything.
 
-**The 33 `TODO(expert)` markers already in this repository are a different thing and are untouched
-by this work.** None of them is an open question, none of them is renumbered, and clearing one has
-no bearing on any fork below. They are listed nowhere here on purpose.
+**The `TODO(expert)` markers already in this repository are a different thing and are untouched by
+this work.** Seven skills carry **25** of them — an unvalidated value each, `TODO(expert):` followed
+by what has to be validated — plus the callout at the top of each of those skills saying the skill
+holds some, which is what makes the count read differently depending on what you grep for: 33 lines
+mention the marker, 25 are markers. None of them is an open question, none is renumbered, and
+clearing one has no bearing on any fork below. They are listed nowhere here on purpose.
 
 ## How a fragment points at this file
 

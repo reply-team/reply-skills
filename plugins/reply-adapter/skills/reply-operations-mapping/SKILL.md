@@ -16,7 +16,7 @@ metadata:
   owner: skills-maintainers
   tags: [mapping, operations, endpoints, scopes, adapter, coverage]
   tools: [reply-cli, reply-mcp]
-  api: [contacts, contact-lists, contact-blacklist-rules, custom-fields, sequences, sequence-steps, sequence-contacts, sequence-email-accounts, email-templates, inbox, tasks, reports, email-accounts, linkedin-accounts, schedules, holiday-calendars, webhooks, live-data, contact-enrichment, email-validations, background-jobs, user-account]
+  api: [contacts, contact-lists, contact-blacklist-rules, custom-fields, sequences, sequence-steps, sequence-contacts, sequence-email-accounts, sequence-linkedin-accounts, sequence-folders, sequence-templates, email-templates, inbox, tasks, reports, email-accounts, linkedin-accounts, accounts, schedules, holiday-calendars, webhooks, live-data, direct-outreach, contact-enrichment, email-validations, background-jobs, user-account, industries, ai-sdr-sequences, ai-sdr-pending-approvals]
   relations:
     depends-on: [reply-api, reply-cli, sdr-operations]
     recommends: [reply-auth, reply-mcp]
@@ -129,8 +129,12 @@ when a plan is being written. The 194 absences are the most informative part of 
 
 Nothing about these figures is a criticism of the product. Reply is strong exactly where an
 outbound programme spends most of its time — contacts, lists, sequences, steps, enrolment, the
-inbox, tasks and reporting — and the absences cluster in privacy machinery, meetings, inbound
-queues, signals and policy objects that live in other systems or in nobody's system yet.
+inbox and tasks. The absences cluster in oversight and review, which is the largest cluster in the
+register, then deliverability, then privacy machinery, meetings, inbound queues, signals and the
+policy objects that live in other systems or in nobody's system yet. Measurement belongs with the
+absences rather than the strengths: the family is mostly absent, because the contract asks for a
+measure set with the grouping as an argument and a stated envelope around every figure, which is a
+different thing from a report.
 
 ### Where the order comes from
 
