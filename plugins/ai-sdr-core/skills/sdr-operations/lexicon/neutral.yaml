@@ -35,6 +35,21 @@
 # with `vocabulary.list` and is an account fact, not a contract fact. A word nobody actually says
 # is not an alias; do not invent input we have never received.
 #
+# WHERE prefLabel GOVERNS, AND WHERE IT DOES NOT. It governs everything written back: an
+# operation name, a plan, a report, a durable artefact, an identifier, a machine-readable field.
+# It does not govern explanatory prose, which may reach for an alias where the alias reads better
+# — a skill saying "the prospect sees a new From address" is using the accepted input word for
+# `contact` in a sentence nobody parses. The line is the sense, not the word: an alias must never
+# be used in a sense this register denies (see `never_means`), and it is never the word a plan or
+# a report writes.
+#
+# ONE DOCUMENTED SPELLING SPLIT. Identifiers are US-spelled — `enrollment.pause`, `campaign.enroll`
+# — because an operation name is a token and tokens do not get regional variants. Prose in this
+# repository is UK-spelled, so it says "enrolment" while naming `enrollment.list` in the same
+# sentence. That looks like an inconsistency and is a deliberate one: the identifier is fixed by
+# the contract and the surrounding sentence follows the repository's own English. `enrolment` is
+# an accepted input alias for exactly this reason.
+#
 # HOW A WORD IS RESOLVED AT RUNTIME. `term.resolve` answers with the concept, or with `ambiguous`,
 # or with `unknown` — never with a guess. This file is what it resolves against. An alias resolving
 # to two concepts is a defect here, not an ambiguity to be reported at runtime.
@@ -74,7 +89,7 @@ concepts:
 
   - id: campaign
     prefLabel: campaign
-    altLabels: [cadence, drip, play, programme, program, nurture track, touch pattern, outreach flow]
+    altLabels: [cadence, drip, play, programme, program, nurture track, touch pattern, outreach flow, flow, journey]
     hiddenLabels: [campaigns, campain, campagne, cmp, outbound programme, multi-step programme]
     definition: >
       A named multi-step programme of touches to named people, with its own steps, schedule,
