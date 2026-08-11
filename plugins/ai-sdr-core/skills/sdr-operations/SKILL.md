@@ -102,14 +102,21 @@ Every operation carries five properties, and they are what decide how it may be 
 
 **Approval is derived, not chosen.** The cell is the whole rule:
 
-|  | `reversible` | `compensatable` | `irreversible` |
+<!-- BEGIN GENERATED approval-derivation -->
+
+<!-- Generated. Do not edit by hand. -->
+
+| reach ↓ · reversibility → | `reversible` | `compensatable` | `irreversible` |
 |---|---|---|---|
 | **`read`** | `auto` | `auto` | `auto` |
-| **`control`** | `auto` | `auto` * | `confirm_once` |
-| **`act`** | `confirm_once` +p | `confirm_once` +p | `confirm_each`, or `confirm_once` +p where one call is one decision over a set |
+| **`control`** | `auto` | `auto` † | `confirm_once` |
+| **`act`** | `confirm_once` ‡ | `confirm_once` ‡ | `confirm_each`, or `confirm_once` ‡ where one call is one decision over a set |
 
-\* `confirm_once` where the call carries a collection or a pattern, or may overwrite state someone
-else owns.  ⁠+p = with a mandatory preview that *names* the population rather than counting it.
+† **widened to `confirm_once`** where the call carries a collection or a pattern, or may
+overwrite state someone else owns.
+‡ **with a mandatory preview**, and the preview names the population rather than counting it.
+
+<!-- END GENERATED approval-derivation -->
 
 Policy may raise the derived class. **Nothing may lower it.** Every raise is marked
 `approval_departs: true` at the operation and states its reason in writing, so a hand-set value is

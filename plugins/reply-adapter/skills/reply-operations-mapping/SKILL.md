@@ -112,7 +112,13 @@ would be a product manual with a neutral vocabulary painted on it.
 
 ### The shape of the coverage, stated honestly
 
+<!-- BEGIN GENERATED adapter-coverage -->
+
+<!-- Generated. Do not edit by hand. -->
+
 All 325 operations carry an entry: **43 direct, 6 composed, 82 partial, 194 absent.**
+
+<!-- END GENERATED adapter-coverage -->
 
 Reaching about a sixth of the contract directly is the true picture, and it is worth stating in
 those terms rather than in the terms a mapping is usually written in. A mapping listing only what

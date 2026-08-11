@@ -3,7 +3,12 @@
 //
 //   references/operation-index.md     — every operation, by family, one line each
 //   references/catalog-NN-<slug>.md   — one full classification table per family
-//   SKILL.md                          — the core-operations table, between its markers
+//   SKILL.md                          — the core-operations table and the approval derivation,
+//                                       each between its own pair of markers
+//
+// and the same derivation into approval-boundaries, plus an adapter's coverage figures into its
+// own skill — every table that used to be written twice by hand and could therefore disagree
+// with itself.
 //
 // and, from a provider adapter's fulfilment register, that adapter's own view of the same
 // operations:
@@ -72,6 +77,21 @@ const FRAGMENT_FILE = /^(\d{2})-([a-z0-9-]+)\.yaml$/;
 const BEGIN_MARKER = '<!-- BEGIN GENERATED core-operations -->';
 const END_MARKER = '<!-- END GENERATED core-operations -->';
 
+// The derivation table is read by an agent in two skills — the contract, where the properties are
+// defined, and approval-boundaries, where the gate is applied. Both printed it by hand, in a
+// repository whose approval skill says in as many words "do NOT restate the derivation inside
+// another skill: two copies of a gate is how one of them ends up wrong". It is now emitted from
+// the same DERIVATION the build reasons with, into both files, between these markers.
+const DERIVATION_BEGIN = '<!-- BEGIN GENERATED approval-derivation -->';
+const DERIVATION_END = '<!-- END GENERATED approval-derivation -->';
+
+// An adapter's own skill states how much of the contract it reaches. Those four numbers were
+// written by hand next to a register that counts them, which is the drift this generator exists
+// to remove — and the numbers are load-bearing: a reader decides whether to plan around this
+// adapter at all by looking at them.
+const COVERAGE_BEGIN = '<!-- BEGIN GENERATED adapter-coverage -->';
+const COVERAGE_END = '<!-- END GENERATED adapter-coverage -->';
+
 // Every key an operation may carry. A typo is otherwise silent and the silence is the damage:
 // `question: [4]` parses, carries no meaning, and detaches an operation from the fork that owns
 // it while the file still reads as though the binding were there. An unknown key is a mistake or
@@ -101,6 +121,29 @@ const DERIVATION = {
     control: { reversible: ['auto'], compensatable: ['auto', 'confirm_once'], irreversible: ['confirm_once'] },
     act: { reversible: ['confirm_once'], compensatable: ['confirm_once'], irreversible: ['confirm_once', 'confirm_each'] },
 };
+
+// How each cell reads to a person. Held next to the sets rather than derived from them, because a
+// widened cell has to say which way it widens and why, and no formatting rule can produce that
+// sentence. The two are checked against each other below, so the table an agent reads and the
+// table the gates apply can never be two different tables.
+const DERIVATION_CELLS = {
+    read: { reversible: '`auto`', compensatable: '`auto`', irreversible: '`auto`' },
+    control: { reversible: '`auto`', compensatable: '`auto` †', irreversible: '`confirm_once`' },
+    act: {
+        reversible: '`confirm_once` ‡',
+        compensatable: '`confirm_once` ‡',
+        irreversible: '`confirm_each`, or `confirm_once` ‡ where one call is one decision over a set',
+    },
+};
+
+const DERIVATION_FOOTNOTES = [
+    '† **widened to `confirm_once`** where the call carries a collection or a pattern, or may',
+    'overwrite state someone else owns.',
+    '‡ **with a mandatory preview**, and the preview names the population rather than counting it.',
+].join('\n');
+
+const REACHES = ['read', 'control', 'act'];
+const REVERSIBILITIES = ['reversible', 'compensatable', 'irreversible'];
 
 const check = process.argv.includes('--check');
 
@@ -641,6 +684,34 @@ const index_md = () => {
     return out;
 };
 
+const derivation_table = () => {
+    let out = `${HEADER}\n\n`;
+    out += `| reach ↓ · reversibility → | ${REVERSIBILITIES.map(r => code(r)).join(' | ')} |\n|---|---|---|---|\n`;
+    for (const reach of REACHES) {
+        out += `| **${code(reach)}** | ${REVERSIBILITIES.map(r => DERIVATION_CELLS[reach][r]).join(' | ')} |\n`;
+    }
+    return `${out}\n${DERIVATION_FOOTNOTES}\n`;
+};
+
+// The printed cell and the derived set must agree. One direction is checked, deliberately: every
+// class a cell names must be one the table actually derives, so no reader is ever told to run
+// something automatically that the gates hold. The reverse is not an error — `control` x
+// `compensatable` prints `auto` with a footnote for the widening, which is how a widened cell is
+// meant to read, and demanding both values in the cell itself would force the footnote back into
+// the table.
+for (const reach of REACHES) {
+    for (const reversibility of REVERSIBILITIES) {
+        const set = DERIVATION[reach][reversibility];
+        const text = DERIVATION_CELLS[reach]?.[reversibility] ?? '';
+        const named = [...text.matchAll(/`([a-z_]+)`/g)].map(m => m[1]);
+        const wrong = named.filter(v => !set.includes(v));
+        if (!named.length || wrong.length) {
+            err('derivation table', `${reach} × ${reversibility} derives ${or_list(set)}, and the cell an agent reads says `
+                + `"${text}"${wrong.length ? ` — ${or_list(wrong)} is not derived here at all` : ' — which names no class'}`);
+        }
+    }
+}
+
 const core_table = () => {
     let out = `${HEADER}\n\n`;
     out += '| Operation | Family | Reach | Approval | What it is for |\n|---|---|---|---|---|\n';
@@ -701,6 +772,7 @@ shape.`;
 
 const adapter_summaries = [];
 const adapter_targets = [];
+const adapter_coverage = [];
 
 for (const adapter_name of ADAPTER_SKILLS) {
     const adapter_skill = skill_dirs().find(d => d.name === adapter_name);
@@ -906,6 +978,16 @@ for (const adapter_name of ADAPTER_SKILLS) {
     }
     adapter_targets.push({ file: path.join(adapter_references, 'fulfilment.md'), text: fulfilment_md() });
 
+    const coverage_sentence = () => {
+        const tally = `**${counts.direct} direct, ${counts.composed} composed, ${counts.partial} partial, ${counts.absent} absent`;
+        const line = unmapped.length
+            ? `${entry_of.size} of ${operation_of.size} operations carry an entry: ${tally}** — and ${unmapped.length} carry `
+                + 'none at all, which is an unanswered question rather than a recorded absence.'
+            : `All ${operation_of.size} operations carry an entry: ${tally}.**`;
+        return [HEADER, '', line, ''].join('\n');
+    };
+    adapter_coverage.push([path.join(adapter_skill.dir, 'SKILL.md'), coverage_sentence()]);
+
     adapter_summaries.push(`Adapter ${adapter_id} — ${entry_of.size} of ${operation_of.size} operations mapped: `
         + `${counts.direct} direct, ${counts.composed} composed, ${counts.partial} partial, ${counts.absent} absent; `
         + `${adapter_targets.length - emitted_before} mapping references.`);
@@ -924,19 +1006,34 @@ targets.push(...adapter_targets);
 // frontmatter through it would rewrite parts of the file this script has no business
 // touching. The markers arrive with the L1 rewrite, so their absence is a notice, not a
 // failure: the catalogs are still worth emitting today.
-const skill_text = fs.readFileSync(SKILL_FILE, 'utf8').replace(/\r\n/g, '\n');
-const begin = skill_text.indexOf(BEGIN_MARKER);
-const end = skill_text.indexOf(END_MARKER);
-if (begin === -1 || end === -1) {
-    notices.push('SKILL.md carries no core-operations markers — that injection is skipped until the L1 body is rewritten.');
-} else if (end < begin) {
-    err('SKILL.md', 'the core-operations END marker precedes its BEGIN marker');
-} else {
-    targets.push({
-        file: SKILL_FILE,
-        text: `${skill_text.slice(0, begin + BEGIN_MARKER.length)}\n\n${core_table()}\n${skill_text.slice(end)}`,
-    });
-}
+const inject = (file, blocks) => {
+    const rel = path.relative(ROOT, file).replace(/\\/g, '/');
+    if (!fs.existsSync(file)) { notices.push(`${rel} does not exist — its generated blocks are skipped.`); return; }
+    let text = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+    let touched = false;
+    for (const [label, begin_marker, end_marker, body] of blocks) {
+        const begin = text.indexOf(begin_marker);
+        const end = text.indexOf(end_marker);
+        if (begin === -1 || end === -1) { notices.push(`${rel} carries no ${label} markers — that injection is skipped.`); continue; }
+        if (end < begin) { err(rel, `the ${label} END marker precedes its BEGIN marker`); continue; }
+        text = `${text.slice(0, begin + begin_marker.length)}\n\n${body}\n${text.slice(end)}`;
+        touched = true;
+    }
+    if (touched) targets.push({ file, text });
+};
+
+inject(SKILL_FILE, [
+    ['core-operations', BEGIN_MARKER, END_MARKER, core_table()],
+    ['approval-derivation', DERIVATION_BEGIN, DERIVATION_END, derivation_table()],
+]);
+
+// The gate's own skill reads the same table. It is the one file in the repository that must not
+// hold a second copy of it, since it is where the copy would be believed.
+for (const [file, body] of adapter_coverage) inject(file, [['adapter-coverage', COVERAGE_BEGIN, COVERAGE_END, body]]);
+
+const approval_skill = skill_dirs().find(d => d.name === 'approval-boundaries');
+if (!approval_skill) notices.push('No approval-boundaries skill in the tree — the derivation table is not injected there.');
+else inject(path.join(approval_skill.dir, 'SKILL.md'), [['approval-derivation', DERIVATION_BEGIN, DERIVATION_END, derivation_table()]]);
 
 // A generated file nobody generates any more. Rename a family and its old catalog stays on disk,
 // fully formatted, carrying the properties of operations that have moved — and the freshness check
@@ -993,6 +1090,6 @@ if (check) {
     }
     console.log(`Operation references are up to date (${targets.length} files).`);
 } else {
-    console.log(`Wrote ${targets.length} operation references — ${targets.length - adapter_targets.length} for the contract, `
-        + `${adapter_targets.length} for the adapter.`);
+    console.log(`Wrote ${targets.length} generated files — the contract's index and catalogs, `
+        + `${adapter_targets.length} adapter mapping references, and the blocks injected into skills between markers.`);
 }

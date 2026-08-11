@@ -91,6 +91,10 @@ discovered during it. When decomposing work:
 
 ### Approval is derived from reversibility by reach
 
+<!-- BEGIN GENERATED approval-derivation -->
+
+<!-- Generated. Do not edit by hand. -->
+
 | reach ↓ · reversibility → | `reversible` | `compensatable` | `irreversible` |
 |---|---|---|---|
 | **`read`** | `auto` | `auto` | `auto` |
@@ -100,6 +104,8 @@ discovered during it. When decomposing work:
 † **widened to `confirm_once`** where the call carries a collection or a pattern, or may
 overwrite state someone else owns.
 ‡ **with a mandatory preview**, and the preview names the population rather than counting it.
+
+<!-- END GENERATED approval-derivation -->
 
 **Policy may raise the class; nothing may lower it.** If your reasoning arrives at a smaller
 gate than the table gives, you have found either a defect in the contract or a misreading of
