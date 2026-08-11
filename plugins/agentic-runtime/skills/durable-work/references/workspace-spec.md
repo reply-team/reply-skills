@@ -66,6 +66,8 @@ goal: q3-saas-founders    # parent goal slug
 status: awaiting-approval # todo | in-progress | blocked | awaiting-approval | done | cancelled
 depends-on: [WI-001]
 operations: [campaign.enroll]    # the business operations this item performs
+idempotency-key: wi-003-enrol-q3 # generated BEFORE the first attempt, one per item per operation;
+                                 # what `invocation.get` recovers an ambiguous outcome by
 outputs: []               # artifact paths / created entity IDs, filled during execution
 approval:                 # present only while status = awaiting-approval
   question: "Enrol audience 'Q3 fintech founders — Series A, US' into campaign 12345, as named in the preview?"
@@ -79,8 +81,11 @@ Rules:
 
 - **Resumable**: enough state in `outputs` and `history` that a fresh session can continue
   without redoing completed steps — record external identifiers as soon as they exist.
-- **Idempotent intent**: before re-executing, check whether the outcome already holds. Every
-  operation in the SDR operation contract names the check to run.
+- **Recoverable**: the key first, the read second. `idempotency-key` is generated before the
+  first attempt and recorded here, so an ambiguous failure is resolved by asking `invocation.get`
+  about that key rather than by guessing; only where no key exists does recovery fall back to the
+  `before_repeating` state every operation in the SDR operation contract states. Where the item's
+  operation is exempt from carrying a key, the contract says so at the operation.
 - **`awaiting-approval`** is the human-review pause: execution stops gracefully until the user
   answers the recorded question. *Which* actions require it is decided by the core pack's
   approval rules, not by this format.

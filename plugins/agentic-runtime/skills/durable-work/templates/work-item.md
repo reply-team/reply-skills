@@ -4,6 +4,8 @@ goal: <goal-slug>
 status: todo              # todo | in-progress | blocked | awaiting-approval | done | cancelled
 depends-on: []
 tools: []                 # e.g. [reply-cli]
+operations: []            # the vendor-neutral operations this item performs, e.g. [campaign.enroll]
+idempotency-key:          # generate BEFORE the first attempt — what recovers an ambiguous outcome
 outputs: []               # artifact paths / created entity IDs — fill AS SOON as they exist
 # approval:               # present only while status = awaiting-approval
 #   question: "Exact yes/no question for the user"

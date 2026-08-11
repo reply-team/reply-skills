@@ -12,8 +12,8 @@ Durable multi-session work: goals, plans, work items, checkpoints, resumability,
 
 | Skill | Description | Maturity | Version |
 |---|---|---|---|
-| [durable-work](skills/durable-work/SKILL.md) | How long-running work survives a session ending: goals, plans, work items, checkpoints, approval pauses, recovery and resumption, kept as plain markdown in a workspace the user owns. Use when work spans more than one session, when resuming work someone or something else started, or when a plan needs to be persisted rather than held in conversation. | draft | 1.0.0 |
-| [execution-reporting](skills/execution-reporting/SKILL.md) | How to write execution reports that become organisational memory: structure, evidence, honest deviations, and feeding results back into the next planning pass. Use after completing meaningful execution, at a plan checkpoint, or when closing a work item. | draft | 2.0.0 |
+| [durable-work](skills/durable-work/SKILL.md) | How long-running work survives a session ending: goals, plans, work items, checkpoints, approval pauses, recovery and resumption, kept as plain markdown in a workspace the user owns. Use when work spans more than one session, when resuming work someone or something else started, or when a plan needs to be persisted rather than held in conversation. | draft | 1.1.0 |
+| [execution-reporting](skills/execution-reporting/SKILL.md) | How to write execution reports that become organisational memory: structure, evidence, honest deviations, and feeding results back into the next planning pass. Use after completing meaningful execution, at a plan checkpoint, or when closing a work item. | draft | 2.0.1 |
 | [orchestrator-integration](skills/orchestrator-integration/SKILL.md) | How durable work is actually driven when nobody is watching: which orchestrator owns scheduling and resumption, how to avoid two of them fighting over the same workspace, and what changes when a run is unattended. Use when setting up background or recurring outbound work, or when more than one orchestration runtime is available. | draft | 1.0.0 |
 
 ### User knowledge — personal and org memory
