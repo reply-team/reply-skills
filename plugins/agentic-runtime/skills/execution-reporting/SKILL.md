@@ -5,7 +5,7 @@ description: >
   honest deviations, and feeding results back into the next planning pass. Use after
   completing meaningful execution, at a plan checkpoint, or when closing a work item.
 metadata:
-  version: 2.0.0
+  version: 2.0.1
   pack: agentic-runtime
   category: runtime
   maturity: draft
@@ -102,6 +102,8 @@ workspace may be shared or committed to git.
 
 ## Changelog
 
+- 2.0.1 (2026-08-11): the report template used a retired entity word in its example. Corrected —
+  a template is copied into every workspace file, so a stale word there outlives the template.
 - 2.0.0 (2026-07-30): renamed from `reporting-conventions` and moved into the
   `agentic-runtime` pack. The report template now ships inside the pack, replacing the
   repository-root reference that would not have existed in an installed copy — the one

@@ -17,7 +17,7 @@ Outcome in 2–4 sentences. Lead with the result, not the process.
 
 ## Completed work
 
-What ran, with IDs/counts (sequences started, contacts imported, replies sent…).
+What ran, with IDs/counts (campaigns activated, contacts imported, messages sent…).
 
 ## Deviations
 

@@ -1,6 +1,6 @@
 {
   "name": "agentic-runtime",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Durable multi-session work: goals, plans, work items, checkpoints, resumability, execution reports and user memory in a plain-markdown workspace. Optional — skip it if your orchestrator already provides durable work.",
   "author": {
     "name": "Reply.io"

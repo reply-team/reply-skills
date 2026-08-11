@@ -2,7 +2,7 @@
 
 Outbound sales expertise for AI agents, as plain markdown skills.
 
-Teach your agent how to run real outbound: shape an audience, launch a sequence, work the
+Teach your agent how to run real outbound: shape an audience, launch a campaign, work the
 replies, read the numbers honestly — with guardrails that protect your domain and explicit
 approval gates before anything reaches a real person.
 
@@ -16,8 +16,8 @@ replaceable pack. Install what you need:
 
 | Pack | What it gives you | Requires |
 |---|---|---|
-| **`ai-sdr-core`** | The vendor-neutral core: what an SDR operation *is*, outbound strategy and playbooks, and the guardrails — sending limits, channel limits, approval boundaries. Works with any provider, or none. | — |
-| **`reply-adapter`** | Executes that core against [Reply.io](https://reply.io): the `reply` CLI, API v3, the MCP server, auth and scopes, error translation. | `ai-sdr-core` + a Reply.io account |
+| **`ai-sdr-core`** | The vendor-neutral core: an operation contract of **325 SDR business operations in 21 families**, 30 of them core — discovery and contacts, audiences and imports, campaigns, steps and enrolment, messages and conversations, tasks and meetings, consent and suppression, sending capability, oversight and measurement. Each operation says what it reaches, whether it can be undone, what approval it needs, what to read before repeating it and what it costs. Plus outbound strategy and playbooks, and the guardrails — sending limits, channel limits, approval boundaries. Works with any provider, or none. | — |
+| **`reply-adapter`** | Executes that core against [Reply.io](https://reply.io): the `reply` CLI, API v3, the MCP server, auth and scopes, error translation — and states, operation by operation, what Reply performs directly, what it performs only in part, and what it does not perform at all. | `ai-sdr-core` + a Reply.io account |
 | **`agentic-runtime`** | Durable multi-session work: goals, plans, work items, checkpoints, resumability, reports, user memory. Skip it if your orchestrator already does this. | `ai-sdr-core` |
 
 `ai-sdr-core` and `agentic-runtime` are useful **without** Reply.io and without the Reply CLI.
@@ -246,14 +246,24 @@ Some business and protection content ships as **honest skeletons** marked `TODO(
 structure and safety posture are final, the numbers await validation by domain experts. A visible
 gap is deliberate — invented expertise would be worse.
 
+The operation contract is honest in a second way, with a second marker. It carries **21 open
+questions**: forks where two readings are defensible, we took one, and taking the other would
+change an operation rather than the prose around it. An operation left unsettled by one of them
+says so, and names the fork.
+
 ## Safety model
 
-Skills never let an agent start a sequence, send a message, or delete data without your explicit
-confirmation in the conversation. Anything that sends content requires you to approve the
-**literal text** first. Bulk operations show their plan and their counts before running.
+Skills never let an agent start a campaign, send a message, or delete data without your explicit
+confirmation in the conversation. A message composed for one named person requires you to approve
+its **literal text**. An operation that carries a set is one decision, and it shows a preview that
+**names** the people it would reach — never a bare count, which is a number you can neither check
+nor refuse.
 
-Protective actions are the one exception: pausing a campaign that is burning your domain happens
-first and tells you immediately, because waiting is the destructive choice.
+Two kinds of operation are the exception, and both run first and tell you immediately. **Stopping**
+— pausing a campaign that is burning your domain, holding outbound, clearing a queue — because
+waiting is the destructive choice. And **recording something that already happened outside our
+control**, such as somebody's request to stop, because delaying that is the only way to get it
+wrong. Starting anything back up is never in that set.
 
 The rules live in one place — the `approval-boundaries` skill — and ship inside `ai-sdr-core`, so
 no selective install can leave them out. They are additionally bound mechanically by

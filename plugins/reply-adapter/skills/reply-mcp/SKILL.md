@@ -5,7 +5,7 @@ description: >
   remote server mcp.reply.io, choose the right auth, and decide when to use MCP tools versus
   the CLI. Use when setting up the Reply MCP connection or choosing between MCP and CLI execution.
 metadata:
-  version: 1.1.0
+  version: 1.2.0
   pack: reply-adapter
   category: execution
   maturity: reviewed
@@ -15,7 +15,7 @@ metadata:
   tools: [reply-mcp]
   api: [introduction]
   relations:
-    recommends: [reply-cli, reply-auth]
+    recommends: [reply-cli, reply-auth, reply-operations-mapping]
     alternative-to: [reply-cli]
 ---
 
@@ -30,8 +30,17 @@ team, and the AI-SDR configuration surface. One connection, no HTTP plumbing.
 ## When to use / when NOT to use
 
 - Use in MCP-capable clients when no shell is available, or when curated tools cover the task.
-- The MCP catalog is a **subset** of the API. When a needed capability is missing from the tools,
-  fall back to the CLI (`reply api` reaches everything) rather than improvising.
+- The MCP catalog is a **subset** of API v3, and API v3 is itself a minority of the job. Of the
+  325 vendor-neutral operations in the `sdr-operations` contract, **most are not performable here
+  at all**, and the rest divide into fully, by composition, and only in part.
+  `reply-operations-mapping` carries that division operation by operation and is generated from the
+  fulfilment register — the figures live there once, rather than being copied into a second skill
+  where they would go stale without anyone noticing. The tool catalog is a curated slice of what
+  remains, so **a missing tool is the ordinary case, not a malfunction**. Size a plan against that
+  rather than against the impression a tidy tool list gives.
+- When a needed capability is missing from the tools, fall back to the CLI (`reply api` reaches
+  the whole API) rather than improvising with an adjacent tool. A tool that returns approximately
+  the right shape for a different question is worse than no tool.
 
 ## Prerequisites
 
@@ -74,7 +83,9 @@ Note which surface executed each step (MCP tool vs CLI) so runs are reproducible
 
 ## Failure modes
 
-- Tool missing for the task → use `reply-cli` (`reply api`); the docs cover the full surface.
+- Tool missing for the task → use `reply-cli` (`reply api`), which reaches the whole documented
+  API. If the operation is not there either, `reply-operations-mapping` says so and why — that is
+  an answer to give the user, not a gap to improvise around.
 - Scope-denied tool call → the key lacks that permission; see `reply-auth`.
 - OAuth client fails with a registration/allow-list error → the client lacks CIMD support and DCR
   is allow-listed server-side; report it to the Reply community Slack (docs.reply.io/slack).
@@ -89,9 +100,16 @@ recommend read-mostly scopes for unattended agents.
 
 - `reply-cli` — full-surface alternative and fallback.
 - `reply-auth` — scope grammar and key hygiene.
+- `reply-operations-mapping` — which operations Reply performs at all, and how far.
 
 ## Changelog
 
+- 1.2.0 (2026-08-10): the "curated subset" claim was measured against nothing. It is now stated
+  against the 325-operation contract, and it points at the generated fulfilment register for the
+  division rather than restating figures that would go stale here — so a reader can see that the
+  tool catalog is a slice of a surface that already covers a minority of the job, and that a
+  missing tool is the expected case rather than a fault. Added the rule that an adjacent tool is
+  never a substitute for a missing one.
 - 1.1.0 (2026-07-30): moved into the `reply-adapter` pack; category `technical` → `execution`;
   `auth-and-keys` renamed `reply-auth`.
 - 1.0.0 (2026-07-27): initial version per docs.reply.io/reply-mcp.
