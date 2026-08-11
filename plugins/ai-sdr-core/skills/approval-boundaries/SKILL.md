@@ -225,14 +225,23 @@ The protective set, named:
   the limit is not.
 
 Recording a fact that is already true belongs here too, for the same reason: `optout.record`,
-`suppression.add`, `restriction.record`, `inbound_lead.record` and `privacy_request.create`
-derive `auto` because recording an event that already happened outside our control is not a
-decision, and delaying it burns the only thing that motion is measured on (K2). Recording that
-somebody said stop is never a judgement about what they meant (A2).
+`restriction.record`, `inbound_lead.record` and `privacy_request.create` derive `auto` because
+recording an event that already happened outside our control is not a decision, and delaying it
+burns the only thing that motion is measured on (K2). Recording that somebody said stop is never
+a judgement about what they meant (A2).
 
-**The restart direction always waits** (L6). `campaign.resume`, `enrollment.resume`,
-`sender.resume`, `outreach.release`, `stoprule.clear` and `suppression.remove` are each declared
-above `auto`, and resume refuses from any state other than held (G5). Nothing that increases
+`suppression.add` sits here **only for a single verified identifier**. Called with a domain, an
+account pattern or a collection it is `confirm_once`, because suppressing a domain is a
+commercial decision and not a protective one — somebody is choosing to stop reaching a whole
+company, which is nothing like honouring one person's stop. The floor covers the shape the call
+actually carries, never the operation's name: read the argument before concluding the gate.
+
+**The restart direction always waits** (L6). `campaign.resume`, `sender.resume`,
+`outreach.release`, `stoprule.clear` and `suppression.remove` are each declared above `auto`, and
+resume refuses from any state other than held (G5). `enrollment.resume` belongs to the same rule
+with the same conditional shape as its pause side: `auto` while the campaign is not live, because
+resuming reaches nobody while nothing is sending, and `confirm_once` with a mandatory preview
+naming who resumes the moment it is. Nothing that increases
 activity, sends anything, or deletes anything is ever covered by the floor.
 
 ### Retries, resumption and idempotency
@@ -375,7 +384,8 @@ The boundary held if, after a run, all of the following are true:
   approval whose named artefact, ceiling and expiry all covered it;
 - every `confirm_once` over a set traces to a preview that **named** its population;
 - every act performed without approval either reduced activity or recorded a fact that was
-  already true;
+  already true, **and derived `auto` for the arguments it was actually called with** — the floor
+  covers a shape, not a name, so "it was a suppression" does not clear a domain-wide one;
 - every departure from the derivation that was relied on carried its stated reason;
 - every gate an unattended run hit left a record, and every call that could not be confirmed as
   completed was resolved through `invocation.get` rather than repeated.
