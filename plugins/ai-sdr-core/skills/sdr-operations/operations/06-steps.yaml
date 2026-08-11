@@ -111,12 +111,10 @@ operations:
     cost: none
     questions: []
 
-  # UNCLEAR: the intent's closing clause reads as truncated — "never silently assumed even" — and is
-  # kept as written rather than repaired.
   - name: variant.add
     intent: >
       "Try a second version of this step's copy", optionally with a split share — an unsettable split
-      is reported, never silently assumed even.
+      is reported, never silently assumed to be even.
     reach:
       value: act
       conditional: true

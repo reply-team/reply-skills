@@ -124,7 +124,7 @@ Every operation in the contract, by family, with the first sentence of its inten
 - `step.update` — "Change a step" — delay, content binding, intent, personalisation, threading, branch condition, or whether it is enabled at all.
 - `step.remove` — "Delete a step" — destroys its variants and their measurement history and can advance everyone waiting on it sooner than they expected.
 - `step.reorder` — "Put the new step at position 2" — moves steps without delete-and-re-add, so variants, template bindings and history survive.
-- `variant.add` — "Try a second version of this step's copy", optionally with a split share — an unsettable split is reported, never silently assumed even.
+- `variant.add` — "Try a second version of this step's copy", optionally with a split share — an unsettable split is reported, never silently assumed to be even.
 - `variant.update` — "Change a variant's content, its split share, or whether it is enabled"
 - `variant.remove` — "Delete this version" — destroys its measurement history, so a variant under test is disabled rather than removed.
 - `variant.list` — "What versions of this step exist, which are enabled, and at what share?"

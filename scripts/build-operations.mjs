@@ -322,6 +322,7 @@ for (const absent of register.declared_absent ?? []) {
 // ------------------------------------------------------ property resolution
 
 const is_block = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+const meters_of = (op) => (op.meter === undefined ? [] : (Array.isArray(op.meter) ? op.meter : [op.meter]));
 const resolve = (op, key) => (op[key] === undefined ? DANGEROUS[key] : (is_block(op[key]) ? op[key].value : op[key]));
 const detail_of = (op, key) => (is_block(op[key]) ? op[key].detail : null);
 
@@ -401,8 +402,15 @@ for (const frag of fragments) {
 
         if (cost === 'metered') {
             if (!op.cost_basis) err(where, 'cost resolves to `metered` but cost_basis is absent — state a basis, never a price');
-            if (!op.meter) err(where, 'cost resolves to `metered` but meter is absent');
-            else if (!METERS.has(op.meter)) err(where, `meter '${op.meter}' is not in the register in families.yaml`);
+            // One call can buy two different things — a reveal and an enrichment — and the
+            // appendix charges both. A single-meter field would drop one of them out of the
+            // machine-readable data and leave it in the prose of the basis, where no projection
+            // can find it, so the field takes a list.
+            const meters = meters_of(op);
+            if (!meters.length) err(where, 'cost resolves to `metered` but meter is absent');
+            for (const m of meters) if (!METERS.has(m)) err(where, `meter '${m}' is not in the register in families.yaml`);
+        } else if (meters_of(op).length) {
+            err(where, `cost resolves to \`${cost}\` but a meter is named — an unmetered operation consumes nothing`);
         }
 
         for (const q of Array.isArray(op.questions) ? op.questions : []) {
@@ -550,7 +558,7 @@ const row = (op) => {
         stack([
             property_cell(op, 'cost'),
             op.cost_basis ? `*basis:* ${cell(op.cost_basis)}` : null,
-            op.meter ? `*meter:* ${code(op.meter)}` : null,
+            meters_of(op).length ? `*meter${meters_of(op).length > 1 ? 's' : ''}:* ${meters_of(op).map(code).join(', ')}` : null,
         ]),
         property_cell(op, 'idempotency_key'),
         property_cell(op, 'per_item_results'),

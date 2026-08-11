@@ -32,7 +32,11 @@
 #       per_item_results: required # required | not_applicable | conditional
 #       cost: none                 # none | metered
 #       cost_basis: >              # REQUIRED when cost is metered — a basis, never a price
-#       meter: message             # the meter consumed, from the register below
+#       meter: message             # the meter consumed, from the register below. A list where one
+#                                  # call buys two different things — `[reveal, enrichment]` — so
+#                                  # that both legs stay machine-readable and the preview can
+#                                  # project each of them separately, rather than one of them
+#                                  # surviving only as prose inside the basis.
 #       questions: [4]             # open-question numbers this operation is unsettled by
 #
 # A fragment does NOT list the invariants an operation is bound by. Each rule in

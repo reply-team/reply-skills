@@ -343,9 +343,11 @@ operations:
     approval: confirm_once
     approval_departs: true
     approval_reason: >
-      declared confirm_once by the appendix where the table derives auto, with no justification
-      stated beyond the row's own terms: it can be published again, and everything already scored
-      keeps its history.
+      declared confirm_once where control × reversible derives auto, and the contract does not yet
+      state why. The row's own terms are that it can be published again and everything already
+      scored keeps its history, so the raise stops at one confirmation. Kept at the declared,
+      stricter class until the question is settled: an unexplained confirmation costs a sentence,
+      and lowering a class on a guess costs whatever relied on it.
     before_repeating: the scorecard's publication state
     idempotency_key: none
     accepts_collection: false

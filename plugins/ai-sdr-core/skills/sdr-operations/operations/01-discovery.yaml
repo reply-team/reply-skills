@@ -40,10 +40,6 @@ operations:
     cost: none
     questions: []
 
-  # UNCLEAR: the appendix charges this against two allowances at once — the reveal allowance per
-  # person, plus the enrichment allowance per field where fields are revealed one at a time. The
-  # schema carries a single meter, so the reveal is named and the enrichment leg is stated in the
-  # basis rather than dropped.
   - name: candidate.promote
     intent: >
       "Buy this person's details and make them ours"
@@ -60,7 +56,7 @@ operations:
     cost_basis: >
       per person revealed, plus the enrichment allowance per field where fields are revealed one at
       a time
-    meter: reveal
+    meter: [reveal, enrichment]
     questions: [19]
 
   - name: company.search

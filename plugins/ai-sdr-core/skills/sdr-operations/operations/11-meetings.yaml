@@ -52,9 +52,10 @@ operations:
     approval_artefact: preview
     approval_departs: true
     approval_reason: >
-      the appendix declares confirm_each when the booking issues the invitation and auto when the
-      preview resolves it to `control`; act × compensatable derives confirm_once, so the acting side
-      sits above the table.
+      confirm_each when the booking issues the invitation, because each invitation reaches one
+      person's calendar and is its own decision; auto when the preview resolves it to recording a
+      meeting invited elsewhere. Act × compensatable derives confirm_once, so the acting side sits
+      deliberately above the table.
     before_repeating: >
       read first — existing meetings for this person and owner in the window; a booking that timed out
       may already have invited them.
