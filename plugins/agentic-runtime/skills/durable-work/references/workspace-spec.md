@@ -65,7 +65,7 @@ id: WI-003                # unique within the goal
 goal: q3-saas-founders    # parent goal slug
 status: awaiting-approval # todo | in-progress | blocked | awaiting-approval | done | cancelled
 depends-on: [WI-001]
-operations: [enrollment.create]   # the business operations this item performs
+operations: [campaign.enroll]    # the business operations this item performs
 outputs: []               # artifact paths / created entity IDs, filled during execution
 approval:                 # present only while status = awaiting-approval
   question: "Start sequence 12345 for 214 contacts?"

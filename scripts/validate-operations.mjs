@@ -24,7 +24,11 @@
 //      itself declares (see read_contract below);
 //   2. a token preceded by `@`, `/`, `-` or another dot is part of a path, a filename argument
 //      or a longer identifier, never a name written as prose. `--body @contact.json` is the live
-//      example, in reply-cli/SKILL.md.
+//      example, in reply-cli/SKILL.md;
+//   3. a token whose second segment is a file extension is a filename. `goal.md` and `plan.md`
+//      are the live examples, in the workspace spec — and they are the harder case, because
+//      `goal` really is a contract entity, so rule 1 cannot save them. Extensions are a closed
+//      set and no operation verb will ever be one: verbs are English imperatives.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -39,6 +43,11 @@ const OPERATION = /(?<![\w/@.-])([a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_-]*){1,2})(?![
 
 // A family written as `entity.*` — the form in which the 1.x catalog declares its families.
 const FAMILY_DECL = /`([a-z][a-z0-9_]*)\.\*`/g;
+
+// Second segments that make a token a filename rather than an operation. Kept deliberately short:
+// only what this repository actually writes, so an unfamiliar extension is reported rather than
+// waved through.
+const FILE_EXTENSIONS = new Set(['md', 'json', 'yaml', 'yml', 'mjs', 'js', 'ts', 'txt', 'csv', 'lock']);
 
 const FRAGMENT = /^\d{2}-[a-z][a-z0-9-]*\.yaml$/;
 
@@ -348,7 +357,9 @@ for (const file of files) {
         if (ANY_HEADING.test(line)) in_changelog = CHANGELOG_HEADING.test(line);
         if (in_changelog) return;
         for (const [, token] of line.matchAll(OPERATION)) {
-            if (!contract.entities.has(token.split('.')[0])) continue;
+            const segments = token.split('.');
+            if (!contract.entities.has(segments[0])) continue;
+            if (segments.length === 2 && FILE_EXTENSIONS.has(segments[1])) continue;
             references++;
             if (contract.names.has(token)) continue;
             unresolved.push({ file: relative(file), line: n + 1, token });
