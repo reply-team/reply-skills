@@ -6,7 +6,7 @@
 
 Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.
 
-**Pack:** `ai-sdr-core` v1.0.0 · **Depends on:** _none_
+**Pack:** `ai-sdr-core` v0.3.0 · **Depends on:** _none_
 
 ### Operations — the vendor-neutral SDR contract
 

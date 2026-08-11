@@ -40,7 +40,7 @@ operations:
 
   - name: account.update
     intent: >
-      "Change the company's state — in play, sequenced, nurture, blocked, customer, partner — or its
+      "Change the company's state — in play, enrolled, nurture, blocked, customer, partner — or its
       tier, with a reason."
     reach: control
     reversibility: reversible

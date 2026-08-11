@@ -14,7 +14,7 @@
     {
       "name": "ai-sdr-core",
       "displayName": "AI SDR Core",
-      "version": "1.0.0",
+      "version": "0.3.0",
       "layers": ["L1 SDR business operations", "L2 strategy & playbooks", "L3 protection & guardrails"],
       "description": "Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.",
       "dependencies": [],

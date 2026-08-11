@@ -6,7 +6,7 @@
 Skills ship in three independently installable packs. `ai-sdr-core` is vendor-neutral and
 depends on nothing; the other two build on it. See [docs/packs.md](docs/packs.md).
 
-## AI SDR Core — `ai-sdr-core` v1.0.0
+## AI SDR Core — `ai-sdr-core` v0.3.0
 
 Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.
 

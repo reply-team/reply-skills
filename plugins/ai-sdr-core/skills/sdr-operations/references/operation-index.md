@@ -392,7 +392,7 @@ Every operation in the contract, by family, with the first sentence of its inten
 
 - `account.get` — "Show me this company as something we own" — its state, its tier, who owns it, what is happening on it.
 - `account.search` — "Which of the companies we already hold match this?" — never queries an outside database and never costs anything.
-- `account.update` — "Change the company's state — in play, sequenced, nurture, blocked, customer, partner — or its tier, with a reason."
+- `account.update` — "Change the company's state — in play, enrolled, nurture, blocked, customer, partner — or its tier, with a reason."
 - `account.claim` — "Reserve this company for my attention for a stated period" — a lease, not ownership, and it expires by itself.
 - `account.release` — "Give the claim back before it expires."
 - `account_membership.create` — "Attach this person to this company deliberately, rather than letting a new company appear for every spelling of a name."
