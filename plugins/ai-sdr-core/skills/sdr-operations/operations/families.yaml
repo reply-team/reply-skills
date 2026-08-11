@@ -22,6 +22,13 @@
 #       approval_reason: >         # REQUIRED when approval_departs is true
 #       before_repeating: >        # the observable state to read before running it again
 #       idempotency_key: required  # required | none | conditional
+#       accepts_collection: false  # ONLY on an operation that carries exactly one object.
+#                                  # Defaults to true, because absence must read as the dangerous
+#                                  # value. A key and a per-item report answer different questions:
+#                                  # a key is required on four independent grounds, and only one of
+#                                  # them is "accepts a collection". Saying an operation returns no
+#                                  # per-item report is therefore a positive assertion about its
+#                                  # arity, not an inference from its key.
 #       per_item_results: required # required | not_applicable | conditional
 #       cost: none                 # none | metered
 #       cost_basis: >              # REQUIRED when cost is metered — a basis, never a price
@@ -119,6 +126,21 @@ retired_entities:
     became: campaign
   - name: metrics
     became: engagement, with the grouping as an argument rather than a separate operation
+
+# Names this contract deliberately does NOT define. They are listed because the contract sometimes
+# has to name an operation in order to say it does not exist — "there is no `consent.check`" is a
+# statement worth making, and it would otherwise read to a checker as a reference to a missing
+# operation.
+#
+# Declaring them here does two things a blanket exemption could not. Prose may name them without
+# the name-resolution check going blind to a genuine typo in the same file. And a name that appears
+# both here and in a fragment is a contradiction the build refuses — so if somebody later adds the
+# operation, the sentence claiming it does not exist cannot quietly survive.
+declared_absent:
+  - name: consent.check
+    instead: consent.prove, or outreach.precheck
+    because: >
+      A permission status with no evidence behind it is precisely the answer that cannot be used.
 
 meters:
   - id: discovery

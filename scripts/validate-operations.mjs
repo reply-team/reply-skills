@@ -239,8 +239,17 @@ const read_contract = () => {
 
     const register = path.join(ops_dir, 'families.yaml');
     if (!fs.existsSync(register)) throw new Error(`${relative(register)} does not exist — it declares the retired entities`);
-    for (const retired of parse_yaml(fs.readFileSync(register, 'utf8'), relative(register)).retired_entities ?? []) {
+    const registry = parse_yaml(fs.readFileSync(register, 'utf8'), relative(register));
+    for (const retired of registry.retired_entities ?? []) {
         if (retired?.name) entities.add(retired.name);
+    }
+
+    // Names the contract states it does not define. The contract sometimes has to name an
+    // operation in order to say it does not exist, and that sentence must not read as a reference
+    // to a missing one. Resolving them here, rather than exempting the file that says it, keeps a
+    // genuine typo in the same paragraph visible.
+    for (const absent of registry.declared_absent ?? []) {
+        if (absent?.name) names.add(absent.name);
     }
 
     for (const file of markdown_under(skill.dir)) {

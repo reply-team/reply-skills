@@ -276,6 +276,16 @@ for (const entry of fs.readdirSync(OPERATIONS_DIR).sort()) {
 
 fragments.sort((a, b) => a.id - b.id);
 
+// A name the register says the contract does not define, defined anyway. The contract states some
+// absences in words — "there is no `consent.check`" — and if the operation later arrives, the
+// sentence denying it must not quietly survive alongside it.
+for (const absent of register.declared_absent ?? []) {
+    if (absent?.name && seen.has(absent.name)) {
+        err(seen.get(absent.name), `'${absent.name}' is defined here, but families.yaml declares it absent — `
+            + 'one of the two is now wrong, and the prose that names it as absent is the one nobody will re-read');
+    }
+}
+
 // ------------------------------------------------------ property resolution
 
 const is_block = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -334,8 +344,26 @@ for (const frag of fragments) {
         // The approximation for "accepts a collection but reports one verdict": a key is
         // required (so a collection or a durable write is in play) yet no per-item outcome
         // is promised. Reads are exempt — a metered read takes a key and returns one answer.
-        if (key === 'required' && per_item === 'not_applicable' && reach !== 'read') {
-            err(where, 'idempotency_key is required while per_item_results is `not_applicable` — a call over a collection reporting one verdict hides partial failure');
+        // A key and a per-item report answer different questions, and an earlier version of this
+        // check confused them. The contract requires a key on four independent grounds — reach
+        // `act`, a write accepting a collection, a write creating a durable object, and any
+        // metered call — and only the second has anything to do with collections. Treating "has a
+        // key" as "takes a collection" forced roughly twenty single-object operations to promise a
+        // per-item report they cannot produce, which is the contract stating something untrue
+        // about itself.
+        //
+        // So the collection question is asked directly. `accepts_collection` defaults to true,
+        // because absence must read as the dangerous value: an operation that says nothing is
+        // assumed to take a collection and therefore owes a result per item. Declaring
+        // `not_applicable` means positively asserting the operation carries one object.
+        if (op.accepts_collection !== false && per_item === 'not_applicable' && reach !== 'read') {
+            err(where, 'per_item_results is `not_applicable` without `accepts_collection: false` — '
+                + 'either the call carries a collection and owes one result per item, or it carries a '
+                + 'single object and must say so');
+        }
+        if (op.accepts_collection === false && per_item === 'required') {
+            err(where, '`accepts_collection: false` contradicts per_item_results `required` — a call '
+                + 'over one object has no items to report on');
         }
 
         if (cost === 'metered') {
