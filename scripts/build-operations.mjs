@@ -5,12 +5,27 @@
 //   references/catalog-NN-<slug>.md   — one full classification table per family
 //   SKILL.md                          — the core-operations table, between its markers
 //
+// and, from a provider adapter's fulfilment register, that adapter's own view of the same
+// operations:
+//
+//   references/mapping-NN-<slug>.md   — one operation-to-surface table per family, named to
+//                                       mirror the catalog file it faces, so a reader moves
+//                                       between contract and adapter without a lookup
+//   references/fulfilment.md          — the roll-up of everything the adapter does not reach,
+//                                       or does not reach fully
+//
 // The fragments are the source of truth, so a classification cannot drift between what the
 // contract says and what an agent reads. This generator is therefore also the contract's
 // checker: it refuses to emit when an operation contradicts the derivation table, when an
 // `act` carries no idempotency key, when a metered operation names no meter, or when an
 // invariant enforces an operation that does not exist. A wrong table is worse than a
 // missing one — every guardrail downstream is read straight off these columns.
+//
+// The adapter side is checked against the same source of truth and on the same principle. An
+// entry claiming an operation the contract does not declare, a `partial` that never says what
+// is missing, an `absent` with no evidence, a `composed` with no order, or a surface written
+// as a request path are all refused. So is silence: an operation with no entry at all is
+// reported, because a mapping that simply omits two hundred operations reads complete.
 //
 // It runs throughout the migration, not only at the end of it: while families are still
 // being drafted it reports coverage and emits what exists, and the whole-contract totals
@@ -23,6 +38,24 @@ import path from 'node:path';
 import { ROOT, skill_dirs } from './lib.mjs';
 
 const SKILL = 'sdr-operations';
+
+// The provider adapters whose fulfilment registers are rendered alongside the contract. One
+// today; a second would be one more entry here and nothing else, because every rule below is
+// stated against the contract rather than against any product.
+const ADAPTER_SKILLS = ['reply-operations-mapping'];
+const FULFILMENT_FILE = 'fulfilment.yaml';
+
+const FULFILMENT_VALUES = ['direct', 'composed', 'partial', 'absent'];
+
+// The field each claim has to arrive with, and why the claim is worthless without it. `direct`
+// is the only one that stands on its own: the other three each assert something a reader cannot
+// check from the value alone, and an agent that cannot check it will act as though the operation
+// were fully performed.
+const REQUIRED_WITH = {
+    composed: ['order', '"several calls do it" is not something an agent can execute, so state the call order that realises the operation'],
+    partial: ['missing', 'a partial claim is only safe once the unkept part is named, because the user has to hear which part before committing to a route that depends on it'],
+    absent: ['because', 'an absence is only trustworthy with its evidence, and "not documented", "documented as coming" and "not evidenced" are different facts that a reader plans differently on'],
+};
 
 // Not read from families.yaml: the register counts operations per family, but the size of
 // the core set is a statement about what an agent can hold in front of it, made in prose.
@@ -526,12 +559,273 @@ const core_table = () => {
     return out + '\n';
 };
 
+// ------------------------------------------------------- adapter fulfilment
+//
+// The contract says what the job is. A fulfilment register says how much of that job one
+// product reaches, one entry per operation, and the two are generated side by side without
+// ever being merged. An operation this product cannot perform is a gap in the adapter and
+// never a defect in the contract; the moment that gap could argue for deleting the operation,
+// the vendor-neutral layer has stopped existing.
+//
+// Silence is the failure this section is built around. An entry that says `absent` has been
+// thought about and carries its evidence; an operation with no entry at all has not been
+// thought about, and in a generated table the two are indistinguishable unless the generator
+// goes looking. Without the missing-entry check an adapter could answer for eleven operations,
+// ignore the other three hundred, and still emit a mapping that reads complete.
+
+const operation_of = new Map(); // operation name -> { op, frag }
+for (const frag of fragments) {
+    for (const op of frag.operations) {
+        if (typeof op.name === 'string' && !operation_of.has(op.name)) operation_of.set(op.name, { op, frag });
+    }
+}
+
+const ADAPTER_SOURCE_NOTE = `Generated from \`${FULFILMENT_FILE}\` in this skill. Edit that file, not this one.`;
+
+const MAPPING_LEGEND = `**Reading the table.** † marks a core operation. *Reach* and *approval* are the
+contract's own classification, reproduced here unchanged: knowing which endpoint performs an
+operation alters neither what it is nor what it needs approved, and the two columns are present so
+a reader can see for themselves that the mapping changed nothing. *Fulfilment* is this adapter's
+claim — \`direct\` (one surface performs it), \`composed\` (several calls in the stated order),
+\`partial\` (performed, but not to the contract's full promise, with the unkept part named) or
+\`absent\` (not performable here today, with the evidence). *Surface* names an endpoint group and a
+documentation page, never a path: the path, its parameters and its body come from that page at call
+time. An operation shown as *not assessed* has no entry at all — nobody has answered for it yet,
+which is a different statement from \`absent\`.`;
+
+const FULFILMENT_OPENING = `This file describes **one product's coverage of the contract**, and nothing else.
+Every line in it is a statement about this adapter — never about the operations themselves. The
+vendor-neutral layer exists precisely so that a capability this product lacks stays visible as an
+unmet need rather than quietly disappearing from the set of things an SDR requires; deleting an
+operation from the contract because this API has no endpoint for it would undo the layer entirely.
+
+**Expect this file to be long, and read its length as the design working rather than failing.** No
+provider covers the whole of an SDR's job, and a map that admitted only the parts one product happens
+to reach would be a flattering map and a useless one. A gap recorded here costs a user one honest
+sentence. A gap papered over with an adjacent endpoint costs them a broken run, wrong data, or a
+message sent to someone who should never have received it — so when an operation is absent, say so
+and name what the documentation says. Never substitute something that returns approximately the right
+shape.`;
+
+const adapter_summaries = [];
+const adapter_targets = [];
+
+for (const adapter_name of ADAPTER_SKILLS) {
+    const adapter_skill = skill_dirs().find(d => d.name === adapter_name);
+    if (!adapter_skill) { notices.push(`No '${adapter_name}' skill in the tree — its mapping references are not generated.`); continue; }
+
+    const register_file = path.join(adapter_skill.dir, FULFILMENT_FILE);
+    if (!fs.existsSync(register_file)) {
+        notices.push(`${adapter_name} carries no ${FULFILMENT_FILE} — its mapping references are not generated.`);
+        continue;
+    }
+
+    let register_doc;
+    try { register_doc = parse_yaml(register_file); }
+    catch (e) { err(FULFILMENT_FILE, e.message); continue; }
+
+    if (!Array.isArray(register_doc.operations)) { err(FULFILMENT_FILE, 'holds no operations list'); continue; }
+
+    const adapter_id = register_doc.adapter ?? adapter_name;
+    const entry_of = new Map(); // operation name -> its fulfilment entry
+
+    for (const entry of register_doc.operations) {
+        const name = typeof entry.name === 'string' ? entry.name : null;
+        const where = `${FULFILMENT_FILE} ${name ?? '<unnamed>'}`;
+
+        if (!name) { err(where, 'entry has no name — an entry answers for exactly one operation and must say which'); continue; }
+        if (!operation_of.has(name)) {
+            err(where, 'names an operation the contract does not declare. The register answers for the contract as it '
+                + 'stands, so a name that exists only here maps nothing — no plan can ever ask for it, and the adapter '
+                + 'carries a promise nobody can call. The operation index lists every declared name.');
+            continue;
+        }
+        if (entry_of.has(name)) { err(where, 'a second entry for this operation — one operation, one coverage claim'); continue; }
+        entry_of.set(name, entry);
+
+        // `absent` is a value, so a missing one cannot be reported as though it were: "fulfilment
+        // 'absent' is not a valid value" is the least helpful sentence this file could produce.
+        if (!FULFILMENT_VALUES.includes(entry.fulfilment)) {
+            err(where, entry.fulfilment === undefined
+                ? `states no fulfilment — every entry claims one of ${FULFILMENT_VALUES.join(', ')}`
+                : `fulfilment '${entry.fulfilment}' is not one of ${FULFILMENT_VALUES.join(', ')}`);
+        } else {
+            const [field, why] = REQUIRED_WITH[entry.fulfilment] ?? [];
+            if (field && !entry[field]) err(where, `fulfilment is \`${entry.fulfilment}\` but ${field} is absent — ${why}`);
+            if (entry.fulfilment !== 'absent' && !entry.surface) {
+                err(where, `fulfilment is \`${entry.fulfilment}\` but no surface is named — a coverage claim with nowhere `
+                    + 'to point is the one an agent cannot act on and cannot check');
+            }
+        }
+
+        // A surface is a GROUP and a PAGE, and the difference matters more here than anywhere else
+        // in the register. Paths, parameters and bodies come from the documentation at call time;
+        // a path written from memory is the single most common way an agent fails against a REST
+        // API, and one written here is that mistake made once and then trusted by everything
+        // downstream, long after the endpoint has moved.
+        if (typeof entry.surface === 'string') {
+            const surface = entry.surface.trim();
+            if (surface.startsWith('/') || surface.includes('/v3/')) {
+                err(where, `surface '${surface}' is written as a request path. It must name the endpoint GROUP and the `
+                    + 'title of the documentation page that describes it, so that an agent fetches the current path '
+                    + 'rather than replaying one somebody remembered.');
+            }
+        }
+    }
+
+    const unmapped = [...operation_of.keys()].filter(name => !entry_of.has(name));
+    const counts = Object.fromEntries(FULFILMENT_VALUES.map(v => [v, 0]));
+    for (const entry of entry_of.values()) if (counts[entry.fulfilment] !== undefined) counts[entry.fulfilment]++;
+
+    // Every operation needs an entry. While the register is still being filled in, that check
+    // would fire once per operation nobody has reached yet — the same reason the whole-contract
+    // totals stay quiet until all 21 fragments are on disk. The difference is that completeness
+    // cannot be derived here: "no operation is missing" IS the check, so there is nothing left
+    // to infer it from. The register declares it instead, with `complete: true` at the top level,
+    // and from that day the progress line below becomes a build failure.
+    if (unmapped.length) {
+        const shown = unmapped.slice(0, 8);
+        const listed = shown.join(', ') + (unmapped.length > shown.length ? `, … (${unmapped.length - shown.length} more)` : '');
+        const line = `${unmapped.length} of ${operation_of.size} operations have no entry in ${FULFILMENT_FILE}: ${listed}`;
+        if (register_doc.complete === true) {
+            err(FULFILMENT_FILE, `${line}. The register declares itself complete, so an operation without an entry is `
+                + 'an unanswered question rather than an implicit `absent` — silence is not a coverage claim.');
+        } else {
+            notices.push(`Adapter ${adapter_id}: ${line}. They render as "not assessed"; `
+                + `set \`complete: true\` in the register to make this a failure.`);
+        }
+    }
+
+    // ---------------------------------------------------------------- adapter rendering
+
+    const fulfilment_cell = (entry) => {
+        if (!entry) return '*not assessed*';
+        return stack([
+            code(entry.fulfilment ?? '—'),
+            entry.beta === true ? '*documented Beta or Coming soon*' : null,
+        ]);
+    };
+
+    const scopes_cell = (entry) => {
+        const scopes = entry?.scopes;
+        if (Array.isArray(scopes)) return scopes.length ? scopes.map(s => code(s)).join(', ') : '—';
+        return scopes ? code(scopes) : '—';
+    };
+
+    const mapping_row = (op) => {
+        const entry = entry_of.get(op.name);
+        return '| ' + [
+            `${code(op.name)}${op.core === true ? ' †' : ''}`,
+            property_cell(op, 'reach'),
+            property_cell(op, 'approval'),
+            fulfilment_cell(entry),
+            entry?.surface ? cell(entry.surface) : '—',
+            scopes_cell(entry),
+            stack([
+                entry?.order ? `*order:* ${cell(entry.order)}` : null,
+                entry?.missing ? `*missing:* ${cell(entry.missing)}` : null,
+                entry?.because ? `*because:* ${cell(entry.because)}` : null,
+                entry?.notes ? cell(entry.notes) : null,
+            ]) || '—',
+        ].join(' | ') + ' |';
+    };
+
+    const mapping_md = (frag) => {
+        const fam = family_of.get(frag.id);
+        const covered = frag.operations.filter(op => entry_of.has(op.name)).length;
+        let out = `${HEADER}\n\n# Family ${fam.id} — ${fam.title} · mapping\n\n`;
+        out += `${ADAPTER_SOURCE_NOTE}\n\n`;
+        out += `*${fam.area}* · ${frag.operations.length} operations, ${covered} with an entry · `
+            + `contract ${register.contract_version} · adapter ${code(adapter_id)}\n\n`;
+        out += `${MAPPING_LEGEND}\n\n`;
+        out += '| Operation | Reach | Approval | Fulfilment | Surface | Scopes | Notes |\n';
+        out += '|---|---|---|---|---|---|---|\n';
+        out += frag.operations.map(mapping_row).join('\n');
+        out += `\n\nThe contract's own classification of these operations — the full five properties, the `
+            + `check before repeating, the invariants they enforce — is in \`catalog-${pad(fam.id)}-${fam.slug}.md\`, `
+            + 'in the `sdr-operations` skill. What this adapter does not reach, and why, is collected in '
+            + '[fulfilment.md](fulfilment.md).\n';
+        return out;
+    };
+
+    const gap_entry = (op) => {
+        const entry = entry_of.get(op.name);
+        const lines = [`- ${code(op.name)} — **${cell(entry.fulfilment)}**`];
+        if (entry.missing) lines.push(`  - *Missing:* ${cell(entry.missing)}`);
+        if (entry.because) lines.push(`  - *Because:* ${cell(entry.because)}`);
+        if (entry.surface) lines.push(`  - *Surface:* ${cell(entry.surface)}${entry.beta === true ? ' (documented Beta or Coming soon)' : ''}`);
+        if (entry.notes) lines.push(`  - *Notes:* ${cell(entry.notes)}`);
+        return lines.join('\n');
+    };
+
+    const family_link = (fam) => `[mapping-${pad(fam.id)}-${fam.slug}.md](mapping-${pad(fam.id)}-${fam.slug}.md)`;
+
+    const fulfilment_md = () => {
+        let out = `${HEADER}\n\n# What this adapter does not reach\n\n${ADAPTER_SOURCE_NOTE}\n\n`;
+        out += `${FULFILMENT_OPENING}\n\n`;
+        out += `**Coverage.** ${entry_of.size} of ${operation_of.size} operations carry an entry — `
+            + `${counts.direct} direct, ${counts.composed} composed, ${counts.partial} partial, ${counts.absent} absent. `
+            + `${unmapped.length} have no entry at all: nothing is claimed about them in either direction, and they are `
+            + 'named row by row, as *not assessed*, in their family mapping table. The table at the foot of this file '
+            + 'is where to look for the shape of that silence.\n';
+
+        let gap_families = 0;
+        for (const frag of fragments) {
+            const fam = family_of.get(frag.id);
+            const gaps = frag.operations.filter(op => ['partial', 'absent'].includes(entry_of.get(op.name)?.fulfilment));
+            if (!gaps.length) continue;
+            gap_families++;
+            out += `\n## ${pad(fam.id)} — ${fam.title}\n\n`;
+            out += `*${fam.area}* · ${family_link(fam)}\n\n`;
+            out += gaps.map(gap_entry).join('\n') + '\n';
+        }
+        if (!gap_families) {
+            out += '\nNo entry in the register is `partial` or `absent` today. That is a statement about how much of the '
+                + 'register has been written, not a claim that this product reaches everything — read the coverage table '
+                + 'below before concluding anything from an empty section.\n';
+        }
+
+        out += '\n## Coverage by family\n\n';
+        out += 'A family whose *not assessed* column is not zero has not been fully answered for yet. Nothing should be '
+            + 'read into those operations either way — an unanswered question is not a recorded absence.\n\n';
+        out += '| Family | Operations | Direct | Composed | Partial | Absent | Not assessed |\n|---|---|---|---|---|---|---|\n';
+        for (const frag of fragments) {
+            const fam = family_of.get(frag.id);
+            const tally = Object.fromEntries(FULFILMENT_VALUES.map(v => [v, 0]));
+            let none = 0;
+            for (const op of frag.operations) {
+                const entry = entry_of.get(op.name);
+                if (!entry) none++;
+                else if (tally[entry.fulfilment] !== undefined) tally[entry.fulfilment]++;
+            }
+            out += `| ${pad(fam.id)} ${cell(fam.title)} · ${family_link(fam)} | ${frag.operations.length} `
+                + `| ${tally.direct} | ${tally.composed} | ${tally.partial} | ${tally.absent} | ${none} |\n`;
+        }
+        return out;
+    };
+
+    const adapter_references = path.join(adapter_skill.dir, 'references');
+    const emitted_before = adapter_targets.length;
+    for (const frag of fragments) {
+        adapter_targets.push({
+            file: path.join(adapter_references, `mapping-${pad(frag.id)}-${frag.slug}.md`),
+            text: mapping_md(frag),
+        });
+    }
+    adapter_targets.push({ file: path.join(adapter_references, 'fulfilment.md'), text: fulfilment_md() });
+
+    adapter_summaries.push(`Adapter ${adapter_id} — ${entry_of.size} of ${operation_of.size} operations mapped: `
+        + `${counts.direct} direct, ${counts.composed} composed, ${counts.partial} partial, ${counts.absent} absent; `
+        + `${adapter_targets.length - emitted_before} mapping references.`);
+}
+
 // --------------------------------------------------------------------- emit
 
 const targets = [{ file: path.join(REFERENCES_DIR, 'operation-index.md'), text: index_md() }];
 for (const frag of fragments) {
     targets.push({ file: path.join(REFERENCES_DIR, `catalog-${pad(frag.id)}-${frag.slug}.md`), text: catalog_md(frag) });
 }
+targets.push(...adapter_targets);
 
 // SKILL.md is edited in place rather than generated: everything outside the markers is
 // hand-written L1 prose. parse_skill_md is deliberately not used here — round-tripping the
@@ -553,7 +847,7 @@ if (begin === -1 || end === -1) {
 }
 
 if (errors.length) {
-    console.error(`The operations contract does not hold (${errors.length}):\n${errors.join('\n')}\nNothing was written.`);
+    console.error(`The operations contract and its adapter mappings do not hold (${errors.length}):\n${errors.join('\n')}\nNothing was written.`);
     process.exit(1);
 }
 
@@ -572,6 +866,7 @@ for (const { file, text } of targets) {
 
 console.log(`Contract ${register.contract_version} — ${fragments.length} of ${FAMILIES.length} families, `
     + `${operation_count} of ${TOTAL_OPERATIONS} operations, ${core_operations.length} of ${CORE_TOTAL} core.`);
+for (const summary of adapter_summaries) console.log(summary);
 for (const notice of notices) console.log(notice);
 
 if (check) {
@@ -584,5 +879,6 @@ if (check) {
     }
     console.log(`Operation references are up to date (${targets.length} files).`);
 } else {
-    console.log(`Wrote ${targets.length} operation references.`);
+    console.log(`Wrote ${targets.length} operation references — ${targets.length - adapter_targets.length} for the contract, `
+        + `${adapter_targets.length} for the adapter.`);
 }
