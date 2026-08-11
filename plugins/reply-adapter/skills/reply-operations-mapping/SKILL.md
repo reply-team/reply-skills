@@ -127,6 +127,16 @@ distinguish "not in this document" from "not possible", which is the one distinc
 when a plan is being written. The 194 absences are the most informative part of the register, and
 [fulfilment.md](references/fulfilment.md) is long for that reason rather than in spite of it.
 
+**One part of this register has not been researched as thoroughly as the rest, and it is worth
+knowing which.** The endpoint groups covering *resources* were worked through page by page — 29 of
+them are named across the entries. The **settings** groups were not: no entry in the register claims
+a `settings:` scope, and that correlates exactly with where the claims are weakest. Every stored
+policy object lands `absent` or `partial` — enrichment, contactability, frequency, response,
+identity, assignment, workload, review, signal and content policies — and that is one missed pass
+rather than fifteen independent judgements. Treat those entries as the least trustworthy in the file
+until the settings pages have been read; `warmup_plan.set` first, because its own entry says the
+absence it records is the one that costs the most in its family.
+
 Nothing about these figures is a criticism of the product. Reply is strong exactly where an
 outbound programme spends most of its time — contacts, lists, sequences, steps, enrolment, the
 inbox and tasks. The absences cluster in oversight and review, which is the largest cluster in the

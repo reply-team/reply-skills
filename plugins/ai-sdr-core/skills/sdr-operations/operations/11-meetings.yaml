@@ -33,7 +33,7 @@ operations:
         metered against the message allowance where the channel meters messages; `none` otherwise.
     cost_basis: per message, where the channel meters messages
     meter: message
-    questions: []
+    questions: [28]
 
   - name: meeting.book
     intent: >
@@ -87,7 +87,7 @@ operations:
         metered against the message allowance where the channel meters messages; `none` otherwise.
     cost_basis: per message, where the channel meters messages
     meter: message
-    questions: []
+    questions: [28]
 
   - name: meeting.reschedule
     intent: >
@@ -104,7 +104,7 @@ operations:
     accepts_collection: false
     per_item_results: not_applicable
     cost: none
-    questions: []
+    questions: [28]
 
   - name: meeting.cancel
     intent: >
@@ -122,7 +122,7 @@ operations:
     accepts_collection: false
     per_item_results: not_applicable
     cost: none
-    questions: []
+    questions: [28]
 
   - name: meeting_outcome.record
     intent: >

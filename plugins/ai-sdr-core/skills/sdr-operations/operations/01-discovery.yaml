@@ -141,7 +141,7 @@ operations:
     cost: metered
     cost_basis: per record checked, or per record watched per period
     meter: monitoring
-    questions: []
+    questions: [27]
 
   - name: email_address.verify
     intent: >

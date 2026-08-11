@@ -69,7 +69,7 @@ const CORE_TOTAL = 30;
 
 // The open questions the contract is drafted against. A `questions` entry outside the range
 // is a typo, and a typo here quietly detaches an operation from the debate that owns it.
-const QUESTION_COUNT = 26;
+const QUESTION_COUNT = 28;
 
 const OPERATION_NAME = /^[a-z][a-z0-9_]*\.[a-z][a-z0-9]*$/;
 const FRAGMENT_FILE = /^(\d{2})-([a-z0-9-]+)\.yaml$/;

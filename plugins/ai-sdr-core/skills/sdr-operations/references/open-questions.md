@@ -1,6 +1,6 @@
 # Open questions
 
-Twenty-six forks in this contract that research could not settle. Each is a place where two
+Twenty-eight forks in this contract that research could not settle. Each is a place where two
 defensible readings exist, we took one, and taking the other would change an operation — not the
 prose around it, the operation.
 
@@ -94,6 +94,8 @@ readings under pressure. Questions 16–19 came out of working the families one 
 | 24 | Nothing in the export pair says personal data left | `export.request`, `export.get` |
 | 25 | Two collection writes take no key and give no reason | `stoprule.clear`, `campaign.freeze` |
 | 26 | One confirmation lifts a collection of legal exclusions | `suppression.remove` |
+| 27 | A standing paid watch has no lifecycle | `employment.check`, possibly three new operations |
+| 28 | Outbound meeting operations are compensatable | `meeting.propose`, `meeting.confirm`, `meeting.reschedule`, `meeting.cancel` |
 
 ---
 
@@ -517,3 +519,42 @@ restored by any second act".
 **Our answer today:** (a), transcribed as declared. **Why we are asking:** this is the one place in
 the contract where the confirmation gradient runs opposite to the consequence, and whether bulk
 lifting is real practice decides between (b) and (c).
+
+## 27. A standing watch is charged for and has no lifecycle
+
+**The fork.** `employment.check` is declared `read` × `auto`, and its basis is "per record checked,
+**or per record watched per period**" against the `monitoring` allowance — which the register defines
+as standing watch on a record for employer change. So one `read` can enrol a record in a recurring
+paid subscription, and no operation anywhere starts, lists or cancels a watch. Its
+`before_repeating` names only the last recorded check, which cannot tell a caller a watch already
+exists, so repeating it double-subscribes — unattended, with no gate, because a `read` never has one.
+
+| Option | Cost |
+|---|---|
+| (a) The watch lives inside the check, as the basis says (current) | Durable state we own and pay for, created by an operation the contract classes as changing nothing. Nothing can list it, nothing can stop it, and a plan cannot ask what it is already paying for |
+| (b) A `control` operation for the watch with a list and a cancel — the shape every other durable thing in the contract has | Three operations for a capability not every provider has, and `employment.check` goes back to being a plain metered read |
+| (c) Drop "or per record watched per period" and say the watch is out of scope | Honest and cheap, and it removes the only use of the `monitoring` meter from the contract — which is itself an argument that the meter was added for something the operations do not express |
+
+**Our answer today:** (a), transcribed as declared. **Why we are asking:** this is the only operation
+in twenty-one families that touches the `monitoring` meter, and whichever way it is settled the
+register and the family have to agree about whether standing watches exist here at all.
+
+## 28. Four outbound meeting operations are compensatable where a delivered message is irreversible
+
+**The fork.** `meeting.propose`, `meeting.confirm`, `meeting.reschedule` and `meeting.cancel` are all
+`act` × **compensatable** × `confirm_each`, raised. Every one of them mails a named person —
+`meeting.propose`'s own `before_repeating` says a repeat "double-books the calendar and mails them
+twice". Elsewhere the contract is firm that a delivered message cannot be undone: `message.send` is
+irreversible, and so is a test send to an address you own. The source argues its side explicitly at
+`meeting.cancel` — compensatable, because a new meeting restores the situation and not this one — so
+this is two considered answers to the same question rather than an oversight.
+
+| Option | Cost |
+|---|---|
+| (a) Compensatable, because the *meeting* can be restored (current) | Every guardrail reasoning about blast radius reads `reversibility` directly, and here it is told four operations that already put words in front of a prospect can be put back. The `confirm_each` on all four then rests on the raise annotation rather than on the table: drop the raise and `act` × `compensatable` derives `confirm_once` |
+| (b) The outbound leg is irreversible, conditional where it only records a meeting invited elsewhere — the shape `meeting.book` already uses | `confirm_each` derives instead of being asserted, and the departure can go. Four rows change, and "reversibility" starts answering about the message rather than about the calendar |
+| (c) Keep both readings by splitting the property's subject explicitly: the calendar entry is compensatable, the notification is not | Truthful and awkward — it means `reversibility` is about two different objects on one row, which the property does not currently allow |
+
+**Our answer today:** (a), transcribed as declared, with the raise carrying the gate. **Why we are
+asking:** the answer decides whether `reversibility` describes the state we hold or the effect on the
+person, and every guardrail downstream reads it as the latter.

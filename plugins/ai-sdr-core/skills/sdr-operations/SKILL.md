@@ -273,7 +273,7 @@ problems and they get different fixes.
   kind of thing each absence actually is: a business rule, an account policy value, a human errand,
   a refusal of principle, or a filter with a name. Answers *why is there no operation for X?* —
   read it before inventing a name.
-- `references/open-questions.md` — the 26 forks where two readings are defensible, one was taken,
+- `references/open-questions.md` — the 28 forks where two readings are defensible, one was taken,
   and the other would change an operation rather than the prose around it. Answers *how settled is
   this?* An operation carrying `questions: [n]` is unsettled by fork n; say so rather than choosing
   silently.
