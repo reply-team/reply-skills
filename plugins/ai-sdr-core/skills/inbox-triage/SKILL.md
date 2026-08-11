@@ -105,8 +105,11 @@ sets it. Read it before asserting any number.
    goes out from that identity (`H5`), not from whichever sender has capacity.
 4. **Decide what the reply means** (`conversation.classify`) — before drafting, because the
    meaning decides whether a reply is the right next act at all. Three cases are not replies:
-   - **a request to stop** is not a meaning (`A2`). It goes to `optout.record`,
-     `suppression.add`, `outreach.hold` and `enrollment.stop`, and nothing is sent back (`H4`);
+   - **a request to stop** is not a meaning (`A2`). It goes to `optout.record` and
+     `outreach.hold`, which are `auto` and go first; then `suppression.add`, which is `auto` for
+     the person's own identifier and `confirm_once` for a domain or a pattern; then
+     `enrollment.stop`, which is `confirm_once` and is asked for. Nothing is sent back (`H4`), and
+     the protective half is never held up waiting for the gated half;
    - **an out-of-office or other automatic message** is answered by `message.schedule` for
      their stated return date, which is a new outbound message rather than a reply (`H4`);
    - **a reply naming somebody else** goes to `referral.record`, which is raised to
@@ -169,8 +172,13 @@ interested people with no meeting yet, and the follow-up that should exist for t
 - **Replying to an automatic message** because the thread is open and it looks like a reply
   (`H4`).
 - **Classifying a request to stop** as the nearest-looking meaning, because it keeps the
-  reporting axis tidy (`A2`). It is an obligation, and the operations that handle it are
-  protective and derive `auto` — they are never delayed for a confirmation.
+  reporting axis tidy (`A2`). It is an obligation. Recording it — `optout.record`, `outreach.hold`
+  — is protective, derives `auto` and is never delayed for a confirmation. The rest of the branch
+  is not: `suppression.add` over a domain or a pattern is `confirm_once`, and `enrollment.stop` is
+  `confirm_once` with no conditional at all, because an enrolment's position is evidence of what
+  the person actually received (`G8`). Perform the protective half immediately and ask for the
+  other half — treating the whole branch as `auto` is how a stop turns into an unapproved
+  domain-wide exclusion.
 - **Treating do-not-contact as a disposition value.** Suppression is `suppression.add` and
   `optout.record`, not a label on a thread, and recording a disposition the user did not agree
   with is a separate mistake worth avoiding on its own.

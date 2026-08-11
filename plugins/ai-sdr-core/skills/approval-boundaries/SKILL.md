@@ -222,6 +222,11 @@ The protective set, named:
   everything queued against them — enrolments, tasks, pending approvals, scheduled sends,
   un-accepted handoffs, outstanding meeting proposals — and reports what it could not reach
   (I5).
+- **`scheduled_message.cancel`** — pull back what has not gone yet. Part of every stop branch,
+  and the one step in it that keeps a queued message from arriving after the person has asked to
+  be left alone.
+- **`approved_content.retire`** — take approved copy out of use. Withdrawing permission to send
+  something never waits; granting it does.
 - **a firing `stoprule.set` rule** — the work stops itself with nobody present, and the firing
   record names the trigger value, the operations halted and every item left unprocessed (L8).
 - **`sender_limit.set` downward** — reducing what a capability may send is protective in shape,
@@ -231,10 +236,16 @@ The protective set, named:
   the limit is not.
 
 Recording a fact that is already true belongs here too, for the same reason: `optout.record`,
-`restriction.record`, `inbound_lead.record` and `privacy_request.create` derive `auto` because
-recording an event that already happened outside our control is not a decision, and delaying it
-burns the only thing that motion is measured on (K2). Recording that somebody said stop is never
-a judgement about what they meant (A2).
+`restriction.record`, `inbound_lead.record`, `privacy_request.create` and `deletion_feed.report`
+derive `auto` because recording an event that already happened outside our control — or meeting a
+deadline that runs whether we act or not — is not a decision, and delaying it burns the only thing
+that motion is measured on (K2). Recording that somebody said stop is never a judgement about what
+they meant (A2).
+
+Those five are **the whole of the floor**, and the list is checked rather than remembered: each one
+carries `protective_floor: true` in the contract, the build refuses that marker on any operation the
+derivation table already gives `auto`, and it refuses a lowering that does not carry it. If you
+believe a sixth operation belongs here, the contract is where that argument is settled.
 
 `suppression.add` sits here **only for a single verified identifier**. Called with a domain, an
 account pattern or a collection it is `confirm_once`, because suppressing a domain is a

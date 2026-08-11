@@ -241,12 +241,16 @@ says so, and names the fork.
 ## Safety model
 
 Skills never let an agent start a campaign, send a message, or delete data without your explicit
-confirmation in the conversation. Anything that sends content requires you to approve the
-**literal text** first. An operation that carries a set shows a preview that **names** the people
-it would reach — never a bare count, which is a number you can neither check nor refuse.
+confirmation in the conversation. A message composed for one named person requires you to approve
+its **literal text**. An operation that carries a set is one decision, and it shows a preview that
+**names** the people it would reach — never a bare count, which is a number you can neither check
+nor refuse.
 
-Protective actions are the one exception: pausing a campaign that is burning your domain happens
-first and tells you immediately, because waiting is the destructive choice.
+Two kinds of operation are the exception, and both run first and tell you immediately. **Stopping**
+— pausing a campaign that is burning your domain, holding outbound, clearing a queue — because
+waiting is the destructive choice. And **recording something that already happened outside our
+control**, such as somebody's request to stop, because delaying that is the only way to get it
+wrong. Starting anything back up is never in that set.
 
 The rules live in one place — the `approval-boundaries` skill — and ship inside `ai-sdr-core`, so
 no selective install can leave them out. They are additionally bound mechanically by
