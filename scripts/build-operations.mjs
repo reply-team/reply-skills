@@ -100,6 +100,7 @@ const OPERATION_KEYS = new Set([
     'name', 'core', 'intent', 'reach', 'reversibility', 'approval', 'approval_artefact',
     'approval_departs', 'approval_reason', 'before_repeating', 'cost', 'cost_basis', 'meter',
     'idempotency_key', 'accepts_collection', 'per_item_results', 'questions',
+    'protective_floor', 'key_exempt',
 ]);
 
 // A property is either a scalar or a conditional block. Every gate below runs against the
@@ -110,7 +111,44 @@ const CONDITIONAL_KEYS = ['reach', 'reversibility', 'approval', 'cost', 'idempot
 // Absence is not a default: a missing property reads as the most dangerous value it could
 // have held. Forgetting `cost` therefore fails the build on the missing basis and meter,
 // which is the point — nothing is left blank because it seemed obvious.
-const DANGEROUS = { reach: 'act', reversibility: 'irreversible', approval: 'confirm_each', cost: 'metered' };
+// Four of the six conditional-capable properties used to be listed here, so a missing
+// `per_item_results` resolved to undefined, rendered as an em dash, and read as no obligation at
+// all — the exact opposite of the stated rule, on a property the guardrails plan against.
+const DANGEROUS = {
+    reach: 'act', reversibility: 'irreversible', approval: 'confirm_each', cost: 'metered',
+    idempotency_key: 'required', per_item_results: 'required',
+};
+
+// The values each property may hold. Without this, `cost: nome` passed and silently skipped the
+// basis and meter requirements, because every gate compared against a literal string; and an
+// approval of `yolo_send_it` rendered straight into the normative table.
+const ALLOWED = {
+    reach: ['read', 'control', 'act'],
+    reversibility: ['reversible', 'compensatable', 'irreversible'],
+    approval: ['auto', 'confirm_once', 'confirm_each'],
+    cost: ['none', 'metered'],
+    idempotency_key: ['required', 'none'],
+    per_item_results: ['required', 'not_applicable'],
+};
+
+// Approval is ordered, and the order is the rule: policy may raise the class, nothing may lower
+// it. Stated in prose in three places and enforced nowhere — `approval_departs: true` switched off
+// every check on the field, so a lowering of `message.send` to `auto` built cleanly.
+const APPROVAL_ORDER = ['auto', 'confirm_once', 'confirm_each'];
+const rank = (a) => APPROVAL_ORDER.indexOf(a);
+
+// The one legitimate way to sit below the derived cell, and now a field rather than a prose
+// convention in an approval_reason. It was unmarked, so the floor could not be checked, could not
+// be generated, and the hand-written list of it in approval-boundaries had already drifted in both
+// directions — one operation wrongly in, one missing.
+const FLOOR_KEY = 'protective_floor';
+
+// A collection write takes a key. The appendix exempts two shapes in words and leaves two rows
+// bare, so the exemption is declared here rather than inferred: `absolute_valued` for a setter
+// that writes the same value again, `terminal_state` for an operation a repeat can only arrive at
+// again, and `unstated` for the rows where the source says "no key" and gives no reason — which
+// is a gap we carry visibly instead of inventing a justification for.
+const KEY_EXEMPTIONS = ['absolute_valued', 'terminal_state', 'unstated'];
 
 // approval follows from reversibility x reach. Each cell is a SET rather than one value,
 // because the table's own footnotes widen two of them: control/compensatable admits
@@ -414,6 +452,15 @@ for (const frag of fragments) {
             if (!value.detail) err(where, `conditional '${key}' has no detail — the detail is what the agent reads`);
         }
 
+        for (const [property, values] of Object.entries(ALLOWED)) {
+            const value = resolve(op, property);
+            if (value !== undefined && !values.includes(value)) {
+                err(where, `${property} resolves to \`${value}\`, which is not one of ${or_list(values)}. `
+                    + 'Every gate below compares against a value it knows, so an unknown one skips its checks '
+                    + 'silently and renders into the normative table as though it meant something.');
+            }
+        }
+
         const reach = resolve(op, 'reach');
         const reversibility = resolve(op, 'reversibility');
         const approval = resolve(op, 'approval');
@@ -432,12 +479,34 @@ for (const frag of fragments) {
             if (reach !== undefined && reversibility !== undefined) {
                 err(where, `reach '${reach}' x reversibility '${reversibility}' is not a cell in the derivation table`);
             }
-        } else if (op.approval_departs === true) {
-            if (!op.approval_reason) err(where, 'approval_departs is true but approval_reason is absent — a departure is justified in writing or not at all');
+        } else if (op.approval_departs === true || op[FLOOR_KEY] === true) {
+            // A departure is either a raise, which policy may make freely with a reason, or the
+            // protective floor, which is the one legitimate lowering and now says so in a field.
+            // Before this, `approval_departs: true` switched off every check on the field: the
+            // direction went unexamined, so a lowering read exactly like a raise, and the rule
+            // stated in three documents — policy may raise, nothing may lower — was enforced
+            // nowhere at all.
+            if (!op.approval_reason) err(where, 'a departure carries no approval_reason — a departure is justified in writing or not at all');
+            const floor = op[FLOOR_KEY] === true;
+            const lowers = approval !== undefined && derived.every(d => rank(approval) < rank(d));
+            if (floor) {
+                if (approval !== 'auto') {
+                    err(where, `${FLOOR_KEY} is true but approval resolves to \`${approval}\` — the floor is the case where `
+                        + 'not performing the operation is itself the harm, and that case is `auto`');
+                }
+                if (!lowers) {
+                    err(where, `${FLOOR_KEY} is true but reach '${reach}' x reversibility '${reversibility}' already derives `
+                        + `${or_list(derived)} — the marker is for the one legitimate lowering, and this is not one`);
+                }
+            } else if (lowers) {
+                err(where, `approval resolves to \`${approval}\` where reach '${reach}' x reversibility '${reversibility}' derives `
+                    + `${or_list(derived)}. Policy may raise a class and may never lower one. If not performing this operation `
+                    + `is itself the harm, that is the protective floor: set ${FLOOR_KEY}: true and say so in approval_reason.`);
+            }
         } else if (approval !== undefined && !derived.includes(approval)) {
             err(where, approval === 'auto'
                 ? `approval resolves to \`auto\` where reach '${reach}' x reversibility '${reversibility}' derives ${or_list(derived)}. `
-                    + 'If this is the protective floor — not performing it is itself the harm — set approval_departs: true and say so in approval_reason.'
+                    + `If this is the protective floor — not performing it is itself the harm — set ${FLOOR_KEY}: true and say so in approval_reason.`
                 : `approval resolves to \`${approval}\`, but reach '${reach}' x reversibility '${reversibility}' derives ${or_list(derived)}. `
                     + 'Policy may raise the class, and every raise sets approval_departs: true with an approval_reason.');
         }
@@ -452,6 +521,8 @@ for (const frag of fragments) {
         // terminal state reaches the same state again (`job.cancel`). Enforcing it mechanically
         // would overrule six rows that state their exemption in words, so it stays a rule a
         // reviewer applies, and the legend now says what is actually required.
+        const carries_collection = op.accepts_collection !== false && reach !== 'read';
+
         if (key !== 'required') {
             const grounds = [
                 reach === 'act' ? 'reach resolves to `act`' : null,
@@ -460,6 +531,33 @@ for (const frag of fragments) {
             if (grounds.length) {
                 err(where, `idempotency_key resolves to \`${key ?? 'absent'}\`, but ${grounds.join('; ')} — a key is required`);
             }
+            // The collection ground, which the contract exempts in two shapes and leaves bare in
+            // two rows. Enforcing it blindly would overrule the exemptions; not enforcing it at
+            // all left six collection writes — two of them the guardrail switches — promising a
+            // per-item report with no key to recover it by, which nothing anywhere reported.
+            // So the exemption is declared rather than inferred, and `unstated` is a legal value:
+            // the source says "no key" and gives no reason, and carrying that visibly beats both
+            // inventing a justification and pretending the hole is not there.
+            else if (carries_collection && !op.key_exempt) {
+                err(where, 'accepts a collection and takes no idempotency key. A partial run cannot be '
+                    + 'recovered without one, so either it takes a key, or it declares why a repeat is '
+                    + `harmless: key_exempt: ${KEY_EXEMPTIONS.join(' | ')}.`);
+            }
+        }
+        if (op.key_exempt !== undefined) {
+            if (!KEY_EXEMPTIONS.includes(op.key_exempt)) err(where, `key_exempt '${op.key_exempt}' is not one of ${or_list(KEY_EXEMPTIONS)}`);
+            if (key === 'required') err(where, 'key_exempt is declared on an operation that takes a key — one of the two is wrong');
+        }
+
+        // The derivation table writes every `act` cell as confirm_once *with a mandatory preview
+        // naming the population*, and the artefact was rendered in the catalogs while being
+        // validated nowhere: a `confirm_once` over a set with no artefact is a yes given without
+        // being told who it covers. Required where there is a population to name — a call carrying
+        // exactly one object has none, and the source's plain `confirm_once` for those is coherent.
+        if (reach === 'act' && approval === 'confirm_once' && carries_collection && !op.approval_artefact) {
+            err(where, 'act + confirm_once over a collection carries no approval_artefact. The derivation '
+                + 'table admits confirm_once here only with a mandatory artefact that names the population, '
+                + 'so the artefact is what the user is actually approving.');
         }
         // The approximation for "accepts a collection but reports one verdict": a key is
         // required (so a collection or a durable write is in play) yet no per-item outcome
@@ -601,10 +699,11 @@ const LEGEND = `**Reading the table.** † marks a core operation. The five prop
 (the observable state to read before running it again) and *cost* (\`none\` · \`metered\`, with its
 basis and the meter it consumes). *Key* and *per-item* are the two standing obligations: an
 idempotency key on every act, every metered call, every write accepting a collection and every
-write creating a durable object — except where a repeat is harmless by construction, which is an
-absolute-valued setter or an operation naming a terminal state; and one outcome per item whenever
-a collection is carried. Where a property is conditional
-the cell holds the dangerous reading, with the condition beneath it.`;
+write creating a durable object. A write that takes no key says why in *exempt* — \`absolute_valued\`
+(the same value written again), \`terminal_state\` (the same state arrived at again), or \`unstated\`,
+which is the contract admitting it has no reason and not a claim that one exists. And one outcome
+per item whenever a collection is carried. Where a property is conditional the cell holds the
+dangerous reading, with the condition beneath it.`;
 
 const cell = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
 const code = (s) => `\`${cell(s)}\``;
@@ -640,7 +739,8 @@ const row = (op) => {
         stack([
             property_cell(op, 'approval'),
             op.approval_artefact ? `*artefact:* ${cell(op.approval_artefact)}` : null,
-            op.approval_departs === true ? `*departs:* ${cell(op.approval_reason)}` : null,
+            op.approval_departs === true || op[FLOOR_KEY] === true
+                ? `*${op[FLOOR_KEY] === true ? 'protective floor' : 'departs'}:* ${cell(op.approval_reason)}` : null,
         ]),
         cell(op.before_repeating) || '—',
         stack([
@@ -648,7 +748,10 @@ const row = (op) => {
             op.cost_basis ? `*basis:* ${cell(op.cost_basis)}` : null,
             meters_of(op).length ? `*meter${meters_of(op).length > 1 ? 's' : ''}:* ${meters_of(op).map(code).join(', ')}` : null,
         ]),
-        property_cell(op, 'idempotency_key'),
+        stack([
+            property_cell(op, 'idempotency_key'),
+            op.key_exempt ? `*exempt:* ${code(op.key_exempt)}` : null,
+        ]),
         property_cell(op, 'per_item_results'),
         ids.length ? ids.map(id => code(id)).join(', ') : '—',
     ].join(' | ') + ' |';
@@ -881,7 +984,13 @@ for (const adapter_name of ADAPTER_SKILLS) {
         return '| ' + [
             `${code(op.name)}${op.core === true ? ' †' : ''}`,
             property_cell(op, 'reach'),
-            property_cell(op, 'approval'),
+            // The contract's own row carries the departure beside the class, and this one dropped
+            // it — so an agent reading only the adapter's table saw a bare `auto` on an operation
+            // the contract declares irreversible, with nothing saying why the gate is relaxed.
+            stack([
+                property_cell(op, 'approval'),
+                op.approval_departs === true || op[FLOOR_KEY] === true ? `*departs:* ${cell(op.approval_reason)}` : null,
+            ]),
             fulfilment_cell(entry),
             entry?.surface ? cell(entry.surface) : '—',
             scopes_cell(entry),

@@ -13,10 +13,11 @@ Generated from the contract fragments in `operations/`. Edit a fragment, not thi
 (the observable state to read before running it again) and *cost* (`none` · `metered`, with its
 basis and the meter it consumes). *Key* and *per-item* are the two standing obligations: an
 idempotency key on every act, every metered call, every write accepting a collection and every
-write creating a durable object — except where a repeat is harmless by construction, which is an
-absolute-valued setter or an operation naming a terminal state; and one outcome per item whenever
-a collection is carried. Where a property is conditional
-the cell holds the dangerous reading, with the condition beneath it.
+write creating a durable object. A write that takes no key says why in *exempt* — `absolute_valued`
+(the same value written again), `terminal_state` (the same state arrived at again), or `unstated`,
+which is the contract admitting it has no reason and not a claim that one exists. And one outcome
+per item whenever a collection is carried. Where a property is conditional the cell holds the
+dangerous reading, with the condition beneath it.
 
 | Operation | Intent | Reach | Reversibility | Approval | Before repeating | Cost | Key | Per-item | Invariants |
 |---|---|---|---|---|---|---|---|---|---|

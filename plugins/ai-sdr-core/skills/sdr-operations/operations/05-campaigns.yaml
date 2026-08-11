@@ -271,6 +271,7 @@ operations:
       the campaign's state and the freeze's expiry — freezing twice with different expiries is a
       change, not a repeat.
     idempotency_key: none
+    key_exempt: unstated
     per_item_results:
       value: required
       conditional: true

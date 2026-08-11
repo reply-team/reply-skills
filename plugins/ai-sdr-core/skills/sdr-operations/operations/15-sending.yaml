@@ -246,6 +246,7 @@ operations:
     reversibility: irreversible
     approval: auto
     approval_departs: true
+    protective_floor: true
     approval_reason: >
       the protective floor: recording an event that already happened outside our control derives auto
       whatever its reversibility, and waiting for permission to record a restriction is the

@@ -13,10 +13,11 @@ Generated from the contract fragments in `operations/`. Edit a fragment, not thi
 (the observable state to read before running it again) and *cost* (`none` · `metered`, with its
 basis and the meter it consumes). *Key* and *per-item* are the two standing obligations: an
 idempotency key on every act, every metered call, every write accepting a collection and every
-write creating a durable object — except where a repeat is harmless by construction, which is an
-absolute-valued setter or an operation naming a terminal state; and one outcome per item whenever
-a collection is carried. Where a property is conditional
-the cell holds the dangerous reading, with the condition beneath it.
+write creating a durable object. A write that takes no key says why in *exempt* — `absolute_valued`
+(the same value written again), `terminal_state` (the same state arrived at again), or `unstated`,
+which is the contract admitting it has no reason and not a claim that one exists. And one outcome
+per item whenever a collection is carried. Where a property is conditional the cell holds the
+dangerous reading, with the condition beneath it.
 
 | Operation | Intent | Reach | Reversibility | Approval | Before repeating | Cost | Key | Per-item | Invariants |
 |---|---|---|---|---|---|---|---|---|---|
@@ -32,6 +33,6 @@ the cell holds the dangerous reading, with the condition beneath it.
 | `adapter.describe` | "How much, how fast, inline or queued" — request ceilings, batch ceilings, page sizes, and the scope and lifetime of an idempotency key. | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `not_applicable` | `N7` |
 | `adapter.verify` | "Prove by test, not by assertion, which operations this installation actually fulfils, how faithfully, and where a promise is composed out of several smaller acts." | `read` | `reversible` | `auto` | the last verification record and its timestamp | `metered`<br>*basis:* request allowance, per call made during the run<br>*meter:* `request` | `required`<br>*conditional:* so an interrupted run is not paid for twice. | `required`<br>*conditional:* one verdict per operation. | `N6` |
 | `job.get` | "How far has this queued work got, and what happened to each item?" | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `required` | — |
-| `job.cancel` | "Stop queued work. Items already done stay done" | `control` | `irreversible`<br>*conditional:* cancelling does not undo the items already processed. | `confirm_once` | the job's state and its per-item ledger | `none` | `none`<br>*conditional:* the operation names a terminal state, so a repeat is harmless. | `required`<br>*conditional:* processed / cancelled / already-terminal per item. | — |
+| `job.cancel` | "Stop queued work. Items already done stay done" | `control` | `irreversible`<br>*conditional:* cancelling does not undo the items already processed. | `confirm_once` | the job's state and its per-item ledger | `none` | `none`<br>*conditional:* the operation names a terminal state, so a repeat is harmless.<br>*exempt:* `terminal_state` | `required`<br>*conditional:* processed / cancelled / already-terminal per item. | — |
 | `invocation.get` | "I lost the result of a call — show me what actually happened, by the key I sent, instead of running it again." | `read` | `reversible` | `auto` | nothing at stake; if the key is unknown the answer is `never_seen`, which is different from `seen_and_failed` and must never be collapsed with it. | `none` | `none`<br>*conditional:* it is keyed on one; that is its whole purpose. | `required`<br>*conditional:* it returns the original call's per-item ledger. | — |
 | `term.resolve` | "Someone said a word I do not use — a colleague's shorthand, an inherited spreadsheet header, another system's label. Which concept is it?" | `read` | `reversible` | `auto` | nothing at stake; the answer is resolved, ambiguous or unknown — never a guess. | `none` | `none` | `required` | — |

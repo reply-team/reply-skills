@@ -18,10 +18,20 @@
 #       reversibility: compensatable
 #       approval: confirm_once     # auto | confirm_once | confirm_each
 #       approval_artefact: preview # when the approval is carried by an artefact rather than a prompt
-#       approval_departs: false    # true when the value differs from the derivation table below
-#       approval_reason: >         # REQUIRED when approval_departs is true
+#       approval_departs: false    # true when the value RAISES above the derivation table below
+#       protective_floor: false    # true for the one legitimate LOWERING: an operation whose
+#                                  # non-performance is itself the harm. Requires approval `auto`
+#                                  # and a reason, and the build refuses it where the table already
+#                                  # derives auto — so the floor is a checked set rather than a
+#                                  # phrase somebody remembered to write in a reason.
+#       approval_reason: >         # REQUIRED for either
 #       before_repeating: >        # the observable state to read before running it again
 #       idempotency_key: required  # required | none | conditional
+#       key_exempt: absolute_valued # REQUIRED on a collection write that takes no key:
+#                                  # absolute_valued | terminal_state | unstated. The first two are
+#                                  # the shapes a repeat is harmless for; `unstated` is for the rows
+#                                  # where the source declares no key and gives no reason, and it is
+#                                  # carried visibly rather than justified by invention.
 #       accepts_collection: false  # ONLY on an operation that carries exactly one object.
 #                                  # Defaults to true, because absence must read as the dangerous
 #                                  # value. A key and a per-item report answer different questions:
@@ -99,11 +109,12 @@
 # 1. An idempotency key is required on every operation with reach `act`, on every write accepting
 #    a collection, on every write creating a durable object, and on every metered operation —
 #    including metered reads, because a lost result there costs real money to obtain again.
-#    Two shapes take no key, and say so, because replaying them is harmless by construction: a
-#    policy setter written as an absolute value ("the ceiling is 400", never "add 200"), and an
-#    operation naming a terminal state, which a repeat can only arrive at again. Everything else
-#    that writes carries one — the build enforces the `act` and metered grounds mechanically, and
-#    the other two are a reviewer's, because "creates a durable object" is not a field.
+#    Two shapes take no key, because replaying them is harmless by construction: a policy setter
+#    written as an absolute value ("the ceiling is 400", never "add 200"), and an operation naming a
+#    terminal state, which a repeat can only arrive at again. They declare which through
+#    `key_exempt`, and a collection write that declares neither fails the build. The `act` and
+#    metered grounds are enforced mechanically; "creates a durable object" is not a field and stays
+#    a reviewer's rule.
 # 2. Any operation accepting a collection returns one outcome per item, with the reason. A partial
 #    success reported as a single verdict is a defect.
 #

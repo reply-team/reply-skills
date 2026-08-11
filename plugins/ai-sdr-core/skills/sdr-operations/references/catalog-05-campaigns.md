@@ -13,10 +13,11 @@ Generated from the contract fragments in `operations/`. Edit a fragment, not thi
 (the observable state to read before running it again) and *cost* (`none` · `metered`, with its
 basis and the meter it consumes). *Key* and *per-item* are the two standing obligations: an
 idempotency key on every act, every metered call, every write accepting a collection and every
-write creating a durable object — except where a repeat is harmless by construction, which is an
-absolute-valued setter or an operation naming a terminal state; and one outcome per item whenever
-a collection is carried. Where a property is conditional
-the cell holds the dangerous reading, with the condition beneath it.
+write creating a durable object. A write that takes no key says why in *exempt* — `absolute_valued`
+(the same value written again), `terminal_state` (the same state arrived at again), or `unstated`,
+which is the contract admitting it has no reason and not a claim that one exists. And one outcome
+per item whenever a collection is carried. Where a property is conditional the cell holds the
+dangerous reading, with the condition beneath it.
 
 | Operation | Intent | Reach | Reversibility | Approval | Before repeating | Cost | Key | Per-item | Invariants |
 |---|---|---|---|---|---|---|---|---|---|
@@ -34,7 +35,7 @@ the cell holds the dangerous reading, with the condition beneath it.
 | `campaign.activate` | "Turn it on" | `act`<br>*conditional:* `act`, with magnitude equal to the enrolled population; `control` only where the campaign holds no enrolments, and even then it arms the campaign so the next enrolment sends immediately. | `irreversible` | `confirm_once`<br>*artefact:* preview | the campaign's live state and its first-touch ledger — an activation whose result was lost may already be sending. | `metered`<br>*basis:* per message released<br>*meter:* `message` | `required` | `required`<br>*conditional:* when a collection is given. | `E1`, `E2`, `E3` |
 | `campaign.pause` †<br>*questions:* 9 | "Stop this campaign" — incident response: never requires a lookup first and never waits for permission. | `control` | `reversible` | `auto` | the campaign's state; pausing a paused campaign is a no-op, not an error. | `none` | `required`<br>*conditional:* when a collection is given. | `required` | `E6`, `G4`, `L6` |
 | `campaign.resume` | "Start it sending again" — refuses unless it is actually paused. | `act` | `irreversible` | `confirm_once`<br>*artefact:* preview | the campaign's state and its first-touch ledger since the attempt. | `metered`<br>*basis:* per message released<br>*meter:* `message` | `required` | `required`<br>*conditional:* when a collection is given. | `E3`, `E6`, `G5`, `L6` |
-| `campaign.freeze`<br>*questions:* 9 | "Suspend it over the holidays, the conference, the incident" — carries a mandatory expiry and resumes itself. | `control` | `reversible` | `auto` | the campaign's state and the freeze's expiry — freezing twice with different expiries is a change, not a repeat. | `none` | `none` | `required`<br>*conditional:* when a collection is given. | `E6`, `G4` |
+| `campaign.freeze`<br>*questions:* 9 | "Suspend it over the holidays, the conference, the incident" — carries a mandatory expiry and resumes itself. | `control` | `reversible` | `auto` | the campaign's state and the freeze's expiry — freezing twice with different expiries is a change, not a repeat. | `none` | `none`<br>*exempt:* `unstated` | `required`<br>*conditional:* when a collection is given. | `E6`, `G4` |
 | `campaign.unfreeze` | "Let it go early" | `act` | `irreversible` | `confirm_once`<br>*artefact:* preview | the campaign's state and the first-touch ledger since the attempt. | `metered`<br>*basis:* per message released<br>*meter:* `message` | `required` | `required`<br>*conditional:* when a collection is given. | `E3`, `E6` |
 | `campaign.archive` | "Retire it" — refused while active enrolments remain unless they are first stopped with a reason. | `control` | `compensatable` | `confirm_once` | the campaign's archived state | `none` | `required`<br>*conditional:* when a collection is given. | `required` | — |
 | `campaign.unarchive` | "Bring it back into the working set" — never resumes sending. | `control` | `reversible` | `auto` | the campaign's archived state | `none` | `required`<br>*conditional:* when a collection is given. | `required` | — |

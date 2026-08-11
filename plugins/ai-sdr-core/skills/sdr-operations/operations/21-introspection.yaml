@@ -215,6 +215,7 @@ operations:
     idempotency_key:
       value: none
       detail: the operation names a terminal state, so a repeat is harmless.
+    key_exempt: terminal_state
     per_item_results:
       value: required
       detail: processed / cancelled / already-terminal per item.

@@ -70,6 +70,7 @@ operations:
     reversibility: compensatable
     approval: confirm_once
     approval_departs: false
+    approval_artefact: preview
     before_repeating: >
       the invitation's state.
     idempotency_key: required
@@ -147,6 +148,7 @@ operations:
     reversibility: compensatable
     approval: confirm_once
     approval_departs: false
+    approval_artefact: preview
     before_repeating: >
       the follow state for this pair.
     idempotency_key: required
@@ -175,6 +177,7 @@ operations:
     reversibility: compensatable
     approval: confirm_once
     approval_departs: false
+    approval_artefact: preview
     before_repeating: >
       the reaction state for this post and sender.
     idempotency_key: required

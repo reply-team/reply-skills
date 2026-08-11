@@ -109,6 +109,7 @@ operations:
     reversibility: irreversible
     approval: auto
     approval_departs: true
+    protective_floor: true
     approval_reason: >
       the protective floor — recording that somebody said stop is an operation whose non-performance
       is itself the harm, and waiting for permission to stop is the destructive choice.
@@ -271,6 +272,7 @@ operations:
     reversibility: irreversible
     approval: auto
     approval_departs: true
+    protective_floor: true
     approval_reason: >
       the protective floor — failing to open the record is itself the breach.
     before_repeating: >
@@ -349,6 +351,7 @@ operations:
     reversibility: irreversible
     approval: auto
     approval_departs: true
+    protective_floor: true
     approval_reason: >
       the protective floor — the reporting deadline is the obligation, so not reporting is the harm.
     before_repeating: >

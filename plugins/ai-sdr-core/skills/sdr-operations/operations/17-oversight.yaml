@@ -110,6 +110,7 @@ operations:
     before_repeating: >
       the current setting for the scope, and whether an unattended run is in flight under the old one.
     idempotency_key: none
+    key_exempt: absolute_valued
     per_item_results: required
     cost: none
     questions: []
@@ -447,6 +448,7 @@ operations:
     before_repeating: >
       the rules in force, and whether this rule is currently in a fired state.
     idempotency_key: none
+    key_exempt: unstated
     per_item_results: required
     cost: none
     questions: []

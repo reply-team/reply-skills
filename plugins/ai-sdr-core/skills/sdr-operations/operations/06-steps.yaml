@@ -87,6 +87,7 @@ operations:
     reversibility: irreversible
     approval: confirm_once
     approval_departs: false
+    approval_artefact: in-flight statement
     before_repeating: >
       the step list — an absent step is a completed removal, not a failure.
     idempotency_key: required
@@ -105,6 +106,7 @@ operations:
     reversibility: reversible
     approval: confirm_once
     approval_departs: false
+    approval_artefact: in-flight statement
     before_repeating: the step list, compared by position
     idempotency_key: required
     per_item_results: required
@@ -125,6 +127,7 @@ operations:
       conditional: true
       detail: auto while not live, confirm_once while live.
     approval_departs: false
+    approval_artefact: in-flight statement
     before_repeating: list variants for one already created under this key
     idempotency_key: required
     per_item_results: required
@@ -144,6 +147,7 @@ operations:
       conditional: true
       detail: auto while not live, confirm_once while live.
     approval_departs: false
+    approval_artefact: in-flight statement
     before_repeating: read the variant; last-write-wins
     idempotency_key: required
     per_item_results: required

@@ -24,6 +24,7 @@ operations:
         often for consent; where it created a contact, that part is compensatable by `contact.delete`.
     approval: auto
     approval_departs: true
+    protective_floor: true
     approval_reason: >
       the protective floor — recording an event that already occurred outside our control is not a
       decision, and delaying it burns the only thing this motion is measured on.

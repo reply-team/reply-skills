@@ -13,14 +13,15 @@ Generated from the contract fragments in `operations/`. Edit a fragment, not thi
 (the observable state to read before running it again) and *cost* (`none` · `metered`, with its
 basis and the meter it consumes). *Key* and *per-item* are the two standing obligations: an
 idempotency key on every act, every metered call, every write accepting a collection and every
-write creating a durable object — except where a repeat is harmless by construction, which is an
-absolute-valued setter or an operation naming a terminal state; and one outcome per item whenever
-a collection is carried. Where a property is conditional
-the cell holds the dangerous reading, with the condition beneath it.
+write creating a durable object. A write that takes no key says why in *exempt* — `absolute_valued`
+(the same value written again), `terminal_state` (the same state arrived at again), or `unstated`,
+which is the contract admitting it has no reason and not a claim that one exists. And one outcome
+per item whenever a collection is carried. Where a property is conditional the cell holds the
+dangerous reading, with the condition beneath it.
 
 | Operation | Intent | Reach | Reversibility | Approval | Before repeating | Cost | Key | Per-item | Invariants |
 |---|---|---|---|---|---|---|---|---|---|
-| `inbound_lead.record` † | "Somebody raised their hand — record it now, and tell me who they are". | `control` | `irreversible`<br>*conditional:* an arrival happened and cannot un-happen, and its time is evidence for the response clock and often for consent; where it created a contact, that part is compensatable by `contact.delete`. | `auto`<br>*departs:* the protective floor — recording an event that already occurred outside our control is not a decision, and delaying it burns the only thing this motion is measured on. | whether an arrival with this key, or this source and source reference, is already recorded — submission notifications retry, and a doubly-recorded arrival routes twice and restarts a clock that was already running. | `none` | `required` | `required` | `A3`, `A9`, `A17`, `B1`, `K1`, `K2`, `K4`, `K5`, `K7` |
+| `inbound_lead.record` † | "Somebody raised their hand — record it now, and tell me who they are". | `control` | `irreversible`<br>*conditional:* an arrival happened and cannot un-happen, and its time is evidence for the response clock and often for consent; where it created a contact, that part is compensatable by `contact.delete`. | `auto`<br>*protective floor:* the protective floor — recording an event that already occurred outside our control is not a decision, and delaying it burns the only thing this motion is measured on. | whether an arrival with this key, or this source and source reference, is already recorded — submission notifications retry, and a doubly-recorded arrival routes twice and restarts a clock that was already running. | `none` | `required` | `required` | `A3`, `A9`, `A17`, `B1`, `K1`, `K2`, `K4`, `K5`, `K7` |
 | `inbound_lead.list` † | "What has come in and not been worked, oldest first" — with how long each has been waiting and how long is left. | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `not_applicable` | `H10`, `K1`, `K8` |
 | `inbound_lead.get` | "Everything about this one" — what they told us, who they turned out to be, what we already have running against them, who owns it and what the clock says. | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `not_applicable` | — |
 | `inbound_lead.route`<br>*questions:* 2 | "Send it to the right owner by the rule" — territory, who already owns the account, round-robin, whoever is actually available. | `control` | `reversible` | `auto` | the current owner, and whether routing has already run — re-routing a lead someone is working moves it out from under them. | `none` | `required` | `required` | `H11`, `K3` |

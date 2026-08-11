@@ -13,10 +13,11 @@ Generated from the contract fragments in `operations/`. Edit a fragment, not thi
 (the observable state to read before running it again) and *cost* (`none` · `metered`, with its
 basis and the meter it consumes). *Key* and *per-item* are the two standing obligations: an
 idempotency key on every act, every metered call, every write accepting a collection and every
-write creating a durable object — except where a repeat is harmless by construction, which is an
-absolute-valued setter or an operation naming a terminal state; and one outcome per item whenever
-a collection is carried. Where a property is conditional
-the cell holds the dangerous reading, with the condition beneath it.
+write creating a durable object. A write that takes no key says why in *exempt* — `absolute_valued`
+(the same value written again), `terminal_state` (the same state arrived at again), or `unstated`,
+which is the contract admitting it has no reason and not a claim that one exists. And one outcome
+per item whenever a collection is carried. Where a property is conditional the cell holds the
+dangerous reading, with the condition beneath it.
 
 | Operation | Intent | Reach | Reversibility | Approval | Before repeating | Cost | Key | Per-item | Invariants |
 |---|---|---|---|---|---|---|---|---|---|
@@ -34,7 +35,7 @@ the cell holds the dangerous reading, with the condition beneath it.
 | `sender.reserve` | "Claim one unit of allowance so parallel work cannot spend it twice". | `control` | `reversible` | `auto` | the reservation ledger for this sender and window. | `none` | `required` | `required` | `A6`, `F3` |
 | `sender.release` | "Give the claim back". | `control` | `reversible` | `auto` | the reservation's state. | `none` | `required` | `required` | — |
 | `sender.summarize` | "This sender's numbers over a window" — failures by class, complaints with their publisher and denominator, deferrals, throttles. | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `not_applicable` | `F6`, `M4` |
-| `restriction.record` | "The platform has restricted this sender" — including the ones we only learned about from a refusal. | `control` | `irreversible` | `auto`<br>*departs:* the protective floor: recording an event that already happened outside our control derives auto whatever its reversibility, and waiting for permission to record a restriction is the destructive choice — the invalidated warm-up position and the recurrence count both hang off this record. | the restriction ledger for this sender: an identical open restriction must not be double-counted into the recurrence count. | `none` | `required` | `required` | `F4`, `K2` |
+| `restriction.record` | "The platform has restricted this sender" — including the ones we only learned about from a refusal. | `control` | `irreversible` | `auto`<br>*protective floor:* the protective floor: recording an event that already happened outside our control derives auto whatever its reversibility, and waiting for permission to record a restriction is the destructive choice — the invalidated warm-up position and the recurrence count both hang off this record. | the restriction ledger for this sender: an identical open restriction must not be double-counted into the recurrence count. | `none` | `required` | `required` | `F4`, `K2` |
 | `restriction.appeal` | "Appeal it where the platform offers a route — and say plainly when it does not". | `act` | `irreversible` | `confirm_each`<br>*departs:* raised from confirm_once: an appeal is written content submitted under a named human's identity, usually with one chance. | the appeal state for this restriction: none / submitted / decided. | `none` | `required` | `not_applicable` | `F5` |
 | `sender_pool.create` | "Group these capabilities so work can rotate across them". | `control` | `compensatable` | `confirm_once` | the pool's existence and membership. | `none` | `required` | `not_applicable` | — |
 | `sender_pool.update` | "Change who is in the pool and how work is routed across it" — including sticky per recipient, which on conversational channels is correctness and not optimisation. | `control` | `reversible` | `confirm_once`<br>*departs:* raised from auto: the call carries the pool's membership and its routing policy, and rotation is not a cure — where a budget's scope is the pool, the organisation or the recipient, rotating across senders moves the problem, and sticky per recipient is correctness on conversational channels rather than optimisation, so this overwrites state that live conversations depend on. | the pool's current membership and routing policy. | `none` | `required` | `required` | `F10` |
