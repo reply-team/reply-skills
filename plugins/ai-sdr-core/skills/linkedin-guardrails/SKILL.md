@@ -99,9 +99,11 @@ Open expert questions:
    how old it is; `outreach.precheck` says whether this person may be contacted on this channel
    at all. A relationship state is a precondition, not a preference (`F12`).
 5. **Invite deliberately** (`social_invitation.send`). It is `confirm_each` — the note is
-   content addressed to a named person — and it is metered on the same meter as a message, so
-   invitations and outreach compete for one allowance rather than two. Where parallel work runs
-   against the same account, `sender.reserve` claims a unit so two runs cannot spend it twice.
+   content addressed to a named person — and it is metered on its own `invitation` allowance,
+   charged per invitation sent. Invitations therefore do not compete with outreach for one
+   allowance, and running out of one says nothing about the other: read both before planning a
+   day's work. Where parallel work runs against the same account, `sender.reserve` claims a unit
+   so two runs cannot spend it twice.
 6. **Ask before writing** (`conversation_window.get`): may we write to this person freely right
    now, only with pre-approved content, or only by spending a credit? `social_credit.get` says
    how many credits are left, when they expire, and whether a reply gives one back. Where the

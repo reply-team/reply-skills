@@ -31,11 +31,13 @@ team, and the AI-SDR configuration surface. One connection, no HTTP plumbing.
 
 - Use in MCP-capable clients when no shell is available, or when curated tools cover the task.
 - The MCP catalog is a **subset** of API v3, and API v3 is itself a minority of the job. Of the
-  325 vendor-neutral operations in the `sdr-operations` contract, Reply performs 43 directly, 6 by
-  composition and 82 in part — see `reply-operations-mapping` for the per-operation answer. The
-  tool catalog is a curated slice of that, so **a missing tool is the ordinary case, not a
-  malfunction**, and the fraction of an SDR's work these tools reach is small. Size a plan against
-  that rather than against the impression a tidy tool list gives.
+  325 vendor-neutral operations in the `sdr-operations` contract, **most are not performable here
+  at all**, and the rest divide into fully, by composition, and only in part.
+  `reply-operations-mapping` carries that division operation by operation and is generated from the
+  fulfilment register — the figures live there once, rather than being copied into a second skill
+  where they would go stale without anyone noticing. The tool catalog is a curated slice of what
+  remains, so **a missing tool is the ordinary case, not a malfunction**. Size a plan against that
+  rather than against the impression a tidy tool list gives.
 - When a needed capability is missing from the tools, fall back to the CLI (`reply api` reaches
   the whole API) rather than improvising with an adjacent tool. A tool that returns approximately
   the right shape for a different question is worse than no tool.
@@ -103,10 +105,11 @@ recommend read-mostly scopes for unattended agents.
 ## Changelog
 
 - 1.2.0 (2026-08-10): the "curated subset" claim was measured against nothing. It is now stated
-  against the 325-operation contract — 43 direct, 6 composed, 82 partial — so a reader can see
-  that the tool catalog is a slice of a surface that already covers a minority of the job, and
-  that a missing tool is the expected case rather than a fault. Added the rule that an adjacent
-  tool is never a substitute for a missing one.
+  against the 325-operation contract, and it points at the generated fulfilment register for the
+  division rather than restating figures that would go stale here — so a reader can see that the
+  tool catalog is a slice of a surface that already covers a minority of the job, and that a
+  missing tool is the expected case rather than a fault. Added the rule that an adjacent tool is
+  never a substitute for a missing one.
 - 1.1.0 (2026-07-30): moved into the `reply-adapter` pack; category `technical` → `execution`;
   `auth-and-keys` renamed `reply-auth`.
 - 1.0.0 (2026-07-27): initial version per docs.reply.io/reply-mcp.

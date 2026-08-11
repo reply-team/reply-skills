@@ -25,9 +25,10 @@ metadata:
 > **Partly an expert skeleton.** The diagnostic method is complete. The benchmark numbers
 > below are explicitly heuristics carried over from the prototype and are marked
 > `TODO(expert)` — they need validation against real outbound data, by the experts who own this
-> skill, before it leaves `draft`. Treat them as rules of thumb, never as law. They are also this skill's own bands
-> and nothing more: the contract returns no benchmark, industry average or portable score at
-> all (`M7`), so a band here can never be confused with a figure something handed back.
+> skill, before it leaves `draft`. Treat them as rules of thumb, never as law. They are also this
+> skill's own bands and nothing more: the contract returns no benchmark, industry average or
+> portable score at all (`M7`), so a band here can never be confused with a figure something
+> handed back.
 
 ## Purpose
 

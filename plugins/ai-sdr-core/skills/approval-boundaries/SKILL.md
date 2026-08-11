@@ -258,8 +258,10 @@ There are two mechanisms, and the order between them matters.
    collection, every write creating a durable object and every metered call — including metered
    reads — takes a **caller-supplied idempotency key**. Generate it before the first attempt,
    not after the first failure: a replay under the same key is the same call, not a second one.
-   Absolute-value policy setters take no key and say so, because replaying them is naturally
-   harmless.
+   Two shapes take no key and say so, because replaying them is harmless by construction: an
+   absolute-value policy setter ("the ceiling is 400", never "add 200"), and an operation naming
+   a terminal state, which a repeat can only arrive at again — `job.cancel` is the example, and
+   its `key: none` is the rule holding rather than an exception to it.
 2. **The read detects one the key could not prevent.** `before_repeating` names the observable
    state to read before running an operation again — a different key, a different session or a
    different agent leaves the key with nothing to match. `campaign.enroll` reads the per-item

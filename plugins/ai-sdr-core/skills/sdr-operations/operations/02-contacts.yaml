@@ -91,8 +91,8 @@ operations:
     cost: none
     questions: []
 
-  # The appendix marks this approval as raised, so the raise is carried as a departure with its own
-  # justification rather than left to look like an ordinary derived value.
+  # The class is declared above what the derivation gives, so it is carried as a departure with its
+  # own justification rather than left to look like an ordinary derived value.
   - name: contact.delete
     intent: >
       "Take this person out of the working database"

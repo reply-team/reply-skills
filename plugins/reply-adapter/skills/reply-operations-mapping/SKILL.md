@@ -388,8 +388,8 @@ those as irreversible with no window and say so before acting rather than after.
   survives here is only what is Reply-specific about the order. New: the fulfilment vocabulary
   (`direct` · `composed` · `partial` · `absent`) with what an agent does on meeting each; the rule
   that an `absent` is a gap in this adapter and never a reason to shrink the contract; the
-  coverage figures stated in the body — 43 direct, 6 composed, 82 partial, 194 absent of 325 — so
-  that a reader is not left to infer completeness from a table's length; the runtime path
+  coverage figures stated in the body, generated from the register itself, so that a reader is not
+  left to infer completeness from a table's length; the runtime path
   (`capability.list`, `adapter.describe`, `adapter.verify`) as preferable to any static table; and
   the Reply limit of one Live Data search per team at a time, which an agent that does not know it
   will plan around wrongly. The `5xx` error row now points at the contract's `before_repeating`
