@@ -176,7 +176,7 @@ operations:
     idempotency_key: required
     per_item_results: required
     cost: none
-    questions: []
+    questions: [14]
 
   - name: contact.disqualify
     intent: >

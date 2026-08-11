@@ -28,7 +28,7 @@ a future clean-up of either, because they are cleared by different people doing 
 A `TODO(expert)` is answered with a number. An open question is answered with a choice, and the
 answer has to be written back into the contract before it means anything.
 
-**The 37 `TODO(expert)` markers already in this repository are a different thing and are untouched
+**The 33 `TODO(expert)` markers already in this repository are a different thing and are untouched
 by this work.** None of them is an open question, none of them is renumbered, and clearing one has
 no bearing on any fork below. They are listed nowhere here on purpose.
 
@@ -302,7 +302,7 @@ commitment the pre-send gates read. Without it, a shipped classification value c
 | Option | Cost |
 |---|---|
 | (a) Cooldown, plus a task at the cooldown date (current) | The person hears nothing for two quarters, and "come back in Q4" becomes a diary entry that depends on somebody working the task |
-| (b) Cooldown **and** enrolment into a separate low-frequency programme | "Not now" is answered with "here is a different sequence", which is what the person was declining. It also needs its own basis and its own frequency accounting |
+| (b) Cooldown **and** enrolment into a separate low-frequency programme | "Not now" is answered with "here is a different campaign", which is what the person was declining. It also needs its own basis and its own frequency accounting |
 
 **Our answer today:** (a). **Why:** the contract can already express (b) — stop with a reason, enrol
 into the nurture campaign — so nothing is lost by making (a) the default advice. **Why we are

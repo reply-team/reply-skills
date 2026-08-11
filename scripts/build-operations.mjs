@@ -420,6 +420,21 @@ const complete = fragments.length === FAMILIES.length;
 if (complete) {
     if (operation_count !== TOTAL_OPERATIONS) err('contract', `holds ${operation_count} operations, but the register sums to ${TOTAL_OPERATIONS}`);
     if (core_operations.length !== CORE_TOTAL) err('contract', `marks ${core_operations.length} operations core, and the core set is ${CORE_TOTAL}`);
+
+    // A question nobody carries is a fork a reader never meets. The range check above catches a
+    // typo, which is a number that is wrong; it cannot catch a number that is missing, and the
+    // effect of a missing one is worse — the operations the fork would change look settled, and
+    // the file declaring the mechanism is the only place the question exists at all. Two of the
+    // twenty-one shipped that way. Mid-migration this would fire for every question whose family
+    // is not yet on disk, so it waits for the whole contract, like the totals above.
+    const asked = new Set(fragments.flatMap(f => f.operations).flatMap(op => (Array.isArray(op.questions) ? op.questions : [])));
+    const orphans = [];
+    for (let q = 1; q <= QUESTION_COUNT; q++) if (!asked.has(q)) orphans.push(q);
+    if (orphans.length) {
+        err('open-questions.md', `question${orphans.length > 1 ? 's' : ''} ${orphans.join(', ')} `
+            + `${orphans.length > 1 ? 'are' : 'is'} bound by no operation. A fork is disclosed on the operations it leaves `
+            + 'unsettled, through `questions: [n]`, or it is a debate the contract itself never mentions.');
+    }
 }
 
 // ------------------------------------------------------- invariant binding

@@ -93,7 +93,7 @@ operations:
     idempotency_key: required
     per_item_results: required
     cost: none
-    questions: []
+    questions: [1]
 
   - name: enrollment.resume
     intent: >
@@ -124,7 +124,7 @@ operations:
       detail: metered while the campaign is live; none while it is not.
     cost_basis: per resumed person, while the campaign is live
     meter: message
-    questions: []
+    questions: [1]
 
   - name: enrollment.stop
     core: true
