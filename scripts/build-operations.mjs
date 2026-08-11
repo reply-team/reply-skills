@@ -431,8 +431,22 @@ if (complete) {
 
 const bindings = new Map(); // operation name -> [rule id]
 
+// A rule opens its own line with its id and nothing before it: `**A9.** **The statement…**`.
+// The match must be anchored to the line and to the id's shape, because a rule body carries
+// bold words of its own — and an unanchored capture read the first of those as the next rule
+// id, silently rebinding every "Enforced by" list below it. Six rules did exactly that, and
+// their bindings shipped in fourteen catalogs under ids like `minimises` and `not measurable`
+// while the real ids appeared nowhere. The dot is part of the heading, not of the identifier:
+// invariants.md declares the citable form dot-less, and that is the form the catalogs print.
+const RULE_ID = /^\*\*([A-N]\d+)\.\*\*/;
+
+// A line that opens like an id but is not one. A typo in a heading would otherwise be invisible:
+// nothing captures, and that rule's operations attach themselves to the rule above it.
+const ID_SHAPED = /^\*\*([A-Za-z]{1,2}\d+)\.?\*\*/;
+
 if (fs.existsSync(INVARIANTS_FILE)) {
     let current = null;
+    const rules = new Set();
     fs.readFileSync(INVARIANTS_FILE, 'utf8').split(/\r?\n/).forEach((line, i) => {
         const trimmed = line.trim();
         if (trimmed.startsWith('*Enforced by:*')) {
@@ -446,8 +460,18 @@ if (fs.existsSync(INVARIANTS_FILE)) {
             }
             return;
         }
-        const id = trimmed.match(/\*\*([^*]+)\*\*/);
-        if (id) current = id[1].trim();
+        const id = trimmed.match(RULE_ID);
+        if (id) {
+            if (rules.has(id[1])) err(`invariants.md:${i + 1}`, `rule id ${id[1]} is declared twice — an id is a citation and cannot mean two rules`);
+            rules.add(id[1]);
+            current = id[1];
+            return;
+        }
+        const near = trimmed.match(ID_SHAPED);
+        if (near) {
+            err(`invariants.md:${i + 1}`, `'${near[1]}' opens a line like a rule id but does not match one — `
+                + 'a rule id is a group letter A–N, a number and a full stop, in bold, at the start of the line');
+        }
     });
     for (const [name, ids] of bindings) {
         if (!seen.has(name)) err('invariants.md', `\`${name}\` is enforced by ${ids.join(', ')}, but it is not an operation in the contract — a ghost reference`);

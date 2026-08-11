@@ -18,8 +18,8 @@ the cell holds the dangerous reading, with the condition beneath it.
 
 | Operation | Intent | Reach | Reversibility | Approval | Before repeating | Cost | Key | Per-item | Invariants |
 |---|---|---|---|---|---|---|---|---|---|
-| `source.inspect` | "Look at this file and tell me what is in it and how it would land" | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `required` | `B9.`, `B10.` |
-| `import.apply`<br>*questions:* 18, 19 | "Take this file, this mapping and these rules, and put the people in" | `control` | `compensatable` | `confirm_once` | the batch record for this key: its state and its per-row ledger. A re-run without the key is a second import, not a retry. | `none` | `required` | `required` | `A1.`, `minimises`, `provenance`, `B1.`, `B2.`, `B3.`, `B4.`, `B6.`, `B9.`, `B10.`, `C4.` |
-| `import.list` | "What imports have we run?" | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `not_applicable` | `M6.` |
+| `source.inspect` | "Look at this file and tell me what is in it and how it would land" | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `required` | `B9`, `B10` |
+| `import.apply`<br>*questions:* 18, 19 | "Take this file, this mapping and these rules, and put the people in" | `control` | `compensatable` | `confirm_once` | the batch record for this key: its state and its per-row ledger. A re-run without the key is a second import, not a retry. | `none` | `required` | `required` | `A1`, `A9`, `A17`, `B1`, `B2`, `B3`, `B4`, `B6`, `B9`, `B10`, `C4` |
+| `import.list` | "What imports have we run?" | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `not_applicable` | `M6` |
 | `import.get` | "Show me that import in full" | `read` | `reversible` | `auto` | nothing at stake | `none` | `none` | `required` | — |
 | `import.revert`<br>*questions:* 3 | "That import was wrong — undo it" | `control` | `compensatable` | `confirm_once` | the batch's revert state and the per-row revert ledger under this key. | `none` | `required` | `required` | — |
