@@ -116,7 +116,7 @@ concepts:
   - id: enrollment
     prefLabel: enrollment
     altLabels: [enrolment, participation, campaign membership, engagement in a campaign]
-    hiddenLabels: [enrol, enroll, enrolled, enrollee, participant, seat]
+    hiddenLabels: [enrol, enroll, enrolled, enrollee, participant]
     definition: >
       One contact's participation in one campaign: its position, state, first-touch timing, the
       reason it ended and who or what ended it. It is an entity in its own right — the same
@@ -231,32 +231,86 @@ concepts:
         sense: Somebody standing for election.
         because: Listed only because the word is common enough to mis-trigger a resolver.
 
+  - id: company
+    prefLabel: company
+    altLabels: [firm, business, employer, target company]
+    hiddenLabels: [companies, co, corp, organisation record, org record]
+    definition: >
+      A firm as it exists in somebody else's database — found, resolved or enriched before we own
+      anything about it. It becomes an `account` the moment it is a record of ours with owners,
+      state and a working history.
+    never_means:
+      - context: crm
+        sense: The company record we already hold and work.
+        because: >
+          That is `account`, and the two carry different obligations: a company is bought or
+          matched, an account is owned, stated and reported on. `company.resolve` answers "is this
+          the same firm"; `account.update` changes what we have decided about one.
+
   - id: account
     prefLabel: account
-    altLabels: [company, organisation, organization, target company, buying organisation, firm]
-    hiddenLabels: [accounts, acct, org, employer, business, logo]
+    altLabels: [organisation, organization, buying organisation, target organisation]
+    hiddenLabels: [accounts, acct, org, logo]
     definition: >
-      A company treated as a unit of work: its state, its tier, who owns it, whether somebody has
-      claimed it, and the people in its buying group. Collision policy, frequency caps and the
-      kill switch all operate at this level as well as at the person level, which is why it is an
-      entity and not a field on a contact.
+      A company as a record of ours: owned, stated, worked and reported on, with members, a state
+      and a tier.
     never_means:
       - context: authentication
-        sense: A login, a workspace, a tenant, or the user account a credential belongs to.
+        sense: A login, a seat, or the credential a run authenticates with.
         because: >
-          That side of the world is `capability` — what a credential is allowed to do — and
-          `sender` — what can send. An account here is never something you sign in to, and
-          confusing the two turns a question about permission into a question about a company.
-      - context: finance
-        sense: A billing account, a plan, or the entity an invoice is addressed to.
+          That is a `sender` or a credential, and confusing them puts a person's mailbox and a
+          target company in the same word.
+
+  - id: engagement
+    prefLabel: engagement
+    altLabels: [outreach performance, campaign performance, engagement figures]
+    hiddenLabels: [engagements, stats, numbers, metrics_view, performance figures]
+    definition: >
+      What happened to outreach, read as one measure set over a stated window with the grouping as
+      an argument — sent, delivered, opened, replied, and every did-not-happen count beside them.
+    never_means:
+      - context: reporting
+        sense: A separate read per scope — one for the account, one per campaign, one per channel.
         because: >
-          Money in this contract appears only as an operation's cost and its meter. What an
-          installation is charged, and by whom, is an account fact outside the contract.
-      - context: customer_success
-        sense: An existing customer under management, as distinct from a prospect.
+          The `metrics` entity was retired precisely because it collapsed: there is one
+          `engagement.summarize` and the grouping is an argument. Looking for a per-campaign
+          operation is how a name that exists in a single playbook gets invented.
+
+  - id: consent
+    prefLabel: consent
+    altLabels: [permission, lawful basis, legal basis, opt-in]
+    hiddenLabels: [consents, gdpr basis, permission record, subscribed]
+    definition: >
+      The evidence that reaching a person is permitted: kind, capture artefact, collecting legal
+      entity, jurisdiction, channels, purposes, subject-matter scope and expiry. Never the answer
+      on its own.
+    never_means:
+      - context: crm
+        sense: A boolean on the person — consented, yes or no.
         because: >
-          Customer is one of the states an account can be in, not a different kind of object. The
-          distinction that matters here is the state, because it changes what may be sent.
+          A basis is not a boolean (`A19`). A flag with no artefact behind it is exactly the answer
+          that cannot be used, which is why `consent.prove` must be able to answer `unprovable` and
+          why there is no `consent.check`.
+      - context: marketing
+        sense: The absence of an opt-out.
+        because: >
+          Not having said stop is not permission. An opt-out is an obligation recorded against a
+          person; consent is evidence recorded about a permission, and neither implies the other.
+
+  - id: signal
+    prefLabel: signal
+    altLabels: [observation, buying signal, intent signal, trigger event]
+    hiddenLabels: [signals, sig, intent data, event]
+    definition: >
+      One observation about a person or a company, carrying its source, the time it was observed,
+      a confidence and a validity window.
+    never_means:
+      - context: sales_intelligence
+        sense: A score — an intent number, a fit grade, a heat rating.
+        because: >
+          A signal is an observation, never a score (`J1`). A number with no source, no
+          observation time and no validity window cannot be reasoned about, and acting on a stale
+          observation is worse than not acting at all (`J2`).
 
   - id: suppression
     prefLabel: suppression
@@ -299,7 +353,8 @@ concepts:
           its own evidence and confidence. Keeping them apart is load-bearing: a request to stop
           is an obligation, and if it sat on the outcome axis a relabel would lift a legal duty.
       - context: call_center
-        sense: The code an agent or a dialler writes at the end of a call — busy, no answer, left
+        sense: >
+          The code an agent or a dialler writes at the end of a call — busy, no answer, left
           voicemail.
         because: >
           That is the outcome of one activity, not of a participation. A call that reached nobody

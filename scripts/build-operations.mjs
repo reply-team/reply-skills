@@ -629,6 +629,72 @@ if (complete) {
     }
 }
 
+// ------------------------------------------------------------------ lexicon
+//
+// docs/conventions.md calls this file authoritative — "the authoritative list is the lexicon
+// inside the sdr-operations skill … a word that exists only in this file is a second source of
+// truth, and the contract cannot have one" — and nothing read it. Four defects shipped because of
+// that, each of which the file's own header declares impossible: an alias belonging to two
+// concepts ("a defect here, not an ambiguity to be reported at runtime"), an alias that is another
+// concept's entity name, a retirement pointing at a concept that does not exist, and a field
+// written outside the YAML subset every other file in the contract obeys.
+
+const LEXICON_FILE = path.join(skill.dir, 'lexicon', 'neutral.yaml');
+
+if (fs.existsSync(LEXICON_FILE)) {
+    let lexicon;
+    try { lexicon = parse_yaml(LEXICON_FILE); }
+    catch (e) { err('lexicon/neutral.yaml', `${e.message}. The register is read by the build now, so it lives inside the same subset as every fragment.`); }
+
+    if (lexicon) {
+        const concepts = Array.isArray(lexicon.concepts) ? lexicon.concepts : [];
+        if (!concepts.length) err('lexicon/neutral.yaml', 'holds no concepts');
+        const entities = new Set([...seen.keys()].map(n => n.split('.')[0]));
+        const owner = new Map(); // label -> concept id that already claims it
+
+        for (const concept of concepts) {
+            const id = concept.id ?? '<unnamed>';
+            if (!concept.prefLabel) err(`lexicon ${id}`, 'has no prefLabel — the one word the contract writes');
+            if (!concept.definition) err(`lexicon ${id}`, 'has no definition');
+            if (complete && concept.id && !entities.has(concept.id)) {
+                err(`lexicon ${id}`, `is not the entity segment of any operation name. A concept the contract `
+                    + 'never names is either misspelled or belongs somewhere other than the operation register.');
+            }
+            const labels = [
+                concept.prefLabel,
+                ...(Array.isArray(concept.altLabels) ? concept.altLabels : []),
+                ...(Array.isArray(concept.hiddenLabels) ? concept.hiddenLabels : []),
+            ].filter(Boolean);
+            for (const label of labels) {
+                if (owner.has(label) && owner.get(label) !== concept.id) {
+                    err('lexicon/neutral.yaml', `'${label}' is a label of both '${owner.get(label)}' and '${concept.id}'. `
+                        + 'An alias resolves silently and cannot resolve to two concepts — the file says so itself.');
+                }
+                owner.set(label, concept.id);
+                // An alias that is another concept's entity name is worse than a collision: a plan
+                // written in prefLabel turns "company" into `account.resolve`, which does not exist.
+                if (label !== concept.prefLabel && entities.has(label) && label !== concept.id) {
+                    err('lexicon/neutral.yaml', `'${label}' is an accepted alias of '${concept.id}' and also the entity `
+                        + 'of live operations. Normalising a word to a concept whose name is another entity produces '
+                        + 'operation names that do not exist.');
+                }
+            }
+        }
+
+        const prefs = new Set(concepts.map(c => c.prefLabel).filter(Boolean));
+        for (const retired of lexicon.retired ?? []) {
+            if (retired?.became && !prefs.has(retired.became)) {
+                err('lexicon/neutral.yaml', `retired word '${retired.word}' became '${retired.became}', which is not a `
+                    + 'concept here — the redirect lands on a word the register answers `unknown` for');
+            }
+            if (retired?.word && owner.has(retired.word)) {
+                err('lexicon/neutral.yaml', `'${retired.word}' is retired and also a label of '${owner.get(retired.word)}' — `
+                    + 'a retired word must come back as retired, never resolve as an alias');
+            }
+        }
+    }
+}
+
 // ------------------------------------------------------- invariant binding
 //
 // A fragment does not list the invariants an operation is bound by. Each rule already names

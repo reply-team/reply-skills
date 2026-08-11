@@ -76,7 +76,11 @@ skills deliberately do not, because a prefix would imply a coupling that must no
   - work — Goal, Plan, Work Item, Artifact, Report, Evidence, Workspace, Protection.
 
   The business row is a reading aid, not the register. The **authoritative list is the lexicon
-  inside the `sdr-operations` skill** — every concept with its preferred label, the aliases
+  inside the `sdr-operations` skill**, and `npm run check` now reads it: one label belongs to one
+  concept, an alias may not be another entity's name, a retired word may not resolve, and every
+  retirement points at a concept that exists. It carries thirteen of the concepts above today; the
+  rest are owed, and a concept missing from it is a gap rather than a licence to define the word
+  somewhere else — every concept with its preferred label, the aliases
   accepted on input, the definitions, and the senses each word explicitly never carries. A concept
   is added there first; a word that exists only in this file is a second source of truth, and the
   contract cannot have one.

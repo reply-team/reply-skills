@@ -239,7 +239,11 @@ const read_contract = () => {
     for (const fragment of fragments) {
         const full = path.join(ops_dir, fragment);
         const doc = parse_yaml(fs.readFileSync(full, 'utf8'), relative(full));
-        for (const op of doc.operations ?? []) {
+        if (!Array.isArray(doc.operations) || !doc.operations.length) {
+            throw new Error(`${relative(full)}: holds no operations list. A fragment that yields no names makes every `
+                + 'reference in the repository unresolvable-by-omission, and this tool would report success.');
+        }
+        for (const op of doc.operations) {
             if (!op || typeof op.name !== 'string') throw new Error(`${relative(full)}: an operation has no name`);
             names.add(op.name);
             entities.add(op.name.split('.')[0]);
@@ -257,9 +261,13 @@ const read_contract = () => {
     // operation in order to say it does not exist, and that sentence must not read as a reference
     // to a missing one. Resolving them here, rather than exempting the file that says it, keeps a
     // genuine typo in the same paragraph visible.
-    let declared_absent = 0;
+    // Names the contract states it does not define are PERMITTED in prose without being part of
+    // the contract. Folding them into the same set used for counting and for the nearest-name hint
+    // made the linter recommend `consent.check` as the fix for a near miss — the one name the
+    // register says must never resolve to an operation.
+    const absent_names = new Set();
     for (const absent of registry.declared_absent ?? []) {
-        if (absent?.name && !names.has(absent.name)) { names.add(absent.name); declared_absent++; }
+        if (absent?.name && !names.has(absent.name)) absent_names.add(absent.name);
     }
 
     for (const file of markdown_under(skill.dir)) {
@@ -267,7 +275,24 @@ const read_contract = () => {
     }
 
     // Sorted, so the nearest-name hint is the same on every machine when two names tie.
-    return { names, sorted: [...names].sort(), entities, fragments: fragments.length, declared_absent };
+    // A validator whose failure mode is "OK" is worse than no validator. Renaming the
+    // `operations:` key in every fragment used to produce "0 operation references … resolve to 1
+    // operation" and exit 0: an empty entity set skips every token in the tree, and the tool
+    // reported success. The register states how many operations each family holds, so the floor is
+    // knowable — and an author running --only on one skill gets a green light off the same code.
+    const families = registry.families ?? [];
+    const declared = families.reduce((n, f) => n + (Number(f.operations) || 0), 0);
+    if (fragments.length === families.length && declared && names.size < declared) {
+        throw new Error(`the fragments yield ${names.size} operation names, but families.yaml registers ${declared} `
+            + 'across its families. Resolution against a contract this small would pass by finding nothing.');
+    }
+
+    return {
+        names, entities, fragments: fragments.length,
+        permitted: new Set([...names, ...absent_names]),
+        sorted: [...names].sort(),
+        declared_absent: absent_names.size,
+    };
 };
 
 // ------------------------------------------------------------- nearest by name
@@ -362,7 +387,7 @@ for (const file of files) {
             if (!contract.entities.has(segments[0])) continue;
             if (segments.length === 2 && FILE_EXTENSIONS.has(segments[1])) continue;
             references++;
-            if (contract.names.has(token)) continue;
+            if (contract.permitted.has(token)) continue;
             unresolved.push({ file: relative(file), line: n + 1, token });
         }
     });
@@ -400,6 +425,6 @@ if (unresolved.length) {
 // read as a reference to a missing operation. Counting it as an operation would publish a
 // contract size that is wrong by exactly the number of absences we were careful to declare.
 console.log(`OK — ${plural(references, 'operation reference')} across ${plural(files.length, 'file')} `
-    + `resolve to ${plural(contract.names.size - contract.declared_absent, 'operation')} in `
+    + `resolve to ${plural(contract.names.size, 'operation')} in `
     + `${plural(contract.fragments, 'fragment')}`
     + (contract.declared_absent ? `, plus ${plural(contract.declared_absent, 'name')} the contract declares absent.` : '.'));
