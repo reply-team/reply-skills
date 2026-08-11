@@ -155,7 +155,9 @@ notices — which is the same failure as Decision 2's drift, caught by the same 
   on every content change, and it should be stated as one rather than presented as free
   tooling. It buys drift being impossible instead of merely discouraged, which the evidence
   above says is worth it.
-- **CI gains two checks.** Generated tables must be current — the same pattern as
+- **CI gains two checks**, both inside `npm run check`, which is now the single step the
+  workflow runs — a named step per script let CI and `package.json` hold different opinions
+  about what "checked" means. Generated tables must be current, the same pattern as
   `check-manifests` and `check-index`, both of which already fail the build on stale generated
   output. And every operation name written anywhere in repository prose must resolve to a
   contract entry, which is precisely the check that would have caught the approval-vocabulary
