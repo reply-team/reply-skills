@@ -99,8 +99,11 @@
 # 1. An idempotency key is required on every operation with reach `act`, on every write accepting
 #    a collection, on every write creating a durable object, and on every metered operation —
 #    including metered reads, because a lost result there costs real money to obtain again.
-#    Policy setters written as an absolute value ("the ceiling is 400", never "add 200") take no
-#    key, and say so: replaying them is naturally harmless.
+#    Two shapes take no key, and say so, because replaying them is harmless by construction: a
+#    policy setter written as an absolute value ("the ceiling is 400", never "add 200"), and an
+#    operation naming a terminal state, which a repeat can only arrive at again. Everything else
+#    that writes carries one — the build enforces the `act` and metered grounds mechanically, and
+#    the other two are a reviewer's, because "creates a durable object" is not a field.
 # 2. Any operation accepting a collection returns one outcome per item, with the reason. A partial
 #    success reported as a single verdict is a defect.
 #

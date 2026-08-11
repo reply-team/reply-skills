@@ -257,8 +257,9 @@ const read_contract = () => {
     // operation in order to say it does not exist, and that sentence must not read as a reference
     // to a missing one. Resolving them here, rather than exempting the file that says it, keeps a
     // genuine typo in the same paragraph visible.
+    let declared_absent = 0;
     for (const absent of registry.declared_absent ?? []) {
-        if (absent?.name) names.add(absent.name);
+        if (absent?.name && !names.has(absent.name)) { names.add(absent.name); declared_absent++; }
     }
 
     for (const file of markdown_under(skill.dir)) {
@@ -266,7 +267,7 @@ const read_contract = () => {
     }
 
     // Sorted, so the nearest-name hint is the same on every machine when two names tie.
-    return { names, sorted: [...names].sort(), entities, fragments: fragments.length };
+    return { names, sorted: [...names].sort(), entities, fragments: fragments.length, declared_absent };
 };
 
 // ------------------------------------------------------------- nearest by name
@@ -394,5 +395,11 @@ if (unresolved.length) {
     process.exit(1);
 }
 
+// The resolving set is one name larger than the contract: a declared absence is a name the
+// contract states it does not define, and it resolves so that the sentence saying so does not
+// read as a reference to a missing operation. Counting it as an operation would publish a
+// contract size that is wrong by exactly the number of absences we were careful to declare.
 console.log(`OK — ${plural(references, 'operation reference')} across ${plural(files.length, 'file')} `
-    + `resolve to ${plural(contract.names.size, 'operation')} in ${plural(contract.fragments, 'fragment')}.`);
+    + `resolve to ${plural(contract.names.size - contract.declared_absent, 'operation')} in `
+    + `${plural(contract.fragments, 'fragment')}`
+    + (contract.declared_absent ? `, plus ${plural(contract.declared_absent, 'name')} the contract declares absent.` : '.'));

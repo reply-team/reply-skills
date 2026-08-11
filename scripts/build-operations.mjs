@@ -72,6 +72,16 @@ const FRAGMENT_FILE = /^(\d{2})-([a-z0-9-]+)\.yaml$/;
 const BEGIN_MARKER = '<!-- BEGIN GENERATED core-operations -->';
 const END_MARKER = '<!-- END GENERATED core-operations -->';
 
+// Every key an operation may carry. A typo is otherwise silent and the silence is the damage:
+// `question: [4]` parses, carries no meaning, and detaches an operation from the fork that owns
+// it while the file still reads as though the binding were there. An unknown key is a mistake or
+// a schema change, and a schema change belongs in families.yaml first.
+const OPERATION_KEYS = new Set([
+    'name', 'core', 'intent', 'reach', 'reversibility', 'approval', 'approval_artefact',
+    'approval_departs', 'approval_reason', 'before_repeating', 'cost', 'cost_basis', 'meter',
+    'idempotency_key', 'accepts_collection', 'per_item_results', 'questions',
+]);
+
 // A property is either a scalar or a conditional block. Every gate below runs against the
 // block's `value`, which the schema fixes as the more dangerous side, so a conditional can
 // describe a softer case without ever softening the gate.
@@ -334,6 +344,23 @@ for (const frag of fragments) {
     for (const op of frag.operations) {
         const where = `${frag.file} ${op.name ?? '<unnamed>'}`;
 
+        for (const key of Object.keys(op)) {
+            if (!OPERATION_KEYS.has(key)) {
+                err(where, `'${key}' is not a key an operation carries. A key nothing reads is worse than a `
+                    + 'missing one: the fragment reads as though the property were declared. The schema is the '
+                    + 'comment block at the top of families.yaml.');
+            }
+        }
+        if (op.intent === undefined) err(where, 'has no intent — the sentence a reader recognises the operation by');
+        // Absence reads as the dangerous value everywhere else, and there is no dangerous default
+        // here to fall back on: "what to read before running this again" is either answered or the
+        // operation cannot be retried safely at all. It rendered as an em dash and read as "nothing
+        // at stake", which is one of the answers rather than the absence of one.
+        if (op.before_repeating === undefined) {
+            err(where, 'declares no before_repeating — state the observable to read before running it again, '
+                + 'or state `nothing at stake`, which is an answer and not a blank');
+        }
+
         for (const [key, value] of Object.entries(op)) {
             if (!is_block(value)) continue;
             if (!CONDITIONAL_KEYS.includes(key)) {
@@ -372,8 +399,24 @@ for (const frag of fragments) {
                     + 'Policy may raise the class, and every raise sets approval_departs: true with an approval_reason.');
         }
 
-        if (reach === 'act' && key !== 'required') {
-            err(where, `reach resolves to \`act\` but idempotency_key resolves to \`${key ?? 'absent'}\` — every act takes a key`);
+        // Two of the key obligation's grounds are checkable here and both are checked. The other
+        // two are not, and it is worth saying why rather than leaving a legend that promises four
+        // and a build that agrees with one. "A write that creates a durable object" has no field
+        // to read — inventing one to make the check symmetrical would be a schema serving the
+        // checker. "A write that accepts a collection" is checkable, but the contract itself
+        // exempts the cases where a repeat is harmless by construction: an absolute-valued setter
+        // writes the same value again (`autonomy.set`, `goal.define`), and an operation naming a
+        // terminal state reaches the same state again (`job.cancel`). Enforcing it mechanically
+        // would overrule six rows that state their exemption in words, so it stays a rule a
+        // reviewer applies, and the legend now says what is actually required.
+        if (key !== 'required') {
+            const grounds = [
+                reach === 'act' ? 'reach resolves to `act`' : null,
+                cost === 'metered' ? 'the call is metered, and a lost result costs real money to obtain again' : null,
+            ].filter(Boolean);
+            if (grounds.length) {
+                err(where, `idempotency_key resolves to \`${key ?? 'absent'}\`, but ${grounds.join('; ')} — a key is required`);
+            }
         }
         // The approximation for "accepts a collection but reports one verdict": a key is
         // required (so a collection or a durable write is in play) yet no per-item outcome
@@ -514,8 +557,10 @@ const LEGEND = `**Reading the table.** † marks a core operation. The five prop
 (\`auto\` · \`confirm_once\` · \`confirm_each\`, derived from reversibility × reach), *before repeating*
 (the observable state to read before running it again) and *cost* (\`none\` · \`metered\`, with its
 basis and the meter it consumes). *Key* and *per-item* are the two standing obligations: an
-idempotency key on every act, every collection write, every durable create and every metered
-call; and one outcome per item whenever a collection is carried. Where a property is conditional
+idempotency key on every act, every metered call, every write accepting a collection and every
+write creating a durable object — except where a repeat is harmless by construction, which is an
+absolute-valued setter or an operation naming a terminal state; and one outcome per item whenever
+a collection is carried. Where a property is conditional
 the cell holds the dangerous reading, with the condition beneath it.`;
 
 const cell = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
@@ -891,6 +936,28 @@ if (begin === -1 || end === -1) {
         file: SKILL_FILE,
         text: `${skill_text.slice(0, begin + BEGIN_MARKER.length)}\n\n${core_table()}\n${skill_text.slice(end)}`,
     });
+}
+
+// A generated file nobody generates any more. Rename a family and its old catalog stays on disk,
+// fully formatted, carrying the properties of operations that have moved — and the freshness check
+// never notices, because it walks the list of files it means to write and this one is not on it.
+// The stale copy is the dangerous one: it reads exactly like the current one. Anything carrying the
+// generated header and not claimed by a target is therefore reported as an orphan, which also
+// means the header is load-bearing and not decoration.
+const claimed = new Set(targets.map(t => path.resolve(t.file)));
+for (const dir of [REFERENCES_DIR, ...ADAPTER_SKILLS.map(name => {
+    const s = skill_dirs().find(d => d.name === name);
+    return s ? path.join(s.dir, 'references') : null;
+}).filter(Boolean)]) {
+    if (!fs.existsSync(dir)) continue;
+    for (const entry of fs.readdirSync(dir)) {
+        if (!entry.endsWith('.md')) continue;
+        const file = path.join(dir, entry);
+        if (claimed.has(path.resolve(file))) continue;
+        if (!fs.readFileSync(file, 'utf8').startsWith(HEADER)) continue;
+        err(path.relative(ROOT, file).replace(/\\/g, '/'), 'is generated but nothing generates it any more — '
+            + 'an orphan left by a rename still reads as current. Delete it, or restore whatever emitted it.');
+    }
 }
 
 if (errors.length) {

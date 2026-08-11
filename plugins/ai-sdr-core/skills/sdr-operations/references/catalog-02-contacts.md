@@ -12,8 +12,10 @@ Generated from the contract fragments in `operations/`. Edit a fragment, not thi
 (`auto` · `confirm_once` · `confirm_each`, derived from reversibility × reach), *before repeating*
 (the observable state to read before running it again) and *cost* (`none` · `metered`, with its
 basis and the meter it consumes). *Key* and *per-item* are the two standing obligations: an
-idempotency key on every act, every collection write, every durable create and every metered
-call; and one outcome per item whenever a collection is carried. Where a property is conditional
+idempotency key on every act, every metered call, every write accepting a collection and every
+write creating a durable object — except where a repeat is harmless by construction, which is an
+absolute-valued setter or an operation naming a terminal state; and one outcome per item whenever
+a collection is carried. Where a property is conditional
 the cell holds the dangerous reading, with the condition beneath it.
 
 | Operation | Intent | Reach | Reversibility | Approval | Before repeating | Cost | Key | Per-item | Invariants |
