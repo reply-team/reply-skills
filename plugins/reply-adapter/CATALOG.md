@@ -6,7 +6,7 @@
 
 Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.
 
-**Pack:** `reply-adapter` v0.2.0 · **Depends on:** `ai-sdr-core`
+**Pack:** `reply-adapter` v0.3.0 · **Depends on:** `ai-sdr-core`
 
 ### Execution — driving the Reply platform
 

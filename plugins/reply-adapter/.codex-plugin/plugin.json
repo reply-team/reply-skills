@@ -1,6 +1,6 @@
 {
   "name": "reply-adapter",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.",
   "author": {
     "name": "Reply.io"

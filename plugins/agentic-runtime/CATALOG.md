@@ -6,7 +6,7 @@
 
 Durable multi-session work: goals, plans, work items, checkpoints, resumability, execution reports and user memory in a plain-markdown workspace. Optional — skip it if your orchestrator already provides durable work.
 
-**Pack:** `agentic-runtime` v0.1.0 · **Depends on:** `ai-sdr-core`
+**Pack:** `agentic-runtime` v0.1.1 · **Depends on:** `ai-sdr-core`
 
 ### Runtime — durable long-running work
 

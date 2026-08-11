@@ -35,7 +35,7 @@
     {
       "name": "reply-adapter",
       "displayName": "Reply.io Adapter",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "layers": ["L4 Reply execution surfaces"],
       "description": "Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.",
       "dependencies": ["ai-sdr-core"],
@@ -55,7 +55,7 @@
     {
       "name": "agentic-runtime",
       "displayName": "Agentic Runtime",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "layers": ["L5 long-running work & runtime coordination"],
       "description": "Durable multi-session work: goals, plans, work items, checkpoints, resumability, execution reports and user memory in a plain-markdown workspace. Optional — skip it if your orchestrator already provides durable work.",
       "dependencies": ["ai-sdr-core"],

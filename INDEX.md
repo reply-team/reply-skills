@@ -36,7 +36,7 @@ Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound s
 | [linkedin-guardrails](plugins/ai-sdr-core/skills/linkedin-guardrails/SKILL.md) | Keep social accounts safe under automation: invitation pacing, messaging windows, metered allowances, daily limits and recovery when the platform restricts an account. Use before any LinkedIn outreach volume, when configuring account limits, or when an account shows a warning. | draft | 0.3.0 |
 | [sending-guardrails](plugins/ai-sdr-core/skills/sending-guardrails/SKILL.md) | Protect sender reputation and inbox placement: domain authentication, warm-up, volume pacing, bounce interpretation and recovery. Use before launching significant email volume, when bounce rates rise, when replies collapse, or when a sending account or domain is new. | draft | 0.3.0 |
 
-## Reply.io Adapter — `reply-adapter` v0.2.0
+## Reply.io Adapter — `reply-adapter` v0.3.0
 
 Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.
 
@@ -52,7 +52,7 @@ Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API
 | [reply-mcp](plugins/reply-adapter/skills/reply-mcp/SKILL.md) | Connect Reply.io to an MCP-compatible AI client (Claude, ChatGPT, Codex, Cursor) via the remote server mcp.reply.io, choose the right auth, and decide when to use MCP tools versus the CLI. Use when setting up the Reply MCP connection or choosing between MCP and CLI execution. | reviewed | 1.2.0 |
 | [reply-operations-mapping](plugins/reply-adapter/skills/reply-operations-mapping/SKILL.md) | Maps the vendor-neutral SDR operation contract onto Reply.io execution: which API v3 endpoint group and doc page performs an operation, which scope it needs, how far Reply keeps the operation's promise, and how Reply's errors translate back into operation outcomes. Use when a plan names an operation and you need to perform it against Reply, when a Reply response needs interpreting in business terms, or when you need to know whether Reply can do a thing at all before promising it to a user. | draft | 2.0.0 |
 
-## Agentic Runtime — `agentic-runtime` v0.1.0
+## Agentic Runtime — `agentic-runtime` v0.1.1
 
 Durable multi-session work: goals, plans, work items, checkpoints, resumability, execution reports and user memory in a plain-markdown workspace. Optional — skip it if your orchestrator already provides durable work.
 
