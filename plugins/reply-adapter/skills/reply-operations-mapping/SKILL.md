@@ -315,8 +315,12 @@ record or it is lost.
 
 ## Reporting
 
-Report in operation terms with Reply identifiers attached — `campaign.enroll → sequence 12345,
-214 requested, 211 enrolled, 3 already in the campaign`. Include background-job identifiers, the
+Report in operation terms, with Reply identifiers attached and marked as Reply's —
+`campaign.enroll → campaign "Q3 SaaS founders" (Reply sequence id 12345), 214 requested,
+211 enrolled, 3 already in the campaign`. A durable artefact names the entity the way the contract
+names it, always; the product's own word survives only inside the identifier it labels, where a
+reader can see it is an identifier and not a claim about what the entity is. Include
+background-job identifiers, the
 idempotency key sent, the endpoint groups used for writes, and any scope or team change the run
 required.
 

@@ -23,7 +23,7 @@ a future clean-up of either, because they are cleared by different people doing 
 | Marker | What it marks | What resolves it | Where it lives |
 |---|---|---|---|
 | `TODO(expert):` | An unvalidated number or playbook — a sending cap, a ramp curve, a response window, a pacing rule. The shape is right; the value is a guess. | Evidence from real runs, or an expert's judgement on a value. | Playbook and guardrail skills, in prose. |
-| `OPEN QUESTION n:` | A fork in the contract we cannot decide alone. `n` is the number in this file and nowhere else. | A decision. It then changes an operation fragment — a property, an option, sometimes a verb that exists or stops existing. | This file, and `questions: [n]` on the operations in `operations/` that the fork leaves unsettled. |
+| an open question `n` | A fork in the contract we cannot decide alone. `n` is the number in this file and nowhere else. | A decision. It then changes an operation fragment — a property, an option, sometimes a verb that exists or stops existing. | A `## n.` heading in this file, and `questions: [n]` on the operations in `operations/` that the fork leaves unsettled — printed on their catalog rows, and checked: a question carried by no operation fails the build. |
 
 A `TODO(expert)` is answered with a number. An open question is answered with a choice, and the
 answer has to be written back into the contract before it means anything.

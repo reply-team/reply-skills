@@ -94,10 +94,13 @@ skills deliberately do not, because a prefix would imply a coupling that must no
   - `TODO(expert):` — an unvalidated number or playbook: a sending cap, a ramp curve, a response
     window. The shape is right, the value is a guess. Resolved by evidence from real runs, or by an
     expert's judgement on that value.
-  - `OPEN QUESTION n:` — a fork in the contract we cannot decide alone, `n` keyed to the
-    open-questions reference inside the `sdr-operations` skill and numbered nowhere else. Resolved
-    by a decision, which is then written into the operation fragment it changes — a property, an
-    option, sometimes a verb that exists or stops existing.
+  - an **open question `n`** — a fork in the contract we cannot decide alone. It is stated under a
+    `## n.` heading in the open-questions reference inside the `sdr-operations` skill, numbered
+    nowhere else, and bound to every operation it leaves unsettled by `questions: [n]` in the
+    operation fragment, which the generated catalogs print on the row as *questions: n*. The
+    binding is the marker, and it is checked: a question carried by no operation fails the build.
+    Resolved by a decision, which is then written into the operation fragment it changes — a
+    property, an option, sometimes a verb that exists or stops existing.
 
   They stay separate because different people clear them, doing different work: one is answered
   with a number from a real run, the other with a choice that has to be written back into the

@@ -92,10 +92,12 @@ a reader knows before relying on it. There are two markers, and they mark differ
 - `TODO(expert): …` — an unvalidated number or playbook: a sending cap, a ramp curve, a response
   window. The shape is right, the value is a guess. Resolved by evidence from real runs, or by an
   expert's judgement on that value.
-- `OPEN QUESTION n: …` — a fork in the operation contract that cannot be decided here, `n` keyed to
-  the open-questions reference inside the `sdr-operations` skill. Resolved by a decision, which then
-  changes an operation fragment — a property, an option, sometimes a verb that exists or stops
-  existing.
+- an **open question `n`** — a fork in the operation contract that cannot be decided here. It is
+  stated under a `## n.` heading in the open-questions reference inside the `sdr-operations` skill,
+  and carried by every operation it leaves unsettled through `questions: [n]` in the operation
+  fragment, which the generated catalogs print on the row. A skill does not restate the fork; it
+  reads the operation's row. Resolved by a decision, which then changes an operation fragment — a
+  property, an option, sometimes a verb that exists or stops existing.
 
 Keep the two spellings apart. Different people clear them, doing different work: one is answered
 with a number, the other with a choice that means nothing until it is written back into the
