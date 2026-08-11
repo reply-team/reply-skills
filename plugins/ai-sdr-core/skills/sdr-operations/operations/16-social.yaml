@@ -10,10 +10,6 @@ family: 16
 
 operations:
 
-  # UNCLEAR: the cost is stated as "metered — per invitation" and names no allowance from the
-  # register. Transcribed against the message meter, the most dangerous reading, because an
-  # invitation carrying a note is a send and would then compete with outreach for the same capacity;
-  # the basis is kept in the source's own words.
   - name: social_invitation.send
     intent: >
       "Connect with them first, then talk" — a connection request, with an optional note.
@@ -29,7 +25,7 @@ operations:
     per_item_results: required
     cost: metered
     cost_basis: per invitation
-    meter: message
+    meter: invitation
     questions: []
 
   - name: social_invitation.list

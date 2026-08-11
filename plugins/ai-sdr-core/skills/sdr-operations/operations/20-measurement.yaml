@@ -128,10 +128,6 @@ operations:
     cost: none
     questions: [13]
 
-  # UNCLEAR: the appendix declares this metered "where the extract consumes an allowance, per call"
-  # but names no meter. `request` — the installation's own call budget, charged per call made — is the
-  # only meter in the register whose basis matches, and it is the meter the appendix names for the
-  # other allowance-charged operation in this batch (`adapter.verify`). Confirm before relying on it.
   - name: export.request
     intent: >
       "Get me a bounded extract for reporting" — never the route for a subject access request, which is

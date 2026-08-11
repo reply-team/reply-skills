@@ -189,6 +189,21 @@ meters:
   - id: request
     consumed_by: the installation's own call budget
     typical_basis: per call made
+  - id: invitation
+    consumed_by: >
+      asking to connect on a channel that meters invitations, whether or not a note travels with the
+      ask
+    typical_basis: per invitation sent
+  - id: test
+    consumed_by: >
+      a deliverability or placement test run through a provider's own seed network, which costs
+      something to run and reaches nobody real
+    typical_basis: per test run
+  - id: registration
+    consumed_by: >
+      submitting a sender, a number or a channel for the approval a channel requires before it will
+      carry anything at all, where the channel charges to register
+    typical_basis: per registration submitted
 
 # `slug` fixes the generated filenames in every pack:
 #   this skill        -> references/catalog-NN-<slug>.md
