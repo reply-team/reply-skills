@@ -50,7 +50,8 @@ operations:
     approval_departs: false
     before_repeating: list campaigns for one already created under this key
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: []
 
@@ -64,7 +65,8 @@ operations:
     approval_departs: false
     before_repeating: a campaign already created under this key
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: []
 
@@ -442,7 +444,8 @@ operations:
     before_repeating: >
       the policy in force; a second define under the same key must not create a second policy.
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: [11]
 

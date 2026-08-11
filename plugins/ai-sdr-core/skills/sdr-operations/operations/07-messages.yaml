@@ -54,7 +54,8 @@ operations:
       read first: no send recorded for this person on this thread or step in the window — a timed-out
       send may already have succeeded.
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost:
       value: metered
       conditional: true

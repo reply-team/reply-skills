@@ -24,7 +24,8 @@ operations:
       outstanding proposals to this person and the slots already offered — a repeat double-books the
       calendar and mails them twice.
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost:
       value: metered
       conditional: true
@@ -58,7 +59,8 @@ operations:
       read first — existing meetings for this person and owner in the window; a booking that timed out
       may already have invited them.
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: []
 
@@ -98,7 +100,8 @@ operations:
     before_repeating: >
       the meeting's current time and each attendee's response.
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: []
 
@@ -115,7 +118,8 @@ operations:
     before_repeating: >
       the meeting's or proposal's state; an already-cancelled one is a success on retry.
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: []
 
@@ -290,6 +294,7 @@ operations:
     before_repeating: >
       whether an open opportunity already exists for this account and this motion.
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: []

@@ -131,7 +131,8 @@ operations:
       read first — whether a call attempt to this person from this identity is already recorded in the
       window; a dial that timed out may already have connected.
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: metered
     cost_basis: per attempt and per connected minute
     meter: call

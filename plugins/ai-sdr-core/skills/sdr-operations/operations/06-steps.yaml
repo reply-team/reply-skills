@@ -202,7 +202,8 @@ operations:
     approval_departs: false
     before_repeating: the template's version list for a draft created under this key
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: []
 
@@ -242,7 +243,8 @@ operations:
     approval_departs: false
     before_repeating: the template's published version
     idempotency_key: required
-    per_item_results: required
+    accepts_collection: false
+    per_item_results: not_applicable
     cost: none
     questions: []
 
