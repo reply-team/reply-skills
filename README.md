@@ -69,7 +69,7 @@ reply skills install --project         # into this repository, not your home
 latest version, and `reply skills remove` takes them out. Add `--dry-run` to any of them to
 see the plan without changing anything.
 
-**Claude Code and Codex are the two hosts this is verified against.** For Cursor, Windsurf,
+**Claude Code, Codex and Cursor are the hosts this is verified against.** For Windsurf,
 Gemini CLI and GitHub Copilot the installer writes the files to each host's documented skills
 directory, but we have not yet confirmed those hosts read them — the command tells you so in
 its output. The per-host sections below are the manual equivalents, for when you would rather
@@ -180,13 +180,15 @@ tooling which detects Codex with `which codex` will wrongly report it as missing
 
 ## Install — Cursor, Windsurf, Gemini CLI and other SKILL.md hosts
 
-> **Not verified yet.** These hosts have no plugin mechanism, so a pack is installed by
-> copying its skills directory. That works because a pack is just a directory of skills, but
-> the exact paths below have not been tested on each host — treat them as a starting point
+> **Verified on Cursor; not yet on the others.** These hosts have no plugin mechanism, so a
+> pack is installed by copying its skills directory. Cursor is confirmed — Cursor 3.14.27 and
+> cursor-agent 2026.08.04-aaa8809, with `reply skills install --agent cursor` writing to
+> `~/.cursor/skills`, or to `.agents/skills` with `--project`. For Windsurf, Gemini CLI and
+> GitHub Copilot the exact paths below have not been tested — treat them as a starting point
 > rather than a contract.
 
-`reply skills install` (above) does this copying for you, to the same unverified paths. These
-manual steps are the equivalent by hand.
+`reply skills install` (above) does this copying for you, to the same paths — verified for
+Cursor and not yet for the others. These manual steps are the equivalent by hand.
 
 No plugin mechanism means no dependency resolution, so **install the core yourself** — every
 other pack needs it:
@@ -212,11 +214,12 @@ starting point, not a promise.
 
 | Channel | Installs | Dependency handling | Layout on disk | Verified |
 |---|---|---|---|---|
-| **`reply skills install`** | Packs | **Resolved by the installer** on every host | Whatever the channel it drives produces | reply CLI 0.4.0 — Claude Code and Codex; other hosts receive files, unconfirmed |
+| **`reply skills install`** | Packs | **Resolved by the installer** on every host | Whatever the channel it drives produces | reply CLI 0.4.0 — Claude Code and Codex; reply CLI 0.5.1 — Cursor; other hosts receive files, unconfirmed |
 | Claude Code plugin marketplace | Packs | **Resolved by the host** — `reply-adapter` pulls `ai-sdr-core` | Namespaced per pack | Claude Code 2.1.220 |
 | `npx skills` / [skills.sh](https://www.skills.sh/reply-team/reply-skills) | Individual skills | **None** — install all 18 yourself | Flat, no namespacing | skills CLI 1.5.21 |
 | Codex plugin marketplace | Packs | **Manual** — install `ai-sdr-core` first; the format has no dependency field | Namespaced per pack | codex-cli 0.146.0-alpha.3.1 |
-| Cursor, Windsurf, Gemini CLI, GitHub Copilot (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, per host path | Not verified |
+| Cursor (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, `~/.cursor/skills` or `.agents/skills` | Cursor 3.14.27, cursor-agent 2026.08.04-aaa8809 |
+| Windsurf, Gemini CLI, GitHub Copilot (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, per host path | Not verified |
 
 The first two channels resolve the `ai-sdr-core` dependency for you. On the rest, installing a
 pack without the core is something you have to avoid deliberately.
