@@ -187,8 +187,8 @@ tooling which detects Codex with `which codex` will wrongly report it as missing
 > GitHub Copilot the exact paths below have not been tested — treat them as a starting point
 > rather than a contract.
 
-`reply skills install` (above) does this copying for you, to the same paths. These
-manual steps are the equivalent by hand.
+`reply skills install` (above) does this copying for you, to the same paths — verified for
+Cursor and not yet for the others. These manual steps are the equivalent by hand.
 
 No plugin mechanism means no dependency resolution, so **install the core yourself** — every
 other pack needs it:
