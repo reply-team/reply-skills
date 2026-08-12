@@ -6,7 +6,7 @@ description: >
   owns. Use when work spans more than one session, when resuming work someone or something
   else started, or when a plan needs to be persisted rather than held in conversation.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   pack: agentic-runtime
   category: runtime
   maturity: draft
@@ -60,14 +60,18 @@ after.
 Three properties make a work item durable:
 
 1. **Small and observable.** It has a stated objective and a way to tell it is done. "Run the
-   campaign" fails both; "enrol the 214 contacts from list *Q3 founders* into sequence 12345"
+   campaign" fails both; "enrol the 214 contacts from list *Q3 founders* into campaign 12345"
    passes.
 2. **Independently resumable.** Enough state recorded that a fresh session can continue from
    the middle. External identifiers get recorded the moment they exist — an identifier that
    only lives in the conversation is lost when the conversation is.
-3. **Idempotent in intent.** Before re-executing anything, check whether the outcome already
-   holds — every operation in the contract names the check to run. This is what makes retry
-   safe, and it is the difference between resuming and duplicating.
+3. **Recoverable by key, then by read.** Two mechanisms, in that order. The **idempotency key**
+   is generated before the first attempt and recorded on the item, so a replay under the same key
+   is the same call rather than a second one — `invocation.get` answers with `never_seen` or
+   `seen_and_failed` and is what turns a timeout into a fact. The key prevents the duplicate;
+   **`before_repeating`**, which every operation in the contract states, detects one the key could
+   not prevent, because between the read and the write the world moves. A key written down after
+   the failure is not a key.
 
 ## Execution guidance
 
@@ -98,9 +102,13 @@ Structure, discovery, and the full file layout are specified in
   unless it persists.
 - **Permanent or validation** — record it in the item's history, mark the item blocked,
   surface it to the user. Do not retry in a loop.
-- **Ambiguous** — the call failed but the effect may have landed. Run the operation's check
-  before doing anything else. This is the case that duplicates real sends when handled
-  carelessly.
+- **Ambiguous** — the call failed but the effect may have landed. Ask `invocation.get` with the
+  key the item recorded: `never_seen` means retry the same call under the same key,
+  `seen_and_failed` means the attempt is accounted for and the outcome is the one to recover. Only
+  where no key was sent does it fall back to reading the operation's `before_repeating` state,
+  which is racy by construction. This is the case that duplicates real sends when handled
+  carelessly, and re-issuing the call instead of recovering its outcome by key is the named
+  failure — a blind retry.
 
 Recovery prefers continuation over restart. Re-running a whole plan because one item failed
 wastes work that succeeded and risks repeating `act` operations.
@@ -125,7 +133,8 @@ state changes, not a transcript.
 - **Work items too coarse to resume**, forcing a restart that repeats `act` operations.
 - **Rewriting a superseded plan** instead of archiving it, destroying the record of what was
   believed and when.
-- **Retrying an ambiguous failure** without running the idempotency check first.
+- **Retrying an ambiguous failure** without recovering the outcome by key first — `invocation.get`
+  before anything else, and `before_repeating` only where no key exists.
 - **A silent `awaiting-approval`** — the work looks finished when it is actually waiting.
 - **Assuming single-writer safety.** These are files with no transactions: two agents writing
   the same workspace concurrently will corrupt each other's view. One operator per workspace.
@@ -150,6 +159,13 @@ secret management, never to a plan, a work item or a log.
 
 ## Changelog
 
+- 1.1.0 (2026-08-11): the retry model was still the pre-rename one — three places instructed "the
+  idempotency check", the term the contract renamed to `before_repeating` precisely so it would stop
+  being confused with the idempotency key, and the key itself appeared nowhere in this pack while the
+  contract makes it primary. Recovery is now stated in the contract's order: the key prevents the
+  duplicate, `invocation.get` turns a timeout into `never_seen` or `seen_and_failed`, and
+  `before_repeating` detects what the key could not prevent. The work-item format and template carry
+  `idempotency-key`, so the format can hold the value that makes work recoverable.
 - 1.0.0 (2026-07-30): initial version. Consolidates the durable-work protocol that was
   previously split between the repository-level workspace specification and the workspace
   mechanics embedded in `outbound-campaign-planning`. The specification now ships inside this

@@ -18,14 +18,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Skill contract & pack architecture
-        run: npm run validate
-
-      - name: Generated manifests are current
-        run: npm run check-manifests
-
-      - name: Generated catalogs are current
-        run: npm run check-index
-
-      - name: Packs install cleanly, per-pack and flattened
-        run: npm run smoke
+      # One step, deliberately: `check` is the whole gate, and it is the same command a
+      # contributor runs locally before pushing. Listing the individual steps here meant CI
+      # and package.json could disagree about what "checked" means — and they did. Two checks
+      # (operation-name resolution in prose, and generated-table freshness) existed in `check`
+      # for a whole branch without CI ever running one of them, while the branch's own
+      # documentation said CI enforced both. Whatever `check` grows next is enforced here the
+      # day it lands, without a second edit anybody has to remember.
+      - name: Full gate — contract, manifests, generated tables, operation names, smoke install
+        run: npm run check

@@ -10,7 +10,7 @@
       "name": "ai-sdr-core",
       "source": "./plugins/ai-sdr-core",
       "description": "Vendor-neutral AI SDR expertise: the SDR business-operation contract, outbound strategy and playbooks, and the guardrails that keep automated outreach safe. Provider-independent — no Reply.io knowledge required.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "Reply.io"
       }
@@ -19,7 +19,7 @@
       "name": "reply-adapter",
       "source": "./plugins/reply-adapter",
       "description": "Executes the AI SDR Core operation contract against Reply.io: the reply CLI, API v3, the MCP server, authentication and scopes, and translation of Reply-specific errors. Replaceable — swap it for another provider's adapter without touching the core.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "Reply.io"
       }
@@ -28,7 +28,7 @@
       "name": "agentic-runtime",
       "source": "./plugins/agentic-runtime",
       "description": "Durable multi-session work: goals, plans, work items, checkpoints, resumability, execution reports and user memory in a plain-markdown workspace. Optional — skip it if your orchestrator already provides durable work.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "Reply.io"
       }

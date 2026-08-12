@@ -9,7 +9,7 @@ Layers classify knowledge. They are the answer to "what kind of thing is this sk
 
 | Layer | Contents |
 |---|---|
-| **L1 — SDR business operations** | Atomic operations in SDR language: add a contact, enrol into a sequence, pause, reply, classify. Vendor-neutral, no provider detail. |
+| **L1 — SDR business operations** | The operation contract, in the language an SDR practitioner already speaks: find a person, put them into a campaign, hold them, answer what comes back, record what it meant, stop when somebody says stop. 325 operations in 21 families, 30 of them core. The layer carries four things — the operations themselves; their five properties (what each one reaches, whether it can be undone, what approval it needs, what to read before repeating it, what it costs, with approval derived from reach and reversibility rather than authored); the rule book the operations may never disagree with — invariants, worked chains, what is deliberately absent, and the open questions; and the lexicon that decides which word means which concept. Vendor-neutral, no provider detail: what a given product can actually perform is L4's statement to make. |
 | **L2 — Strategy & playbooks** | How and when operations compose: audience building, launch, triage, analysis, planning. |
 | **L3 — Protection & guardrails** | Cross-cutting constraints: sending limits, channel limits, approval boundaries, anomaly handling. Not another step — a constraint on all of them. |
 | **L4 — Provider execution** | Mapping L1 onto a real product: endpoints, auth, call ordering, error translation. |
