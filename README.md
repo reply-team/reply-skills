@@ -186,8 +186,9 @@ tooling which detects Codex with `which codex` will wrongly report it as missing
 > writing to `~/.cursor/skills`, or to `.agents/skills` with `--project`. Windsurf is confirmed
 > as well — it ships as Devin 3.6.27 with the devin CLI 3000.3.27, and
 > `reply skills install --agent windsurf` writes to `~/.codeium/windsurf/skills`, or to
-> `.windsurf/skills` with `--project`. For Gemini CLI and GitHub Copilot the exact paths below
-> have not been tested — treat them as a starting point rather than a contract.
+> `.windsurf/skills` with `--project`. For Gemini CLI and GitHub Copilot we have not confirmed
+> which directory the host reads — take the one its own documentation names, and treat it as a
+> starting point rather than a contract.
 
 `reply skills install` (above) does this copying for you, to the same paths — verified for
 Cursor and Windsurf, not yet for the others. These manual steps are the equivalent by hand.
@@ -226,6 +227,11 @@ starting point, not a promise.
 
 The first two channels resolve the `ai-sdr-core` dependency for you. On the rest, installing a
 pack without the core is something you have to avoid deliberately.
+
+Two of the directory-copy rows overlap, which the table does not show: Windsurf also reads
+`.agents/skills`, the directory Cursor uses for `--project`. Copying skills into it for one of
+them makes them visible in the other, and removing them for one changes what the other sees.
+Use the per-host user directory when you want a host's skills to itself.
 
 ## Execution requirements
 
