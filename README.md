@@ -7,7 +7,7 @@ replies, read the numbers honestly — with guardrails that protect your domain 
 approval gates before anything reaches a real person.
 
 Skills are in the open [Agent Skills](https://agentskills.io) format, so they work in Claude
-Code, Codex, Cursor, Gemini CLI and any `SKILL.md`-compatible host.
+Code, Codex, Cursor, Antigravity and any `SKILL.md`-compatible host.
 
 ## Three packs
 
@@ -69,9 +69,9 @@ reply skills install --project         # into this repository, not your home
 latest version, and `reply skills remove` takes them out. Add `--dry-run` to any of them to
 see the plan without changing anything.
 
-**Claude Code, Codex, Cursor and Windsurf are the hosts this is verified against.** For
-Gemini CLI and GitHub Copilot the installer writes the files to each host's documented skills
-directory, but we have not yet confirmed those hosts read them — the command tells you so in
+**Claude Code, Codex, Cursor, Windsurf and Antigravity are the hosts this is verified
+against.** For GitHub Copilot the installer writes the files to the host's documented skills
+directory, but we have not yet confirmed the host reads them — the command tells you so in
 its output. The per-host sections below are the manual equivalents, for when you would rather
 not install the CLI.
 
@@ -178,20 +178,23 @@ reach the model — 9 + 5 + 4, confirmed via `codex debug prompt-input`. Re-runn
 `%LOCALAPPDATA%\OpenAI\Codex\bin\<hash>\codex.exe`. Call it by full path, and note that
 tooling which detects Codex with `which codex` will wrongly report it as missing.
 
-## Install — Cursor, Windsurf, Gemini CLI and other SKILL.md hosts
+## Install — Cursor, Windsurf, Antigravity and other SKILL.md hosts
 
-> **Verified on Cursor and Windsurf; not yet on the others.** These hosts have no plugin
-> mechanism, so a pack is installed by copying its skills directory. Cursor is confirmed —
-> Cursor 3.14.27 and cursor-agent 2026.08.04-aaa8809, with `reply skills install --agent cursor`
-> writing to `~/.cursor/skills`, or to `.agents/skills` with `--project`. Windsurf is confirmed
-> as well — it ships as Devin 3.6.27 with the devin CLI 3000.3.27, and
-> `reply skills install --agent windsurf` writes to `~/.codeium/windsurf/skills`, or to
-> `.windsurf/skills` with `--project`. For Gemini CLI and GitHub Copilot we have not confirmed
-> which directory the host reads — take the one its own documentation names, and treat it as a
-> starting point rather than a contract.
+> **Verified on Cursor, Windsurf and Antigravity; not yet on GitHub Copilot.** These hosts have
+> no plugin mechanism, so a pack is installed by copying its skills directory. Cursor is
+> confirmed — Cursor 3.14.27 and cursor-agent 2026.08.04-aaa8809, with
+> `reply skills install --agent cursor` writing to `~/.cursor/skills`, or to `.agents/skills`
+> with `--project`. Windsurf is confirmed as well — it ships as Devin 3.6.27 with the devin CLI
+> 3000.3.27, and `reply skills install --agent windsurf` writes to
+> `~/.codeium/windsurf/skills`, or to `.windsurf/skills` with `--project`. Antigravity 2.0.1 is
+> confirmed at `~/.gemini/config/skills`, or `.agents/skills` with `--project`; it is the one
+> host that needs no new session, re-reading its skills every turn. For GitHub Copilot we have
+> not confirmed which directory the host reads — take the one its own documentation names, and
+> treat it as a starting point rather than a contract.
 
 `reply skills install` (above) does this copying for you, to the same paths — verified for
-Cursor and Windsurf, not yet for the others. These manual steps are the equivalent by hand.
+Cursor, Windsurf and Antigravity, not yet for GitHub Copilot. These manual steps are the
+equivalent by hand.
 
 No plugin mechanism means no dependency resolution, so **install the core yourself** — every
 other pack needs it:
@@ -207,7 +210,7 @@ cp -r /tmp/reply-skills/plugins/agentic-runtime/skills/* <host skills dir>/
 
 Omit the packs you do not want — but never copy `reply-adapter` or `agentic-runtime` without
 `ai-sdr-core`, or their skills will reference guidance that is not there. Start a new session
-afterwards.
+afterwards — except on Antigravity, which picks them up in a conversation already open.
 
 ## Install channels — what is actually verified
 
@@ -217,21 +220,22 @@ starting point, not a promise.
 
 | Channel | Installs | Dependency handling | Layout on disk | Verified |
 |---|---|---|---|---|
-| **`reply skills install`** | Packs | **Resolved by the installer** on every host | Whatever the channel it drives produces | reply CLI 0.4.0 — Claude Code and Codex; reply CLI 0.5.1 — Cursor and Windsurf; other hosts receive files, unconfirmed |
+| **`reply skills install`** | Packs | **Resolved by the installer** on every host | Whatever the channel it drives produces | reply CLI 0.4.0 — Claude Code and Codex; reply CLI 0.5.1 — Cursor and Windsurf; the release adding `--agent antigravity` — Antigravity; GitHub Copilot receives files, unconfirmed |
 | Claude Code plugin marketplace | Packs | **Resolved by the host** — `reply-adapter` pulls `ai-sdr-core` | Namespaced per pack | Claude Code 2.1.220 |
 | `npx skills` / [skills.sh](https://www.skills.sh/reply-team/reply-skills) | Individual skills | **None** — install all 18 yourself | Flat, no namespacing | skills CLI 1.5.21 |
 | Codex plugin marketplace | Packs | **Manual** — install `ai-sdr-core` first; the format has no dependency field | Namespaced per pack | codex-cli 0.146.0-alpha.3.1 |
 | Cursor (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, `~/.cursor/skills` or `.agents/skills` | Cursor 3.14.27, cursor-agent 2026.08.04-aaa8809 |
 | Windsurf (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, `~/.codeium/windsurf/skills` or `.windsurf/skills` | Devin 3.6.27, devin CLI 3000.3.27 |
-| Gemini CLI, GitHub Copilot (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, per host path | Not verified |
+| Antigravity (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, `~/.gemini/config/skills` or `.agents/skills` | Antigravity 2.0.1 |
+| GitHub Copilot (directory copy) | Skills, by copying | **Manual** — copy `ai-sdr-core` first | Flat, per host path | Not verified |
 
 The first two channels resolve the `ai-sdr-core` dependency for you. On the rest, installing a
 pack without the core is something you have to avoid deliberately.
 
-Two of the directory-copy rows overlap, which the table does not show: Windsurf also reads
-`.agents/skills`, the directory Cursor uses for `--project`. Copying skills into it for one of
-them makes them visible in the other, and removing them for one changes what the other sees.
-Use the per-host user directory when you want a host's skills to itself.
+Several of the directory-copy rows overlap, which the table does not show: Windsurf also reads
+`.agents/skills`, the directory Cursor and Antigravity use for `--project`. Copying skills into
+it for one of them makes them visible in the others, and removing them for one changes what the
+others see. Use the per-host user directory when you want a host's skills to itself.
 
 ## Execution requirements
 
