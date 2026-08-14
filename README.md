@@ -229,9 +229,10 @@ The first two channels resolve the `ai-sdr-core` dependency for you. On the rest
 pack without the core is something you have to avoid deliberately.
 
 Two of the directory-copy rows overlap, which the table does not show: Windsurf also reads
-`.agents/skills`, the directory Cursor uses for `--project`. Copying skills into it for one of
-them makes them visible in the other, and removing them for one changes what the other sees.
-Use the per-host user directory when you want a host's skills to itself.
+`.agents/skills`, the directory Cursor and Codex use for `--project` — Codex's plugin mechanism
+is user-scoped, so a project-scope install falls back to copying there. Copying skills into it
+for one of them makes them visible in the others, and removing them for one changes what the
+others see. Use the per-host user directory when you want a host's skills to itself.
 
 ## Execution requirements
 
