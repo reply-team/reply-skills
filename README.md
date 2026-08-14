@@ -188,7 +188,9 @@ tooling which detects Codex with `which codex` will wrongly report it as missing
 > 3000.3.27, and `reply skills install --agent windsurf` writes to
 > `~/.codeium/windsurf/skills`, or to `.windsurf/skills` with `--project`. Antigravity 2.0.1 is
 > confirmed at `~/.gemini/config/skills`, or `.agents/skills` with `--project`; it is the one
-> host that needs no new session, re-reading its skills every turn. For GitHub Copilot we have
+> host that needs no new session, re-reading its skills every turn. The CLI decides that host is
+> present by looking for `~/.gemini/antigravity`, which is not the directory it writes to — if
+> your install goes undetected, that is the one to check. For GitHub Copilot we have
 > not confirmed which directory the host reads — take the one its own documentation names, and
 > treat it as a starting point rather than a contract.
 
