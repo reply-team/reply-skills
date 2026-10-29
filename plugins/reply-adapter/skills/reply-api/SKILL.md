@@ -102,9 +102,9 @@ per-page `.md` fetches; the spec is large.
     cancelled. `direct_send.not_found` says Reply holds no send under the reference, and
     `direct_send.not_owned` that it holds one for an account this one is not; neither is repeated.
     A failed send carries Reply's `failure_code`: `directSend.dispatchWindowMissed` is `failed` -
-    "Nothing went out; sending again is safe" - while `directSend.dispatchInterrupted` reads
-    `unknown` - "It may have gone out; check before sending again" - so read the person's thread
-    before any new send.
+    "Nothing went out; sending again is safe" - while `directSend.dispatchInterrupted` is to be
+    read as `unknown`, not `failed`: it may have gone out - "check before sending again" - so read
+    the person's thread before any new send.
   - **A lost answer:** where an earlier try returned a `reference`, read it first with `reply
     direct-send get <reference>` (from reply-cli 0.17.0), and let its state decide; repeat only
     when the read says nothing of the send. Reply keeps a key for a day, so a repeat goes under
