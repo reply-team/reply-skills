@@ -6,7 +6,7 @@ description: >
   Use before calling any non-trivial v3 endpoint, when choosing an endpoint for a task,
   or when an API call fails and needs interpretation.
 metadata:
-  version: 1.1.0
+  version: 1.2.0
   pack: reply-adapter
   category: execution
   maturity: reviewed
@@ -64,6 +64,13 @@ per-page `.md` fetches; the spec is large.
   with JSON Pointers to the offending fields — read them, fix, retry once.
 - **Async:** long operations return `202 Accepted` + `Location: /v3/background-jobs/{id}`.
   Poll that endpoint until it completes; report the job result, not the 202.
+- **Change feed:** `GET /v3/inbox/threads/changes` lists the inbox threads that changed, oldest
+  first, a page at a time from an opaque `cursor` or a `since` moment, and holds the last 30 days
+  only; from reply-cli 0.17.0 it is `reply inbox changes`. Keep the cursor it hands back, even on an
+  empty page, and pass it unchanged. A cursor or moment older than the window is refused (CLI code
+  `inbox.cursor_expired`), and so is a cursor the feed never issued or one ahead of its clock (CLI
+  code `inbox.cursor_refused`): read again from a moment inside the window. An account whose Reply
+  has no feed yet answers a bare 404 — page through the inbox threads instead.
 - **Rate limits:** 100 req/min and 3000 req/hour per user; reporting and sequence-stats endpoints
   are stricter. On 429 the CLI already retried honoring `Retry-After` — if it still fails, wait
   and reduce concurrency (sequential calls for bulk work).
@@ -108,6 +115,7 @@ skill's confirmation rules — especially anything that sends messages or starts
 
 ## Changelog
 
+- 1.2.0 (2026-10-29): the inbox change feed, `GET /v3/inbox/threads/changes`, and its window.
 - 1.1.0 (2026-07-30): moved into the `reply-adapter` pack; category `technical` → `execution`;
   `auth-and-keys` renamed `reply-auth`.
 - 1.0.0 (2026-07-27): initial version against docs.reply.io (v3, July 2026).
