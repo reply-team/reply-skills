@@ -18,7 +18,7 @@ message sent to someone who should never have received it — so when an operati
 and name what the documentation says. Never substitute something that returns approximately the right
 shape.
 
-**Coverage.** 325 of 325 operations carry an entry — 43 direct, 6 composed, 82 partial, 194 absent. 0 have no entry at all: nothing is claimed about them in either direction, and they are named row by row, as *not assessed*, in their family mapping table. The table at the foot of this file is where to look for the shape of that silence.
+**Coverage.** 325 of 325 operations carry an entry — 43 direct, 6 composed, 84 partial, 192 absent. 0 have no entry at all: nothing is claimed about them in either direction, and they are named row by row, as *not assessed*, in their family mapping table. The table at the foot of this file is where to look for the shape of that silence.
 
 ## 01 — Discovery, enrichment and verification
 
@@ -256,12 +256,16 @@ shape.
   - *Missing:* Only a reply inside an existing thread. The contract's message.send is one message to one person on one channel, including the first one; opening a new conversation outside a campaign has no surface here.
   - *Surface:* inbox -> Send a reply within a thread
   - *Notes:* The reply goes out on the thread's own channel. If that channel's account is disconnected the send fails — tell the user to reconnect, and never switch channel silently.
-- `message.schedule` — **absent**
-  - *Because:* The direct send endpoints take no send-at field and no scheduled-send surface is documented anywhere. A manual-email task dated for the 14th is queued work for a person, not a queued send, and offering it as one promises the user something nobody will do while they are away.
+- `message.schedule` — **partial**
+  - *Missing:* Only a send outside any campaign, and only where the account's Reply has the route. From reply-cli 0.17.0 the direct sends take `--send-after`, a moment with its offset, which the CLI sends as UTC, and Reply holds the send until then; a moment already past is sent at once. A Reply that does not keep a direct send for later answers a bare 404, and nothing is scheduled. The contract's read before repeating — the pending sends for this person on this thread — has no list surface here: a harness that keeps the reference reads and cancels by it.
+  - *Surface:* direct-outreach -> the direct sends (an email, a LinkedIn message, InMail or voice message, and Send a LinkedIn connection request to a contact), each with its send-after moment
+  - *Notes:* From reply-cli 0.17.0, send with `--idempotency-key`, which goes as the Idempotency-Key header: the same request repeated under the same key answers the send Reply took and sends nothing twice, so a lost answer is repeated under the key rather than read around. Reply honours the key only where it has the direct-send routes, so read `reply direct-send get` of a reference first (from reply-cli 0.17.0): its own `direct_send.not_found` or `direct_send.not_owned` says the routes are there, a bare 404 says they are not, and a key sent there protects nothing. The answer names the send's `reference` and its `state` — `queued` or `sending` means it has not gone yet. Keep the reference; it is the only handle on the send. A manual-email task dated for the 14th is still queued work for a person, not a queued send.
 - `scheduled_message.list` — **absent**
-  - *Because:* Nothing can be scheduled, so nothing is listed. There is no pending-send queue in the documentation to read.
-- `scheduled_message.cancel` — **absent**
-  - *Because:* The same absence. What is genuinely pending is the next touch of a live participation, and stopping that is enrollment.pause or enrollment.stop rather than the cancellation of a queued message.
+  - *Because:* No surface lists the pending sends — not by person, campaign or sender. From reply-cli 0.17.0, `reply direct-send get <reference>` reads one send by its reference — its state, its moment, when it went and why it failed — which answers for a send already known and never for "what is queued". A harness that keeps the reference reads and cancels by it.
+- `scheduled_message.cancel` — **partial**
+  - *Missing:* By reference only, and only where the account's Reply has the route. From reply-cli 0.17.0, `reply direct-send cancel <reference>` cancels one direct send still held for its moment. Nothing lists the pending sends, so a harness that keeps the reference reads and cancels by it; a send whose reference was not kept cannot be found to cancel. What is pending in a live participation is still the next touch of a campaign, and stopping that is enrollment.pause or enrollment.stop rather than this.
+  - *Surface:* direct-outreach -> the direct send's cancel, by its reference
+  - *Notes:* A cancel of a send already cancelled is a success, and one whose answer was lost is safe to run again. A send that has gone answers `direct_send.already_sent` and one that failed `direct_send.already_failed`: report it as gone or failed, never as cancelled. A bare 404 means the account's Reply does not have the route yet.
 
 ## 08 — Enrollment
 
@@ -851,7 +855,7 @@ A family whose *not assessed* column is not zero has not been fully answered for
 | 04 Import · [mapping-04-import.md](mapping-04-import.md) | 5 | 0 | 1 | 2 | 2 | 0 |
 | 05 Campaign, schedule, windows and limits · [mapping-05-campaigns.md](mapping-05-campaigns.md) | 26 | 7 | 2 | 11 | 6 | 0 |
 | 06 Steps, content and content policy · [mapping-06-steps.md](mapping-06-steps.md) | 18 | 6 | 0 | 6 | 6 | 0 |
-| 07 Messages · [mapping-07-messages.md](mapping-07-messages.md) | 5 | 0 | 0 | 2 | 3 | 0 |
+| 07 Messages · [mapping-07-messages.md](mapping-07-messages.md) | 5 | 0 | 0 | 4 | 1 | 0 |
 | 08 Enrollment · [mapping-08-enrollment.md](mapping-08-enrollment.md) | 7 | 3 | 0 | 3 | 1 | 0 |
 | 09 Conversations and activity · [mapping-09-conversations.md](mapping-09-conversations.md) | 9 | 2 | 0 | 2 | 5 | 0 |
 | 10 Task queue and touches · [mapping-10-tasks.md](mapping-10-tasks.md) | 12 | 5 | 1 | 1 | 5 | 0 |

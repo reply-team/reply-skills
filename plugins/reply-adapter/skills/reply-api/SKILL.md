@@ -6,7 +6,7 @@ description: >
   Use before calling any non-trivial v3 endpoint, when choosing an endpoint for a task,
   or when an API call fails and needs interpretation.
 metadata:
-  version: 1.1.0
+  version: 1.2.0
   pack: reply-adapter
   category: execution
   maturity: reviewed
@@ -67,6 +67,15 @@ per-page `.md` fetches; the spec is large.
 - **Rate limits:** 100 req/min and 3000 req/hour per user; reporting and sequence-stats endpoints
   are stricter. On 429 the CLI already retried honoring `Retry-After` — if it still fails, wait
   and reduce concurrency (sequential calls for bulk work).
+- **Direct sends** (from reply-cli 0.17.0): `--send-after <moment>` takes a moment with its offset
+  and sends it as UTC, and Reply holds the send until then. `--idempotency-key <key>` goes as the
+  `Idempotency-Key` header: the same request repeated under it answers the send Reply took rather
+  than sending again; `idempotency_key.in_use` says the first send under it is still being made
+  (wait and repeat), and `idempotency_key.reused` that it was taken for another request, whose send
+  the error's `details` names. The answer carries the send's `reference` and `state`; `reply
+  direct-send get <reference>` reads the send and `reply direct-send cancel <reference>` cancels one
+  still held. Nothing lists the pending sends: a harness that keeps the reference reads and cancels
+  by it.
 
 ### Endpoint availability (GA / Beta / Coming soon)
 
@@ -74,6 +83,12 @@ The docs mark endpoints as **Beta** (shape may change) or **Coming soon** (not c
 much of the AI-SDR cluster (autopilot, pending approvals, enrichment, Live Data) carries such
 marks. Check the endpoint's doc page; if it's Coming soon, say so honestly — never improvise a
 replacement with unrelated endpoints.
+
+Not every account's Reply has every route yet. A bare 404 — no `code` of Reply's own — on a
+direct send, `direct-send get` or `direct-send cancel` means the account's Reply does not have the
+route, not that an identifier is wrong; from reply-cli 0.17.0 the CLI passes it through as
+`reply.refused` with status 404 and no Reply code. Say the capability is not there yet; never
+retry it as a stale identifier.
 
 ## Validation
 
@@ -108,6 +123,9 @@ skill's confirmation rules — especially anything that sends messages or starts
 
 ## Changelog
 
+- 1.2.0 (2026-10-29): *Conventions* names the direct sends' `--send-after` and `--idempotency-key`,
+  the two `idempotency_key.*` codes and `reply direct-send get` and `cancel`, from reply-cli
+  0.17.0; *Endpoint availability* says what a bare 404 on those routes means.
 - 1.1.0 (2026-07-30): moved into the `reply-adapter` pack; category `technical` → `execution`;
   `auth-and-keys` renamed `reply-auth`.
 - 1.0.0 (2026-07-27): initial version against docs.reply.io (v3, July 2026).
