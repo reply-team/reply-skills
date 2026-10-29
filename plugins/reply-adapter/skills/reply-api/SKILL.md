@@ -6,7 +6,7 @@ description: >
   Use before calling any non-trivial v3 endpoint, when choosing an endpoint for a task,
   or when an API call fails and needs interpretation.
 metadata:
-  version: 1.2.0
+  version: 1.3.0
   pack: reply-adapter
   category: execution
   maturity: reviewed
@@ -74,6 +74,30 @@ per-page `.md` fetches; the spec is large.
 - **Rate limits:** 100 req/min and 3000 req/hour per user; reporting and sequence-stats endpoints
   are stricter. On 429 the CLI already retried honoring `Retry-After` — if it still fails, wait
   and reduce concurrency (sequential calls for bulk work).
+- **Direct sends** (from reply-cli 0.17.0): `--send-after <moment>` takes a moment with its offset
+  and sends it as UTC, and Reply holds the send until then. `--idempotency-key <key>` goes as the
+  `Idempotency-Key` header: the same request repeated under it answers the send Reply took rather
+  than sending again; `idempotency_key.in_use` says the first send under it is still being made
+  (wait and repeat), and `idempotency_key.reused` that it was taken for another request, whose send
+  the error's `details` names. The answer carries the send's `reference` and `state`, and its
+  `send_after` where one was given; take each field only when the answer gives it, and read a
+  `send_after` of null as no moment given. `reply direct-send get <reference>` reads the send and
+  `reply direct-send cancel <reference>` cancels one still held. Nothing lists the pending sends: a
+  harness that keeps the reference reads and cancels by it.
+  - **State:** `sent` means it went. `failed` and `cancelled` are final: Reply will not send it,
+    and neither a repeat under the key nor a read changes that. Any other state — `queued`,
+    `sending`, `waitingForSchedule`, or one this skill does not name — means Reply took the send
+    and it has not gone yet. Every such send can still be cancelled except a `sending` one, which
+    Reply is already sending.
+  - **Text:** where the answer carries `rendered_subject` and `rendered_body`, they are the
+    message as sent — the subject rendered, the body rendered with the account's signature and
+    the tracking applied. Reply keeps no other rendered copy.
+  - **A lost answer:** where an earlier try returned a `reference`, read it first with `reply
+    direct-send get <reference>` (from reply-cli 0.17.0), and let its state decide; repeat only
+    when the read says nothing of the send. Reply keeps a key for a day, so a repeat goes under
+    the same key only within 23 hours of the first try. Past that, or where the account's Reply
+    has no direct-send route (a bare 404 on the read), the key no longer settles a repeat: send
+    nothing, and leave whether the first try went to a person to check at Reply.
 
 ### Endpoint availability (GA / Beta / Coming soon)
 
@@ -81,6 +105,12 @@ The docs mark endpoints as **Beta** (shape may change) or **Coming soon** (not c
 much of the AI-SDR cluster (autopilot, pending approvals, enrichment, Live Data) carries such
 marks. Check the endpoint's doc page; if it's Coming soon, say so honestly — never improvise a
 replacement with unrelated endpoints.
+
+Not every account's Reply has every route yet. A bare 404 — no `code` of Reply's own — on a
+direct send, `direct-send get` or `direct-send cancel` means the account's Reply does not have the
+route, not that an identifier is wrong; from reply-cli 0.17.0 the CLI passes it through as
+`reply.refused` with status 404 and no Reply code. Say the capability is not there yet; never
+retry it as a stale identifier.
 
 ## Validation
 
@@ -115,6 +145,12 @@ skill's confirmation rules — especially anything that sends messages or starts
 
 ## Changelog
 
+- 1.3.0 (2026-10-29): *Conventions* names the direct sends' `--send-after` and `--idempotency-key`,
+  the two `idempotency_key.*` codes and `reply direct-send get` and `cancel`, from reply-cli
+  0.17.0, and what a send's answer says: its fields only when given, its state (`sent`, final
+  `failed` and `cancelled`, anything else held), its rendered text as sent, and a lost answer read
+  back by reference first and repeated under the key within 23 hours; *Endpoint availability*
+  says what a bare 404 on those routes means.
 - 1.2.0 (2026-10-29): the inbox change feed, `GET /v3/inbox/threads/changes`, and its window.
 - 1.1.0 (2026-07-30): moved into the `reply-adapter` pack; category `technical` → `execution`;
   `auth-and-keys` renamed `reply-auth`.
