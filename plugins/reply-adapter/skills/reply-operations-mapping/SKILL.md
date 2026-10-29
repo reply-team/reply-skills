@@ -329,9 +329,10 @@ arguments, `args.provider`, `message.send` performed as a direct send by email r
 Reply holds the send until the schedule's first opening, at or after `send_after` where both are
 given. Every other operation leaves the object unread. Another shape or another key is refused
 before anything is sent, with a message that names the shape and quotes nothing of what was given:
-write the object in that shape and ask again. Reply's LinkedIn direct sends read no schedule: one
-sent there is dropped unread and the message goes at once, so a schedule on a LinkedIn message is
-refused before any call. When a schedule serves better than a moment is `reply-api`'s to say.
+write the object in that shape and ask again. Reply refuses a schedule on every LinkedIn direct
+send in this version (scheduleId is not supported for LinkedIn sends in this version, a 400 on
+each LinkedIn route), so a schedule on a LinkedIn message is refused before any call. When a
+schedule serves better than a moment is `reply-api`'s to say.
 
 ### Choosing CLI or MCP
 
