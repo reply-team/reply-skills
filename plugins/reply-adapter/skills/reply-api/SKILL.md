@@ -6,7 +6,7 @@ description: >
   Use before calling any non-trivial v3 endpoint, when choosing an endpoint for a task,
   or when an API call fails and needs interpretation.
 metadata:
-  version: 1.3.0
+  version: 1.4.0
   pack: reply-adapter
   category: execution
   maturity: reviewed
@@ -98,6 +98,30 @@ per-page `.md` fetches; the spec is large.
     the same key only within 23 hours of the first try. Past that, or where the account's Reply
     has no direct-send route (a bare 404 on the read), the key no longer settles a repeat: send
     nothing, and leave whether the first try went to a person to check at Reply.
+- **Schedules** are the account's sending windows: a time zone — the schedule's own, or the
+  recipient's where `use_recipient_time_zone` is true — the active ranges of each weekday, whether
+  holidays are skipped, and the windows of a sequence's later steps. `reply schedule list` (from
+  reply-cli 0.16.0) lists them with their `id`. Reading one, creating one and deleting one go
+  through `reply api`, on the pages of the `schedules` group in `llms.txt`: reply-cli 0.17.0 has no
+  command of its own for them. A schedule is shared, so a change or a delete reaches every sequence
+  that uses it. Its `reply_status` is Reply's word for the first use it finds — a campaign template,
+  a sequence of yours or a team member's, or a default — and a delete is only for one nothing uses.
+  - **On a direct send** (from reply-cli 0.17.0), `--schedule-id <id>` names a schedule from
+    `reply schedule list`, on email only: Reply refuses it on every LinkedIn route. Reply then
+    holds the send until the schedule's first opening at or after `--send-after`, or after now
+    where no moment is given, looking 30 days ahead. The answer's `state` says Reply holds the
+    send, and it names no fixed moment, since Reply only estimates when the schedule opens.
+  - **A schedule or a moment.** A moment is one exact instant somebody chose. A schedule serves
+    better where the right time is the person's working hours in their own time zone, where
+    holidays should be skipped, or where nobody will be awake to time each send: Reply works out
+    the next opening for each person. With both, the send goes at the schedule's first opening at
+    or after the moment.
+  - **A provider object.** Where the runtime carrying the work keeps a provider object beside an
+    operation's arguments (`input.provider`), `message.send` by email reads `{"schedule_id":
+    "<id>"}` and nothing else: the schedule's `id` from `reply schedule list`, written as a string
+    of its digits. Any other shape, another key, or a schedule on LinkedIn is refused before
+    anything is sent, with a message that names the shape; write the object in that shape and ask
+    again.
 
 ### Endpoint availability (GA / Beta / Coming soon)
 
@@ -145,6 +169,11 @@ skill's confirmation rules — especially anything that sends messages or starts
 
 ## Changelog
 
+- 1.4.0 (2026-10-29): *Conventions* names the schedules: `reply schedule list` (from reply-cli
+  0.16.0), reading, creating and deleting one through `reply api`, and that a schedule is shared;
+  `--schedule-id` on a direct send by email (from reply-cli 0.17.0), the first opening at or after
+  the moment where both are given, when a schedule serves better than a moment, and the provider
+  object a `message.send` reads where the runtime keeps one.
 - 1.3.0 (2026-10-29): *Conventions* names the direct sends' `--send-after` and `--idempotency-key`,
   the two `idempotency_key.*` codes and `reply direct-send get` and `cancel`, from reply-cli
   0.17.0, and what a send's answer says: its fields only when given, its state (`sent`, final

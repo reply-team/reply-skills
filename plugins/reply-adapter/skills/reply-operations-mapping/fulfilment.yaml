@@ -134,6 +134,12 @@ operations:
     notes: >
       The reply goes out on the thread's own channel. If that channel's account is disconnected
       the send fails — tell the user to reconnect, and never switch channel silently.
+      Where the runtime carrying the work keeps a provider object beside the operation's
+      arguments (`input.provider`) and the send is a direct send by email, that object is
+      `{"schedule_id": "<id>"}` and nothing else: the `id` of a schedule from `reply schedule
+      list`, written as a string of its digits. It goes as `--schedule-id` (from reply-cli 0.17.0). Another
+      shape, another key, or a schedule on LinkedIn is refused before anything is sent, with a
+      message naming the shape; write the object in that shape and ask again.
 
   - name: contact.enrich
     fulfilment: absent
@@ -1916,8 +1922,12 @@ operations:
       any other state means Reply holds it and it has not gone yet. Keep the reference; it is the
       only handle on the send, and after a lost answer `reply direct-send get` of it is read before
       any repeat. Reply keeps a key for a day, so a repeat goes under it only within 23 hours of
-      the first try; past that, nothing is sent again. A manual-email task dated for the 14th is still
-      queued work for a person, not a queued send.
+      the first try; past that, nothing is sent again. From reply-cli 0.17.0 an email direct send
+      also takes `--schedule-id`, a schedule from `reply schedule list`; Reply refuses it on every
+      LinkedIn route. Reply then holds the send until the schedule's first opening at or after the
+      moment, or after now where none is given, looking 30 days ahead, and the answer names no
+      fixed moment, since Reply only estimates when the schedule opens. A manual-email task dated
+      for the 14th is still queued work for a person, not a queued send.
 
   - name: scheduled_message.list
     fulfilment: absent
