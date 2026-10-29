@@ -314,7 +314,10 @@ with such a surface would resolve against.
 
 The direct sends are the one exception. From reply-cli 0.17.0 they take `--idempotency-key`, and
 Reply answers a repeat of the same request under the same key with the send it took, so a lost
-answer there is repeated under the key: after `reply direct-send get` of a reference the earlier
+answer there — a timeout, a dropped connection, a CLI that died, an exit 0 cut off or unreadable,
+or a 5xx — is repeated under the key, and a send Reply answered with a failure, a 4xx, never is,
+since Reply keeps no key for it; `idempotency_key.in_use` and a rate limit sent nothing and are
+waited out. The repeat comes after `reply direct-send get` of a reference the earlier
 try returned has said nothing of the send, and only within 23 hours of the first try, since Reply
 keeps a key for a day. That holds only where the account's Reply has the
 direct-send routes, which `reply direct-send get` of a reference tells (from reply-cli 0.17.0): a
