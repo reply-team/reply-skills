@@ -320,17 +320,18 @@ keeps a key for a day. That holds only where the account's Reply has the
 direct-send routes, which `reply direct-send get` of a reference tells (from reply-cli 0.17.0): a
 bare 404 there means a key sent to a send protects nothing.
 
-### A provider object beside the arguments
+### A provider object inside the arguments
 
-Where the runtime carrying the work keeps a provider object beside an operation's arguments
-(`input.provider`), `message.send` performed as a direct send by email reads it as
+Where the runtime carrying the work passes the reserved `provider` key inside the operation's
+arguments, `args.provider`, `message.send` performed as a direct send by email reads it as
 `{"schedule_id": "<id>"}` and nothing else: the `id` of one of the account's schedules from
 `reply schedule list` (from reply-cli 0.16.0), written as a string of its digits. It becomes the send's `--schedule-id` (from reply-cli 0.17.0), and
 Reply holds the send until the schedule's first opening, at or after `send_after` where both are
-given. Every other operation leaves the object unread. Another shape, another key, or a schedule
-on a LinkedIn send — Reply times a schedule on email only — is refused before anything is sent,
-with a message that names the shape and quotes nothing of what was given: write the object in that
-shape and ask again. When a schedule serves better than a moment is `reply-api`'s to say.
+given. Every other operation leaves the object unread. Another shape or another key is refused
+before anything is sent, with a message that names the shape and quotes nothing of what was given:
+write the object in that shape and ask again. Reply's LinkedIn direct sends read no schedule: one
+sent there is dropped unread and the message goes at once, so a schedule on a LinkedIn message is
+refused before any call. When a schedule serves better than a moment is `reply-api`'s to say.
 
 ### Choosing CLI or MCP
 
@@ -419,7 +420,7 @@ those as irreversible with no window and say so before acting rather than after.
 
 ## Changelog
 
-- 2.2.0 (2026-10-29): *A provider object beside the arguments* says what `message.send` reads
+- 2.2.0 (2026-10-29): *A provider object inside the arguments* says what `message.send` reads
   there — `{"schedule_id": "<id>"}`, a schedule from `reply schedule list`, by email only — and
   that it becomes `--schedule-id` from reply-cli 0.17.0; `message.send` and `message.schedule` in
   the fulfilment register name it too.

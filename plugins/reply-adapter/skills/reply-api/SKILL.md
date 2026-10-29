@@ -107,21 +107,23 @@ per-page `.md` fetches; the spec is large.
   that uses it. Its `reply_status` is Reply's word for the first use it finds — a campaign template,
   a sequence of yours or a team member's, or a default — and a delete is only for one nothing uses.
   - **On a direct send** (from reply-cli 0.17.0), `--schedule-id <id>` names a schedule from
-    `reply schedule list`, on email only: Reply refuses it on every LinkedIn route. Reply then
-    holds the send until the schedule's first opening at or after `--send-after`, or after now
-    where no moment is given, looking 30 days ahead. The answer's `state` says Reply holds the
+    `reply schedule list`, on email only: Reply's LinkedIn direct sends read no schedule, so one
+    sent there is dropped unread and the message goes at once. Reply then holds the send until the
+    schedule's first opening at or after `--send-after`, or after now where no moment is given,
+    looking 30 days ahead. The answer's `state` says Reply holds the
     send, and it names no fixed moment, since Reply only estimates when the schedule opens.
   - **A schedule or a moment.** A moment is one exact instant somebody chose. A schedule serves
     better where the right time is the person's working hours in their own time zone, where
     holidays should be skipped, or where nobody will be awake to time each send: Reply works out
     the next opening for each person. With both, the send goes at the schedule's first opening at
     or after the moment.
-  - **A provider object.** Where the runtime carrying the work keeps a provider object beside an
-    operation's arguments (`input.provider`), `message.send` by email reads `{"schedule_id":
-    "<id>"}` and nothing else: the schedule's `id` from `reply schedule list`, written as a string
-    of its digits. Any other shape, another key, or a schedule on LinkedIn is refused before
-    anything is sent, with a message that names the shape; write the object in that shape and ask
-    again.
+  - **A provider object.** Where the runtime carrying the work passes the reserved `provider` key
+    inside the operation's arguments, `args.provider`, `message.send` by email reads
+    `{"schedule_id": "<id>"}` and nothing else: the schedule's `id` from `reply schedule list`,
+    written as a string of its digits. Any other shape or another key is refused before anything is
+    sent, with a message that names the shape; write the object in that shape and ask again.
+    Reply's LinkedIn direct sends read no schedule: one sent there is dropped unread and the
+    message goes at once, so a schedule on a LinkedIn message is refused before any call.
 
 ### Endpoint availability (GA / Beta / Coming soon)
 
