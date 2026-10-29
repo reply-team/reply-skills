@@ -128,9 +128,11 @@ operations:
     surface: inbox -> Send a reply within a thread
     scopes: [inbox:operate]
     missing: >
-      Only a reply inside an existing thread. The contract's message.send is one message to one
-      person on one channel, including the first one; opening a new conversation outside a
-      campaign has no surface here.
+      Inside a thread, only a reply. The contract's message.send is one message to one person on
+      one channel, including the first one: from reply-cli 0.17.0 the direct sends (an email, a
+      LinkedIn message, InMail or voice message) send the first one outside any campaign, where
+      the account's Reply has the route; inside a campaign a first message is the campaign's
+      step, with no surface here.
     notes: >
       The reply goes out on the thread's own channel. If that channel's account is disconnected
       the send fails — tell the user to reconnect, and never switch channel silently.

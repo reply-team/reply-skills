@@ -97,7 +97,12 @@ per-page `.md` fetches; the spec is large.
     when the read says nothing of the send. Reply keeps a key for a day, so a repeat goes under
     the same key only within 23 hours of the first try. Past that, or where the account's Reply
     has no direct-send route (a bare 404 on the read), the key no longer settles a repeat: send
-    nothing, and leave whether the first try went to a person to check at Reply.
+    nothing, and leave whether the first try went to a person to check at Reply. Only a lost
+    answer is repeated: a timeout, a dropped connection, a CLI that died, an exit 0 whose answer
+    was cut off or could not be read, or a 5xx. A send Reply answered with a failure, a 4xx, is
+    never repeated, under the key or otherwise: Reply keeps no key for it, so a repeat would be a
+    new send. `idempotency_key.in_use` and a rate limit are the two 4xx that sent nothing, and
+    are waited out as their own rows say.
 
 ### Endpoint availability (GA / Beta / Coming soon)
 

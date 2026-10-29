@@ -253,7 +253,7 @@ shape.
   - *Surface:* email-templates -> Render an email template, Get template variables
   - *Notes:* Renders against one contact identifier, optionally in the context of a campaign and a sending identity so their variables resolve too. Two other renders exist and both carry a beta mark — Get sequence preview for a contact under sequence-contacts, and Generate an AI draft reply under inbox — so say beta out loud before planning a route through either.
 - `message.send` — **partial**
-  - *Missing:* Only a reply inside an existing thread. The contract's message.send is one message to one person on one channel, including the first one; opening a new conversation outside a campaign has no surface here.
+  - *Missing:* Inside a thread, only a reply. The contract's message.send is one message to one person on one channel, including the first one: from reply-cli 0.17.0 the direct sends (an email, a LinkedIn message, InMail or voice message) send the first one outside any campaign, where the account's Reply has the route; inside a campaign a first message is the campaign's step, with no surface here.
   - *Surface:* inbox -> Send a reply within a thread
   - *Notes:* The reply goes out on the thread's own channel. If that channel's account is disconnected the send fails — tell the user to reconnect, and never switch channel silently.
 - `message.schedule` — **partial**
