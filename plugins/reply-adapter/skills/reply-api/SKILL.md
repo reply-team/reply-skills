@@ -101,6 +101,10 @@ per-page `.md` fetches; the spec is large.
     `direct_send.already_failed`: nothing changed, so report it as gone or failed, never as
     cancelled. `direct_send.not_found` says Reply holds no send under the reference, and
     `direct_send.not_owned` that it holds one for an account this one is not; neither is repeated.
+    A failed send carries Reply's `failure_code`: `directSend.dispatchWindowMissed` is `failed` -
+    "Nothing went out; sending again is safe" - while `directSend.dispatchInterrupted` reads
+    `unknown` - "It may have gone out; check before sending again" - so read the person's thread
+    before any new send.
   - **A lost answer:** where an earlier try returned a `reference`, read it first with `reply
     direct-send get <reference>` (from reply-cli 0.17.0), and let its state decide; repeat only
     when the read says nothing of the send. Reply keeps a key for a day, so a repeat goes under
@@ -163,7 +167,8 @@ skill's confirmation rules — especially anything that sends messages or starts
   the two `idempotency_key.*` codes and `reply direct-send get` and `cancel`, from reply-cli
   0.17.0, and what a send's answer says: its fields only when given, its state (`sent`, final
   `failed` and `cancelled`, anything else held), its rendered text as sent, what a read and a
-  cancel answer, a cancel's two refusals and a second cancel a success, and a lost answer read
+  cancel answer, a failed send's two codes, a cancel's two refusals and a second cancel a
+  success, and a lost answer read
   back by reference first and repeated under the key within 23 hours; *Endpoint availability*
   says what a bare 404 on those routes means.
 - 1.2.0 (2026-10-29): the inbox change feed, `GET /v3/inbox/threads/changes`, and its window.
