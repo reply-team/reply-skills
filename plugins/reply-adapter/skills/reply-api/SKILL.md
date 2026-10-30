@@ -6,7 +6,7 @@ description: >
   Use before calling any non-trivial v3 endpoint, when choosing an endpoint for a task,
   or when an API call fails and needs interpretation.
 metadata:
-  version: 1.4.0
+  version: 1.5.0
   pack: reply-adapter
   category: execution
   maturity: reviewed
@@ -92,6 +92,20 @@ per-page `.md` fetches; the spec is large.
   - **Text:** where the answer carries `rendered_subject` and `rendered_body`, they are the
     message as sent — the subject rendered, the body rendered with the account's signature and
     the tracking applied. Reply keeps no other rendered copy.
+  - **Templates:** the text of an email, a LinkedIn message and an InMail is read as a template
+    in Reply's own syntax and filled in for the contact. A send that goes now is filled in before
+    anything goes, and one Reply cannot fill is refused with nothing sent, under a code reply-cli
+    gives it from 0.17.2: on an email, a code of the contact's for variables missing, whose
+    `details.missing_variables` lists the names, or one for a rendering that failed; on LinkedIn,
+    `linkedin.missing_variables`. A send
+    held for a later moment or a schedule is filled in when it goes, so a name Reply cannot fill
+    then is not refused at the send: the send ends `failed`, with no `failure_code` and Reply's
+    sentence as its `failure_reason`. On LinkedIn the sending account carries
+    `SendingLinkedIn.SenderFirstName` and `SendingLinkedIn.SenderName`, and no last name or
+    address, and the text goes as written: it is not HTML. A LinkedIn message's length is the
+    length after the text is filled in (`linkedin.message_too_long`). A connection request's note
+    and a voice message's script are never filled in: either holding `{{` is refused,
+    `linkedin.missing_variables`, so write them as final text.
   - **Read and cancel:** `reply direct-send get <reference>` answers the send's `state`, `channel`
     and `send_after`, and, as they apply, `sent_at` and `message_id` once it went, `failure_reason`
     where it failed and `cancelled_at` where it was cancelled. `reply direct-send cancel
@@ -190,6 +204,11 @@ skill's confirmation rules — especially anything that sends messages or starts
 
 ## Changelog
 
+- 1.5.0 (2026-10-30): *Conventions* says how a direct send's text is filled in as a template:
+  on an email, a LinkedIn message and an InMail; a send that goes now refused by reply-cli 0.17.2's
+  three codes, with the names Reply lists; a held send filled in when it goes and failed then; the
+  LinkedIn sender's two names, the text as written and the length after it is filled in; and a
+  connection request's note and a voice message's script never filled in.
 - 1.4.0 (2026-10-29): *Conventions* names the schedules: `reply schedule list` (from reply-cli
   0.16.0), reading, creating and deleting one through `reply api`, and that a schedule is shared;
   `--schedule-id` on a direct send by email (from reply-cli 0.17.0), the first opening at or after
