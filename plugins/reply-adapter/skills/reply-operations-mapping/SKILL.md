@@ -8,7 +8,7 @@ description: >
   interpreting in business terms, or when you need to know whether Reply can do a thing at all
   before promising it to a user.
 metadata:
-  version: 2.0.0
+  version: 2.3.0
   pack: reply-adapter
   category: execution
   maturity: draft
@@ -116,7 +116,7 @@ would be a product manual with a neutral vocabulary painted on it.
 
 <!-- Generated. Do not edit by hand. -->
 
-All 325 operations carry an entry: **43 direct, 6 composed, 82 partial, 194 absent.**
+All 325 operations carry an entry: **43 direct, 6 composed, 84 partial, 192 absent.**
 
 <!-- END GENERATED adapter-coverage -->
 
@@ -124,7 +124,7 @@ Reaching about a sixth of the contract directly is the true picture, and it is w
 those terms rather than in the terms a mapping is usually written in. A mapping listing only what
 it can do would read as complete while being less useful — the reader would have no way to
 distinguish "not in this document" from "not possible", which is the one distinction they need
-when a plan is being written. The 194 absences are the most informative part of the register, and
+when a plan is being written. The 192 absences are the most informative part of the register, and
 [fulfilment.md](references/fulfilment.md) is long for that reason rather than in spite of it.
 
 **One part of this register has not been researched as thoroughly as the rest, and it is worth
@@ -291,6 +291,11 @@ one — is `audience-building` → *Where an audience comes from*.
 | `403 insufficient_scope` | The credential may not perform this class of operation | Name the missing scope to the user; do not retry. This is also how a capability is discovered here, since no endpoint reports the granted scope set |
 | `403`/`401` `TEAM_REQUIRED` · `TEAM_NOT_ACCESSIBLE` · `USER_REQUIRED` · `USER_NOT_FOUND` | The call could not be attributed to one team or acting user | See `reply-auth`; the CLI prints the exact fix |
 | `404` | The identifier is wrong or stale, so the precondition never held | Re-resolve the entity; never invent an identifier |
+| A bare `404` — no `code` of Reply's own — on a direct send, `direct-send get` or `direct-send cancel` | The account's Reply does not have the route yet; nothing was done | Say the capability is not offered here; never re-resolve or retry it as a stale identifier |
+| `direct_send.not_found` · `direct_send.not_owned` (from reply-cli 0.17.0) | No send this account holds under the reference | Take the reference from the record of the send; never guess one |
+| `direct_send.already_sent` · `direct_send.already_failed` (from reply-cli 0.17.0) | A cancel that came after the send went, or after it failed | Report the send as gone or as failed, never as cancelled; the cancel is not retried |
+| `idempotency_key.in_use` (from reply-cli 0.17.0) | The first send under the key is still being made, and this one sent nothing | Wait, then repeat under the same key |
+| `idempotency_key.reused` (from reply-cli 0.17.0) | The key was taken for another request, and Reply sent nothing for this one; `details` names the send the key holds — its `reference`, `state` and `send_after` | Where the key is the operation's own, that send is the operation's; never send again under a new key |
 | `429` | The operation is fine, the pace is not | Honour `Retry-After`, go sequential. On a measurement pass, cache instead of re-reading |
 | `5xx`, or a dropped connection | Unknown whether the operation took effect | Read the operation's **`before_repeating`** state from the contract first, and let that decide. A retry is only safe because a caller-supplied idempotency key was sent with the original call |
 | Per-contact `not processed` in a bulk result | Partial success — a normal outcome, not an error | Report each reason; offer the corresponding fix |
@@ -306,6 +311,31 @@ the recovery is the operation's own `before_repeating` read against the entity i
 the contact, the participation, the thread — and a blind retry is never the answer. Send the key
 anyway and record it: it is what makes the run reconstructable, and it is what a future adapter
 with such a surface would resolve against.
+
+The direct sends are the one exception. From reply-cli 0.17.0 they take `--idempotency-key`, and
+Reply answers a repeat of the same request under the same key with the send it took, so a lost
+answer there — a timeout, a dropped connection, a CLI that died, an exit 0 cut off or unreadable,
+or a 5xx — is repeated under the key, and a send Reply answered with a failure, a 4xx, never is,
+since Reply keeps no key for it; `idempotency_key.in_use` and a rate limit sent nothing and are
+waited out. The repeat comes after `reply direct-send get` of a reference the earlier
+try returned has said nothing of the send, and only within 23 hours of the first try, since Reply
+keeps a key for a day. That holds only where the account's Reply has the
+direct-send routes, which `reply direct-send get` of a reference tells (from reply-cli 0.17.0): a
+bare 404 there means a key sent to a send protects nothing.
+
+### A provider object inside the arguments
+
+Where the runtime carrying the work passes the reserved `provider` key inside the operation's
+arguments, `args.provider`, `message.send` performed as a direct send by email reads it as
+`{"schedule_id": "<id>"}` and nothing else: the `id` of one of the account's schedules from
+`reply schedule list` (from reply-cli 0.16.0), written as a string of its digits. It becomes the send's `--schedule-id` (from reply-cli 0.17.0), and
+Reply holds the send until the schedule's first opening, at or after `send_after` where both are
+given. Every other operation leaves the object unread. Another shape or another key is refused
+before anything is sent, with a message that names the shape and quotes nothing of what was given:
+write the object in that shape and ask again. Reply refuses a schedule on every LinkedIn direct
+send in this version (scheduleId is not supported for LinkedIn sends in this version, a 400 on
+each LinkedIn route), so a schedule on a LinkedIn message is refused before any call. When a
+schedule serves better than a moment is `reply-api`'s to say.
 
 ### Choosing CLI or MCP
 
@@ -394,6 +424,21 @@ those as irreversible with no window and say so before acting rather than after.
 
 ## Changelog
 
+- 2.3.0 (2026-10-30): `message.send` in the fulfilment register says that a message composed as a
+  template goes by the same command and that Reply fills it in, before anything goes or when it
+  goes, and points to reply-api's *Templates* for the rest.
+- 2.2.0 (2026-10-29): *A provider object inside the arguments* says what `message.send` reads
+  there — `{"schedule_id": "<id>"}`, a schedule from `reply schedule list`, by email only — and
+  that it becomes `--schedule-id` from reply-cli 0.17.0; `message.send` and `message.schedule` in
+  the fulfilment register name it too.
+- 2.1.0 (2026-10-29): `message.schedule` and `scheduled_message.cancel` move from `absent` to
+  `partial`: from reply-cli 0.17.0 a direct send takes `--send-after` and `--idempotency-key`, and
+  `reply direct-send cancel` cancels one by its reference, where the account's Reply has the
+  routes. `scheduled_message.list` stays `absent`, since `reply direct-send get` reads one send by
+  reference and lists nothing. *Error translation* gains the bare 404 of these routes, the
+  `direct_send.*` codes and the two `idempotency_key.*` codes, and the idempotency paragraph names
+  the direct sends as the one place a key settles a lost answer, read back by reference first and
+  repeated under the key only within 23 hours.
 - 2.0.0 (2026-08-10): rewritten against contract 2.0.0. The six hand-written family tables are
   **deleted**: every operation now has an entry in the coverage register `fulfilment.yaml`, from
   which the twenty-one per-family mapping tables and `fulfilment.md` are generated, and this file
