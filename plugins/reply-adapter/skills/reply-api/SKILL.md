@@ -95,7 +95,7 @@ per-page `.md` fetches; the spec is large.
   - **Templates:** the text of an email, a LinkedIn message and an InMail is read as a template
     in Reply's own syntax and filled in for the contact. A send Reply makes within the call is
     filled in before anything goes, and one Reply cannot fill is refused with nothing sent, under a code reply-cli
-    gives it from 0.17.2: on an email, a code of the contact's for variables missing, whose
+    gives it: on an email, from reply-cli 0.17.2, a code of the contact's for variables missing, whose
     `details.missing_variables` lists the names, or one for a rendering that failed; on LinkedIn,
     `linkedin.missing_variables`. A send
     held for a later moment or a schedule, or one that goes now which Reply queues behind the
@@ -106,7 +106,7 @@ per-page `.md` fetches; the spec is large.
     its `failure_reason`. On LinkedIn Reply fills the sending account's
     `SendingLinkedIn.SenderFirstName` and `SendingLinkedIn.SenderName`, and has no variable for
     its last name or its address; the text goes as written, and Reply converts it from HTML to text
-    after filling it in. A LinkedIn message's length is the length after the text is filled in (`linkedin.message_too_long`). A connection request's note
+    after filling it in. A LinkedIn message's or InMail's length is the length after the text is filled in (`linkedin.message_too_long`). A connection request's note
     and a voice message's script are never filled in: either holding `{{` is refused,
     `linkedin.missing_variables`, so write them as final text.
   - **Read and cancel:** `reply direct-send get <reference>` answers the send's `state`, `channel`
