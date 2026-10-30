@@ -144,7 +144,13 @@ operations:
       write the object in that shape and ask again. Reply refuses a schedule on every LinkedIn
       direct send in this version (scheduleId is not supported for LinkedIn sends in this version,
       a 400 on each LinkedIn route), so a schedule on a LinkedIn message is refused before any
-      call.
+      call. A message composed as a template goes by the same command, in Reply's own syntax,
+      and Reply fills it in for the contact: a send Reply makes within the call is filled in
+      before anything goes and refused with nothing sent where Reply cannot fill it; one held for
+      a later moment or a schedule, or queued behind the account's other sends, is filled in when
+      it goes and fails then. The codes, the names Reply lists, the LinkedIn sending account's
+      two names and the formats that are never filled in are under reply-api, Direct sends,
+      Templates.
 
   - name: contact.enrich
     fulfilment: absent

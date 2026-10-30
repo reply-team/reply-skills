@@ -8,7 +8,7 @@ description: >
   interpreting in business terms, or when you need to know whether Reply can do a thing at all
   before promising it to a user.
 metadata:
-  version: 2.2.0
+  version: 2.3.0
   pack: reply-adapter
   category: execution
   maturity: draft
@@ -424,6 +424,9 @@ those as irreversible with no window and say so before acting rather than after.
 
 ## Changelog
 
+- 2.3.0 (2026-10-30): `message.send` in the fulfilment register says that a message composed as a
+  template goes by the same command and that Reply fills it in, before anything goes or when it
+  goes, and points to reply-api's *Templates* for the rest.
 - 2.2.0 (2026-10-29): *A provider object inside the arguments* says what `message.send` reads
   there — `{"schedule_id": "<id>"}`, a schedule from `reply schedule list`, by email only — and
   that it becomes `--schedule-id` from reply-cli 0.17.0; `message.send` and `message.schedule` in
