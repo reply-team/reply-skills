@@ -100,8 +100,10 @@ per-page `.md` fetches; the spec is large.
     `linkedin.missing_variables`. A send
     held for a later moment or a schedule, or one that goes now which Reply queues behind the
     account's other sends, is filled in when it goes, so a name Reply cannot fill
-    then is not refused at the send: the send ends `failed`, with no `failure_code` and Reply's
-    sentence as its `failure_reason`. On LinkedIn Reply fills the sending account's
+    then is not refused at the send: the send ends `failed`. On an email its `failure_code` is
+    `contact.missingVariables`, with the names under `missing_variables`, or `contact.renderingFailed`,
+    as reply-cli 0.17.2 prints them; on LinkedIn it carries no `failure_code`, and Reply's sentence is
+    its `failure_reason`. On LinkedIn Reply fills the sending account's
     `SendingLinkedIn.SenderFirstName` and `SendingLinkedIn.SenderName`, and has no variable for
     its last name or its address; the text goes as written, and Reply converts it from HTML to text
     after filling it in. A LinkedIn message's length is the length after the text is filled in (`linkedin.message_too_long`). A connection request's note
