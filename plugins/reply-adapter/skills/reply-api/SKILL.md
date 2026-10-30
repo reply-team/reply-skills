@@ -103,8 +103,8 @@ per-page `.md` fetches; the spec is large.
     then is not refused at the send: the send ends `failed`, with no `failure_code` and Reply's
     sentence as its `failure_reason`. On LinkedIn Reply fills the sending account's
     `SendingLinkedIn.SenderFirstName` and `SendingLinkedIn.SenderName`, and has no variable for
-    its last name or its address; the text goes as written: it is not HTML. A LinkedIn message's length is the
-    length after the text is filled in (`linkedin.message_too_long`). A connection request's note
+    its last name or its address; the text goes as written, and Reply converts it from HTML to text
+    after filling it in. A LinkedIn message's length is the length after the text is filled in (`linkedin.message_too_long`). A connection request's note
     and a voice message's script are never filled in: either holding `{{` is refused,
     `linkedin.missing_variables`, so write them as final text.
   - **Read and cancel:** `reply direct-send get <reference>` answers the send's `state`, `channel`
