@@ -93,12 +93,13 @@ per-page `.md` fetches; the spec is large.
     message as sent — the subject rendered, the body rendered with the account's signature and
     the tracking applied. Reply keeps no other rendered copy.
   - **Templates:** the text of an email, a LinkedIn message and an InMail is read as a template
-    in Reply's own syntax and filled in for the contact. A send that goes now is filled in before
-    anything goes, and one Reply cannot fill is refused with nothing sent, under a code reply-cli
+    in Reply's own syntax and filled in for the contact. A send Reply makes within the call is
+    filled in before anything goes, and one Reply cannot fill is refused with nothing sent, under a code reply-cli
     gives it from 0.17.2: on an email, a code of the contact's for variables missing, whose
     `details.missing_variables` lists the names, or one for a rendering that failed; on LinkedIn,
     `linkedin.missing_variables`. A send
-    held for a later moment or a schedule is filled in when it goes, so a name Reply cannot fill
+    held for a later moment or a schedule, or one that goes now which Reply queues behind the
+    account's other sends, is filled in when it goes, so a name Reply cannot fill
     then is not refused at the send: the send ends `failed`, with no `failure_code` and Reply's
     sentence as its `failure_reason`. On LinkedIn Reply fills the sending account's
     `SendingLinkedIn.SenderFirstName` and `SendingLinkedIn.SenderName`, and has no variable for
